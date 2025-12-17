@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 3d7ebca8d9572fe4898e07af098909c2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/Scripts/ScriptableObjects/ASP_TextureList.cs
+  uploadId: 828908

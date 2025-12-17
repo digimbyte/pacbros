@@ -1,0 +1,28 @@
+fileFormatVersion: 2
+guid: aa5f165e9b10d2a4fb3b3f264e2adfcd
+timeCreated: 1540649886
+licenseType: Store
+AudioImporter:
+  serializedVersion: 6
+  defaultSettings:
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 0
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  preloadAudioData: 1
+  loadInBackground: 0
+  3D: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 128406
+  packageName: Retro Game Sounds
+  packageVersion: 1.0
+  assetPath: Assets/RetroGameSounds/bounce tick long (1).wav
+  uploadId: 275219

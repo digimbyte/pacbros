@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 66ce03dc8df15ab4ca07fce118b9844c
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226304
+  packageName: Nova
+  packageVersion: 2.1.3
+  assetPath: Assets/Nova/Scripts/Internal/SortGroupInfo.Internal.cs
+  uploadId: 631462

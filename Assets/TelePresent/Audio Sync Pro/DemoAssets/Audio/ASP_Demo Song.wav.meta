@@ -1,0 +1,30 @@
+fileFormatVersion: 2
+guid: d359ba2ff7e2f3a4a98ffb77386f21fc
+AudioImporter:
+  externalObjects: {}
+  serializedVersion: 7
+  defaultSettings:
+    serializedVersion: 2
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 44100
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+    preloadAudioData: 1
+  platformSettingOverrides: {}
+  forceToMono: 0
+  normalize: 1
+  loadInBackground: 0
+  ambisonic: 0
+  3D: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/DemoAssets/Audio/ASP_Demo Song.wav
+  uploadId: 828908

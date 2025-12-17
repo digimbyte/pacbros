@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d7ebca8d9572fe4898e07af098909c2, type: 3}
+  m_Name: ASP_LipTextureList
+  m_EditorClassIdentifier: 
+  textures:
+  - {fileID: 2800000, guid: 5afc7ba3581f4754abe99364b91c0bfd, type: 3}
+  - {fileID: 2800000, guid: d5bf43f232e19c746bb57c8785481e7c, type: 3}
+  - {fileID: 2800000, guid: 887d31a4dfde91b46beefd6f78150f8c, type: 3}
+  - {fileID: 2800000, guid: 24e7259e21ee0694caf15069cf160512, type: 3}
+  - {fileID: 2800000, guid: 452e88bae21aea24a9995f3d437997cf, type: 3}
+  - {fileID: 2800000, guid: 7e8691aae4bb009428ec513cb2a950cb, type: 3}
+  - {fileID: 2800000, guid: 1a2f13ed2c8d38544bc9cecfc68fab17, type: 3}

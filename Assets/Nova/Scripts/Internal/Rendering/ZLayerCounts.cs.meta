@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 8c8d6dd2e3dcf0c47a8db528f5549fd8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226304
+  packageName: Nova
+  packageVersion: 2.1.3
+  assetPath: Assets/Nova/Scripts/Internal/Rendering/ZLayerCounts.cs
+  uploadId: 631462

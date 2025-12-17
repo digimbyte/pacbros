@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 16107b5d812c0d44e8e72bc4b9473a54
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/Scripts/ReactorComponents/Templates/ASPR_BeatTemplate.cs
+  uploadId: 828908

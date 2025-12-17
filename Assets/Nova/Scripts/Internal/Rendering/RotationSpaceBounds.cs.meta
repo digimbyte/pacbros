@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 4797e7829e61a5e4f8413e8cd81220bb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226304
+  packageName: Nova
+  packageVersion: 2.1.3
+  assetPath: Assets/Nova/Scripts/Internal/Rendering/RotationSpaceBounds.cs
+  uploadId: 631462

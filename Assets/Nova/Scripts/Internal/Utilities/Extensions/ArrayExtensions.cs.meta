@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: dceda7b9596e74343a44cf9146ccfd22
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226304
+  packageName: Nova
+  packageVersion: 2.1.3
+  assetPath: Assets/Nova/Scripts/Internal/Utilities/Extensions/ArrayExtensions.cs
+  uploadId: 631462

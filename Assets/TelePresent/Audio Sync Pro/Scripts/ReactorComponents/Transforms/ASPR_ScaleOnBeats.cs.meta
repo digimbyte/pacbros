@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 41ae17d607ae9c149ae80d061f26de42
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/Scripts/ReactorComponents/Transforms/ASPR_ScaleOnBeats.cs
+  uploadId: 828908

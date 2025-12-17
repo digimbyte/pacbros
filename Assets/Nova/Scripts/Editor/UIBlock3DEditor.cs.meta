@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: dcc10e3d6027bfd4f8d9f7a83822ede8
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 226304
+  packageName: Nova
+  packageVersion: 2.1.3
+  assetPath: Assets/Nova/Scripts/Editor/UIBlock3DEditor.cs
+  uploadId: 631462

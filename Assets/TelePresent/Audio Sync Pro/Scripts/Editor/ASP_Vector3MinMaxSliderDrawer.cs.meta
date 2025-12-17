@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: b887ee8361cf5b545ba113cb24c03daf
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/Scripts/Editor/ASP_Vector3MinMaxSliderDrawer.cs
+  uploadId: 828908

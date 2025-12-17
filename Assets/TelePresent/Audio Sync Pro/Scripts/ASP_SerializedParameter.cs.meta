@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: aedfc28ce86b1f547aa4cfa5e24024cc
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/Scripts/ASP_SerializedParameter.cs
+  uploadId: 828908

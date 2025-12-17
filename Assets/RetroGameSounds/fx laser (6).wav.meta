@@ -1,0 +1,28 @@
+fileFormatVersion: 2
+guid: 7c4057e3d560cd741b5e7a9994b5b83c
+timeCreated: 1540649854
+licenseType: Store
+AudioImporter:
+  serializedVersion: 6
+  defaultSettings:
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 0
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  preloadAudioData: 1
+  loadInBackground: 0
+  3D: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 128406
+  packageName: Retro Game Sounds
+  packageVersion: 1.0
+  assetPath: Assets/RetroGameSounds/fx laser (6).wav
+  uploadId: 275219

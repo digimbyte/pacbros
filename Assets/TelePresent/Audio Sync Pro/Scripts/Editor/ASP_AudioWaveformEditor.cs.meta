@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ef7242f382d5c1240a6a724d08e1d573
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/Scripts/Editor/ASP_AudioWaveformEditor.cs
+  uploadId: 828908

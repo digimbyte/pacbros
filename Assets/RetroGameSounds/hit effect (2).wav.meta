@@ -1,0 +1,28 @@
+fileFormatVersion: 2
+guid: c2a11871743b647469b4b8597f2e82b5
+timeCreated: 1540649903
+licenseType: Store
+AudioImporter:
+  serializedVersion: 6
+  defaultSettings:
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 0
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  preloadAudioData: 1
+  loadInBackground: 0
+  3D: 1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 128406
+  packageName: Retro Game Sounds
+  packageVersion: 1.0
+  assetPath: Assets/RetroGameSounds/hit effect (2).wav
+  uploadId: 275219

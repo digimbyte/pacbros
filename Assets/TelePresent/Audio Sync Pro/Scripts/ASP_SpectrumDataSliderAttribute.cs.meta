@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: ed4dc5e50f767e54f9294db1807bc2df
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/Scripts/ASP_SpectrumDataSliderAttribute.cs
+  uploadId: 828908

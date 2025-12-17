@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: f59bce94ae44b05479ee20cdae0b092a
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {fileID: 2800000, guid: a63ffe2bd815ec445ba45329d2f05d90, type: 3}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/Scripts/AudioSourcePlus.cs
+  uploadId: 828908

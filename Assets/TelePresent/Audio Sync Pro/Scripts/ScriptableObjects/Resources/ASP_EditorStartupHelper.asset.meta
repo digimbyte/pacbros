@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 133b838b2d9fc71479ab8f0200d75dcd
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 11400000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 294046
+  packageName: Audio Sync Pro
+  packageVersion: 1.2.4
+  assetPath: Assets/TelePresent/Audio Sync Pro/Scripts/ScriptableObjects/Resources/ASP_EditorStartupHelper.asset
+  uploadId: 828908
