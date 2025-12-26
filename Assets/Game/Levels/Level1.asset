@@ -125,7 +125,7 @@ MonoBehaviour:
     rotationIndex: 2
   - x: 5
     y: 27
-    tile: {fileID: -2782204159839725589, guid: 6cd8688aa45274345bc94834b51f2e4c, type: 3}
+    tile: {fileID: -1382718333010098526, guid: fd70740d1952d2c469810f847e80dc29, type: 3}
     rotationIndex: 0
   - x: 4
     y: 27
@@ -377,20 +377,20 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 9
     y: 28
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
-    rotationIndex: 1
+    tile: {fileID: 6435338811587375429, guid: bb287cfbdad284e4d92a687711e0d655, type: 3}
+    rotationIndex: 0
   - x: 9
     y: 26
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
-    rotationIndex: 1
+    tile: {fileID: -8898120891871626909, guid: 2910d5696d3d5164e8f4865e534513b6, type: 3}
+    rotationIndex: 0
   - x: 9
     y: 25
     tile: {fileID: -3285165343615480943, guid: a5557b15f8cd94b42be922e58fd103af, type: 3}
     rotationIndex: 2
   - x: 9
     y: 24
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
-    rotationIndex: 1
+    tile: {fileID: 4054986085679452633, guid: bc685eb85203a3246a015809f31b7999, type: 3}
+    rotationIndex: 0
   - x: 10
     y: 23
     tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
@@ -537,7 +537,7 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 12
     y: 27
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
+    tile: {fileID: -1382718333010098526, guid: fd70740d1952d2c469810f847e80dc29, type: 3}
     rotationIndex: 0
   - x: 13
     y: 27
@@ -561,7 +561,7 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 12
     y: 25
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
+    tile: {fileID: 3633705124238017660, guid: ccbf84d51e498ee44bef2297eb9ca585, type: 3}
     rotationIndex: 0
   - x: 11
     y: 25
@@ -577,8 +577,8 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 15
     y: 28
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
-    rotationIndex: 1
+    tile: {fileID: 6435338811587375429, guid: bb287cfbdad284e4d92a687711e0d655, type: 3}
+    rotationIndex: 0
   - x: 15
     y: 27
     tile: {fileID: -3285165343615480943, guid: a5557b15f8cd94b42be922e58fd103af, type: 3}
@@ -589,12 +589,12 @@ MonoBehaviour:
     rotationIndex: 3
   - x: 15
     y: 26
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
-    rotationIndex: 1
+    tile: {fileID: -8898120891871626909, guid: 2910d5696d3d5164e8f4865e534513b6, type: 3}
+    rotationIndex: 0
   - x: 15
     y: 24
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
-    rotationIndex: 1
+    tile: {fileID: 4054986085679452633, guid: bc685eb85203a3246a015809f31b7999, type: 3}
+    rotationIndex: 0
   - x: 16
     y: 23
     tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
@@ -969,8 +969,8 @@ MonoBehaviour:
     rotationIndex: 3
   - x: 3
     y: 9
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
-    rotationIndex: 3
+    tile: {fileID: -2168870478677215179, guid: ae3c881f98ff9f14581d05c9fc48b8bd, type: 3}
+    rotationIndex: 0
   - x: 2
     y: 8
     tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
@@ -1345,8 +1345,8 @@ MonoBehaviour:
     rotationIndex: 2
   - x: 21
     y: 9
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
-    rotationIndex: 3
+    tile: {fileID: -2168870478677215179, guid: ae3c881f98ff9f14581d05c9fc48b8bd, type: 3}
+    rotationIndex: 0
   - x: 23
     y: 9
     tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
@@ -1721,7 +1721,7 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 12
     y: 10
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
+    tile: {fileID: -2168870478677215179, guid: ae3c881f98ff9f14581d05c9fc48b8bd, type: 3}
     rotationIndex: 0
   - x: 13
     y: 10
@@ -1737,7 +1737,7 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 12
     y: 8
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
+    tile: {fileID: -2168870478677215179, guid: ae3c881f98ff9f14581d05c9fc48b8bd, type: 3}
     rotationIndex: 0
   - x: 11
     y: 8
@@ -1881,8 +1881,8 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 19
     y: 27
-    tile: {fileID: -2782204159839725589, guid: 6cd8688aa45274345bc94834b51f2e4c, type: 3}
-    rotationIndex: 1
+    tile: {fileID: 3633705124238017660, guid: ccbf84d51e498ee44bef2297eb9ca585, type: 3}
+    rotationIndex: 0
   - x: 19
     y: 29
     tile: {fileID: -2782204159839725589, guid: 6cd8688aa45274345bc94834b51f2e4c, type: 3}
@@ -1899,4 +1899,984 @@ MonoBehaviour:
     y: 27
     tile: {fileID: -3285165343615480943, guid: a5557b15f8cd94b42be922e58fd103af, type: 3}
     rotationIndex: 1
-  placeables: []
+  placeables:
+  - x: 3
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 2
+    marker: SP
+    markerColor: {r: 0.15, g: 0.85, b: 0.15, a: 1}
+  - x: 4
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 3
+    marker: E
+    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - x: 13
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 3
+    marker: E
+    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - x: 12
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 3
+    marker: E
+    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - x: 9
+    y: 24
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 0
+    marker: '*'
+    markerColor: {r: 1, g: 1, b: 1, a: 1}
+  - x: 12
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 6
+    marker: I
+    markerColor: {r: 0, g: 1, b: 1, a: 1}
+  - x: 12
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 8
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 15
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 8
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 3
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 8
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 21
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 8
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 15
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 1
+    marker: 
+    markerColor: {r: 1, g: 1, b: 1, a: 1}
+  - x: 9
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 8
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 15
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 8
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 19
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 8
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 5
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 8
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 4
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 5
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 5
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 11
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 15
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 19
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 21
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 22
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 5
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 7
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 10
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 15
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 15
+    y: 25
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 25
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 25
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 25
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 10
+    y: 25
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 25
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 10
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 15
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 10
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 5
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 5
+    y: 28
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 28
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 28
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 28
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 20
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 28
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 22
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 29
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 28
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 22
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 20
+    y: 27
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 17
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 20
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 23
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 22
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 21
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 19
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 20
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 20
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 20
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 22
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 22
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 15
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 11
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 22
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 21
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 22
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 23
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 10
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 15
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 10
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}

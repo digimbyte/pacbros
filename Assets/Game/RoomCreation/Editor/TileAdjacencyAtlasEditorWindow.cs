@@ -26,6 +26,12 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
     private Tile paintTile;
     private int paintRotation;
 
+    // Rotated preview cache (generated in-memory textures).
+    // Keyed by the source Texture2D instance id.
+    private readonly Dictionary<int, Texture2D[]> rotatedPreviewCache = new Dictionary<int, Texture2D[]>();
+
+    private const float PreviewInset = 2f;
+
     private PaintMode paintMode;
     private GameObject paintPlaceable;
     private int paintPlaceableRotation;
@@ -79,6 +85,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         return new MarkerDef { kind = kind, label = "*", color = Color.white };
     }
 
+
     private void SetPaintMarker(TileAdjacencyAtlas.PlaceableKind kind)
     {
         paintPlaceableKind = kind;
@@ -107,6 +114,25 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
     {
         RefreshTiles();
         SetPaintMarker(TileAdjacencyAtlas.PlaceableKind.Prefab);
+    }
+
+    private void OnDisable()
+    {
+        // Avoid leaking generated textures.
+        foreach (var kv in rotatedPreviewCache)
+        {
+            var arr = kv.Value;
+            if (arr == null) continue;
+            for (int i = 1; i < arr.Length; i++)
+            {
+                if (arr[i] != null)
+                {
+                    DestroyImmediate(arr[i]);
+                    arr[i] = null;
+                }
+            }
+        }
+        rotatedPreviewCache.Clear();
     }
 
     private void OnGUI()
@@ -420,10 +446,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
                 Texture2D tex = ResolvePreview(tile);
                 if (tex != null)
                 {
-                    Matrix4x4 prev = GUI.matrix;
-                    GUIUtility.RotateAroundPivot(paintRotation * 90f, btnRect.center);
-                    GUI.DrawTexture(btnRect, tex, ScaleMode.ScaleToFit, true);
-                    GUI.matrix = prev;
+                    DrawRotatedPreviewClipped(btnRect, tex, TileAdjacencyAtlas.NormalizeRot(paintRotation));
                 }
                 else
                 {
@@ -535,8 +558,13 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
                         }
                         else
                         {
-                            // Only allow placeables on existing tile cells.
-                            if (cell.tile != null)
+                            // Placeable mode: if Prefab kind with null prefab, clear the placeable.
+                            if (paintPlaceableKind == TileAdjacencyAtlas.PlaceableKind.Prefab && paintPlaceable == null)
+                            {
+                                atlas.SetPlaceable(x, y, null, 0);
+                            }
+                            // Otherwise, only allow placeables on existing tile cells.
+                            else if (cell.tile != null)
                             {
                                 var def = ResolveMarkerDef(paintPlaceableKind);
                                 atlas.SetPlaceable(
@@ -555,39 +583,12 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
 
                 GUI.Box(rect, GUIContent.none);
 
-                // Overlay marker for placeable (prefab or marker)
-                if (HasPlaceable(placeable))
-                {
-                    var def = ResolveMarkerDef(placeable.kind);
-                    string label = !string.IsNullOrEmpty(placeable.marker) ? placeable.marker : def.label;
-                    Color col = placeable.markerColor.a > 0.001f ? placeable.markerColor : def.color;
-
-                    var style = new GUIStyle(EditorStyles.boldLabel)
-                    {
-                        alignment = TextAnchor.MiddleCenter,
-                        fontSize = 16,
-                        normal = { textColor = col }
-                    };
-
-                    GUI.Label(mainRect, label, style);
-                }
-
                 if (cell.tile != null)
                 {
                     Texture2D tex = ResolvePreview(cell.tile);
                     if (tex != null)
                     {
-                        // IMPORTANT: Rotating the GUI matrix can cause drawing to bleed outside the cell.
-                        // Clip to the cell bounds by drawing inside a group.
-                        GUI.BeginGroup(mainRect);
-                        Rect localRect = new Rect(0f, 0f, mainRect.width, mainRect.height);
-
-                        Matrix4x4 prev = GUI.matrix;
-                        GUIUtility.RotateAroundPivot(cell.rotationIndex * 90f, localRect.center);
-                        GUI.DrawTexture(localRect, tex, ScaleMode.ScaleToFit, true);
-                        GUI.matrix = prev;
-
-                        GUI.EndGroup();
+                        DrawRotatedPreviewClipped(mainRect, tex, TileAdjacencyAtlas.NormalizeRot(cell.rotationIndex));
                     }
 
                     GUIStyle cornerStyle = new GUIStyle(GUI.skin.button)
@@ -598,13 +599,30 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
                         fixedWidth = corner.width
                     };
 
-                    string label = ((cell.rotationIndex % 4) + 1).ToString();
-                    if (GUI.Button(corner, label, cornerStyle))
+                    string rotLabel = (TileAdjacencyAtlas.NormalizeRot(cell.rotationIndex) + 1).ToString();
+                    if (GUI.Button(corner, rotLabel, cornerStyle))
                     {
                         int newRot = (cell.rotationIndex + 1) % 4;
                         atlas.SetCell(x, y, cell.tile, newRot);
                         MarkDirty();
                     }
+                }
+
+                // Overlay marker for placeable (draw AFTER tile preview so it's on top)
+                if (HasPlaceable(placeable))
+                {
+                    var def = ResolveMarkerDef(placeable.kind);
+                    string markerLabel = !string.IsNullOrEmpty(placeable.marker) ? placeable.marker : def.label;
+                    Color col = placeable.markerColor.a > 0.001f ? placeable.markerColor : def.color;
+
+                    var markerStyle = new GUIStyle(EditorStyles.boldLabel)
+                    {
+                        alignment = TextAnchor.MiddleCenter,
+                        fontSize = 16,
+                        normal = { textColor = col }
+                    };
+
+                    GUI.Label(mainRect, markerLabel, markerStyle);
                 }
 
                 string cellLabel = cell.tile != null ? cell.tile.name : "-";
@@ -622,6 +640,8 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
 
     private bool showPlaceables;
 
+    private Vector2 scrollPlaceables;
+
     private void DrawPlaceablesList()
     {
         if (atlas == null) return;
@@ -636,6 +656,8 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             return;
         }
 
+        // Limit height to avoid pushing content off screen.
+        scrollPlaceables = EditorGUILayout.BeginScrollView(scrollPlaceables, GUILayout.MaxHeight(150));
         for (int i = 0; i < atlas.placeables.Count; i++)
         {
             var p = atlas.placeables[i];
@@ -662,6 +684,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             }
             EditorGUILayout.EndHorizontal();
         }
+        EditorGUILayout.EndScrollView();
     }
 
     private void DrawBakeSection()
@@ -1206,6 +1229,259 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
     {
         int r = ((rot % 4) + 4) % 4;
         return (Dir)(((int)d + r) % 4);
+    }
+
+    private void DrawRotatedPreviewClipped(Rect bounds, Texture2D source, int rotIndex)
+    {
+        if (source == null) return;
+
+        rotIndex = TileAdjacencyAtlas.NormalizeRot(rotIndex);
+        Texture2D tex = GetRotatedPreview(source, rotIndex);
+        if (tex == null) return;
+
+        // Clip strictly to the destination bounds.
+        GUI.BeginGroup(bounds);
+        Rect localBounds = new Rect(0f, 0f, bounds.width, bounds.height);
+        Rect inset = InsetRect(localBounds, PreviewInset);
+        Rect fit = GetAspectFitRect(inset, tex.width, tex.height);
+        DrawTextureWithPointFiltering(fit, tex, true);
+        GUI.EndGroup();
+    }
+
+    private static Rect InsetRect(Rect r, float inset)
+    {
+        if (inset <= 0f) return r;
+        return new Rect(r.x + inset, r.y + inset, Mathf.Max(0f, r.width - inset * 2f), Mathf.Max(0f, r.height - inset * 2f));
+    }
+
+    private Texture2D GetRotatedPreview(Texture2D source, int rotIndex)
+    {
+        if (source == null) return null;
+        rotIndex = TileAdjacencyAtlas.NormalizeRot(rotIndex);
+
+        int key = source.GetInstanceID();
+        if (!rotatedPreviewCache.TryGetValue(key, out var arr) || arr == null || arr.Length != 4)
+        {
+            arr = new Texture2D[4];
+            arr[0] = source;
+            rotatedPreviewCache[key] = arr;
+        }
+
+        if (rotIndex == 0) return source;
+        if (arr[rotIndex] != null) return arr[rotIndex];
+
+        // Build rotated textures from a readable copy (AssetPreview textures are often non-readable).
+        Texture2D readable = null;
+        bool destroyReadable = false;
+        try
+        {
+            readable = MakeReadableCopy(source);
+            destroyReadable = readable != null && readable != source;
+
+            // Generate all 3 rotated variants in one shot.
+            // NOTE: Swap 90/270 to match the 3D level's CCW rotation convention.
+            var r1 = Rotate90CW(readable);
+            var r2 = Rotate180(readable);
+            var r3 = Rotate270CW(readable);
+
+            arr[1] = r3;  // rotationIndex 1 = 270° CW (= 90° CCW)
+            arr[2] = r2;  // rotationIndex 2 = 180°
+            arr[3] = r1;  // rotationIndex 3 = 90° CW (= 270° CCW)
+
+            return arr[rotIndex];
+        }
+        catch
+        {
+            // Fallback: if anything goes wrong, return the original preview so the editor stays usable.
+            return source;
+        }
+        finally
+        {
+            if (destroyReadable && readable != null)
+            {
+                DestroyImmediate(readable);
+            }
+        }
+    }
+
+    private static Texture2D MakeReadableCopy(Texture2D src)
+    {
+        if (src == null) return null;
+
+        // Fast path: if readable, use it directly.
+        try
+        {
+            // Accessing isReadable can throw in some edge cases; wrap defensively.
+            if (src.isReadable) return src;
+        }
+        catch { /* ignore */ }
+
+        // Use sRGB read/write to preserve color space (Unity AssetPreview textures are usually in sRGB).
+        var rt = RenderTexture.GetTemporary(src.width, src.height, 0, RenderTextureFormat.ARGB32, RenderTextureReadWrite.sRGB);
+        RenderTexture prev = RenderTexture.active;
+        try
+        {
+            Graphics.Blit(src, rt);
+            RenderTexture.active = rt;
+
+            var copy = new Texture2D(src.width, src.height, TextureFormat.RGBA32, false, false);
+            copy.hideFlags = HideFlags.HideAndDontSave;
+            copy.filterMode = FilterMode.Point;
+            copy.wrapMode = TextureWrapMode.Clamp;
+            copy.ReadPixels(new Rect(0, 0, src.width, src.height), 0, 0, false);
+            copy.Apply(false, false);
+            return copy;
+        }
+        finally
+        {
+            RenderTexture.active = prev;
+            RenderTexture.ReleaseTemporary(rt);
+        }
+    }
+
+    private static Texture2D Rotate90CW(Texture2D src)
+    {
+        int sw = src.width;
+        int sh = src.height;
+        var srcPix = src.GetPixels();
+        int dw = sh;
+        int dh = sw;
+        var dstPix = new Color[dw * dh];
+
+        // Rotate 90° clockwise: new coords = (sh - 1 - y, x)
+        for (int y = 0; y < sh; y++)
+        {
+            for (int x = 0; x < sw; x++)
+            {
+                int srcIdx = x + y * sw;
+                int destX = sh - 1 - y;
+                int destY = x;
+                int dstIdx = destX + destY * dw;
+                dstPix[dstIdx] = srcPix[srcIdx];
+            }
+        }
+
+        var dst = new Texture2D(dw, dh, TextureFormat.RGBA32, false, false);
+        dst.hideFlags = HideFlags.HideAndDontSave;
+        dst.filterMode = FilterMode.Point;
+        dst.wrapMode = TextureWrapMode.Clamp;
+        dst.SetPixels(dstPix);
+        dst.Apply(false, false);
+        return dst;
+    }
+
+    private static Texture2D Rotate180(Texture2D src)
+    {
+        int sw = src.width;
+        int sh = src.height;
+        var srcPix = src.GetPixels();
+        var dstPix = new Color[sw * sh];
+
+        // Rotate 180°: new coords = (sw - 1 - x, sh - 1 - y)
+        for (int y = 0; y < sh; y++)
+        {
+            for (int x = 0; x < sw; x++)
+            {
+                int srcIdx = x + y * sw;
+                int destX = sw - 1 - x;
+                int destY = sh - 1 - y;
+                int dstIdx = destX + destY * sw;
+                dstPix[dstIdx] = srcPix[srcIdx];
+            }
+        }
+
+        var dst = new Texture2D(sw, sh, TextureFormat.RGBA32, false, false);
+        dst.hideFlags = HideFlags.HideAndDontSave;
+        dst.filterMode = FilterMode.Point;
+        dst.wrapMode = TextureWrapMode.Clamp;
+        dst.SetPixels(dstPix);
+        dst.Apply(false, false);
+        return dst;
+    }
+
+    private static Texture2D Rotate270CW(Texture2D src)
+    {
+        int sw = src.width;
+        int sh = src.height;
+        var srcPix = src.GetPixels();
+        int dw = sh;
+        int dh = sw;
+        var dstPix = new Color[dw * dh];
+
+        // Rotate 270° clockwise (= 90° CCW): new coords = (y, sw - 1 - x)
+        for (int y = 0; y < sh; y++)
+        {
+            for (int x = 0; x < sw; x++)
+            {
+                int srcIdx = x + y * sw;
+                int destX = y;
+                int destY = sw - 1 - x;
+                int dstIdx = destX + destY * dw;
+                dstPix[dstIdx] = srcPix[srcIdx];
+            }
+        }
+
+        var dst = new Texture2D(dw, dh, TextureFormat.RGBA32, false, false);
+        dst.hideFlags = HideFlags.HideAndDontSave;
+        dst.filterMode = FilterMode.Point;
+        dst.wrapMode = TextureWrapMode.Clamp;
+        dst.SetPixels(dstPix);
+        dst.Apply(false, false);
+        return dst;
+    }
+
+    // Return an inner rect that fits the texture's aspect ratio inside target, centered.
+    private static Rect GetAspectFitRect(Rect target, float texWidth, float texHeight)
+    {
+        if (texWidth <= 0f || texHeight <= 0f) return target;
+        float targetRatio = target.width / target.height;
+        float texRatio = texWidth / texHeight;
+
+        Rect r = new Rect(target.x, target.y, target.width, target.height);
+        if (texRatio > targetRatio)
+        {
+            // Texture is wider; fit to width
+            float h = target.width / texRatio;
+            r.y += (target.height - h) * 0.5f;
+            r.height = h;
+        }
+        else
+        {
+            // Texture is taller; fit to height
+            float w = target.height * texRatio;
+            r.x += (target.width - w) * 0.5f;
+            r.width = w;
+        }
+        return r;
+    }
+
+    private static void DrawTextureWithPointFiltering(Rect dest, Texture tex, bool alpha)
+    {
+        if (tex == null) return;
+        var tex2 = tex as Texture2D;
+        FilterMode prevMode = FilterMode.Point;
+        bool changed = false;
+        if (tex2 != null)
+        {
+            prevMode = tex2.filterMode;
+            if (prevMode != FilterMode.Point)
+            {
+                tex2.filterMode = FilterMode.Point;
+                changed = true;
+            }
+        }
+
+        try
+        {
+            GUI.DrawTexture(dest, tex, ScaleMode.ScaleToFit, alpha);
+        }
+        finally
+        {
+            if (changed && tex2 != null)
+            {
+                tex2.filterMode = prevMode;
+            }
+        }
     }
 }
 #endif
