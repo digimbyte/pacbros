@@ -1,0 +1,240 @@
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+
+[CreateAssetMenu(fileName = "TileAdjacencyAtlas", menuName = "PacBros/Rooms/Tile Adjacency Atlas", order = 12)]
+public class TileAdjacencyAtlas : ScriptableObject
+{
+    [Min(1)] public int width = 4;
+    [Min(1)] public int height = 4;
+
+    public List<Cell> cells = new List<Cell>();
+
+    // Placeables are non-tile objects you want to place into grid cells (spawns, items, etc).
+    // They are stored separately so tile painting and adjacency baking stay tile-only.
+    public List<PlaceableCell> placeables = new List<PlaceableCell>();
+
+    public void Resize(int newWidth, int newHeight)
+    {
+        width = Mathf.Max(1, newWidth);
+        height = Mathf.Max(1, newHeight);
+        cells.RemoveAll(c => c.x < 0 || c.y < 0 || c.x >= width || c.y >= height);
+        placeables.RemoveAll(p => p.x < 0 || p.y < 0 || p.x >= width || p.y >= height);
+    }
+
+    public void ExtendNorth(int rows)
+    {
+        rows = Mathf.Max(1, rows);
+        height += rows;
+    }
+
+    public void ExtendSouth(int rows)
+    {
+        rows = Mathf.Max(1, rows);
+        height += rows;
+        // Shift all existing cells up by 'rows'
+        for (int i = 0; i < cells.Count; i++)
+        {
+            var c = cells[i];
+            c.y += rows;
+            cells[i] = c;
+        }
+        for (int i = 0; i < placeables.Count; i++)
+        {
+            var p = placeables[i];
+            p.y += rows;
+            placeables[i] = p;
+        }
+    }
+
+    public void ExtendEast(int cols)
+    {
+        cols = Mathf.Max(1, cols);
+        width += cols;
+    }
+
+    public void ExtendWest(int cols)
+    {
+        cols = Mathf.Max(1, cols);
+        width += cols;
+        // Shift all existing cells right by 'cols'
+        for (int i = 0; i < cells.Count; i++)
+        {
+            var c = cells[i];
+            c.x += cols;
+            cells[i] = c;
+        }
+        for (int i = 0; i < placeables.Count; i++)
+        {
+            var p = placeables[i];
+            p.x += cols;
+            placeables[i] = p;
+        }
+    }
+
+    public Cell GetCell(int x, int y)
+    {
+        for (int i = 0; i < cells.Count; i++)
+        {
+            if (cells[i].x == x && cells[i].y == y)
+            {
+                return cells[i];
+            }
+        }
+        return default;
+    }
+
+    public bool HasCell(int x, int y)
+    {
+        for (int i = 0; i < cells.Count; i++)
+        {
+            if (cells[i].x == x && cells[i].y == y)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void SetCell(int x, int y, Tile tile, int rotationIndex = 0)
+    {
+        if (x < 0 || y < 0 || x >= width || y >= height)
+        {
+            return;
+        }
+
+        int rot = NormalizeRot(rotationIndex);
+
+        int index = cells.FindIndex(c => c.x == x && c.y == y);
+        Cell cell = new Cell
+        {
+            x = x,
+            y = y,
+            tile = tile,
+            rotationIndex = rot
+        };
+
+        if (tile == null)
+        {
+            if (index >= 0)
+            {
+                cells.RemoveAt(index);
+            }
+            // Note: placeables are stored separately and are not cleared here.
+            return;
+        }
+
+        if (index >= 0)
+        {
+            cells[index] = cell;
+        }
+        else
+        {
+            cells.Add(cell);
+        }
+    }
+
+    public PlaceableCell GetPlaceable(int x, int y)
+    {
+        for (int i = 0; i < placeables.Count; i++)
+        {
+            if (placeables[i].x == x && placeables[i].y == y)
+            {
+                return placeables[i];
+            }
+        }
+        return default;
+    }
+
+    public bool HasPlaceable(int x, int y)
+    {
+        for (int i = 0; i < placeables.Count; i++)
+        {
+            if (placeables[i].x == x && placeables[i].y == y)
+            {
+                var p = placeables[i];
+                return p.prefab != null || p.kind != PlaceableKind.None || !string.IsNullOrEmpty(p.marker);
+            }
+        }
+        return false;
+    }
+
+    public void SetPlaceable(
+        int x,
+        int y,
+        GameObject prefab,
+        int rotationIndex = 0,
+        PlaceableKind kind = PlaceableKind.Prefab,
+        string marker = null,
+        Color? markerColor = null)
+    {
+        if (x < 0 || y < 0 || x >= width || y >= height)
+            return;
+
+        int rot = NormalizeRot(rotationIndex);
+        int index = placeables.FindIndex(p => p.x == x && p.y == y);
+
+        bool isEmpty = prefab == null && kind == PlaceableKind.None && string.IsNullOrEmpty(marker);
+        if (isEmpty)
+        {
+            if (index >= 0) placeables.RemoveAt(index);
+            return;
+        }
+
+        PlaceableCell pcell = new PlaceableCell
+        {
+            x = x,
+            y = y,
+            prefab = prefab,
+            rotationIndex = rot,
+            kind = kind,
+            marker = marker,
+            markerColor = markerColor ?? Color.white
+        };
+
+        if (index >= 0)
+            placeables[index] = pcell;
+        else
+            placeables.Add(pcell);
+    }
+
+    public static int NormalizeRot(int rot)
+    {
+        return ((rot % 4) + 4) % 4;
+    }
+
+    [Serializable]
+    public struct Cell
+    {
+        public int x;
+        public int y;
+        public Tile tile;
+        public int rotationIndex; // 0=0°,1=+90°,2=+180°,3=+270°
+    }
+
+    [Serializable]
+    public enum PlaceableKind
+    {
+        None = 0,
+        Prefab = 1,
+        SpawnPlayer = 2,
+        Enemy = 3,
+        Door = 4,
+        Portal = 5,
+        Item = 6,
+        Coin = 7,
+        Gun = 8
+    }
+
+    [Serializable]
+    public struct PlaceableCell
+    {
+        public int x;
+        public int y;
+        public GameObject prefab;
+        public int rotationIndex; // 0=0°,1=+90°,2=+180°,3=+270°
+        public PlaceableKind kind;
+        public string marker;
+        public Color markerColor;
+    }
+}

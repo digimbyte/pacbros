@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f38dfc13d3d5a1d4b89775b15bc8480b, type: 3}
+  m_Name: DB_Border
+  m_EditorClassIdentifier: Assembly-CSharp::TilesDatabase
+  category: Default
+  tiles:
+  - {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+  defaultTile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}

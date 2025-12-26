@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c1a5cde7f27b2814bb18fbb093be2ba0, type: 3}
+  m_Name: Prison_Classic
+  m_EditorClassIdentifier: Assembly-CSharp::RoomTemplate
+  width: 5
+  height: 3
+  pivot: {x: 2, y: 1}
+  cells:
+  - x: 1
+    y: 1
+    tile: {fileID: -3285165343615480943, guid: 5809a96dd15084b44969e1d015bf908a, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 2
+  - x: 2
+    y: 1
+    tile: {fileID: -3285165343615480943, guid: a5557b15f8cd94b42be922e58fd103af, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 1
+  - x: 3
+    y: 1
+    tile: {fileID: -3285165343615480943, guid: 5809a96dd15084b44969e1d015bf908a, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 0
+  - x: 0
+    y: 2
+    tile: {fileID: 9130934886052907233, guid: 1b23f77f1b30346479d83cf222274f05, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 2
+  - x: 1
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 0
+  - x: 0
+    y: 1
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 1
+  - x: 0
+    y: 0
+    tile: {fileID: 9130934886052907233, guid: 1b23f77f1b30346479d83cf222274f05, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 1
+  - x: 1
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 0
+  - x: 2
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 0
+  - x: 3
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 0
+  - x: 4
+    y: 0
+    tile: {fileID: 9130934886052907233, guid: 1b23f77f1b30346479d83cf222274f05, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 0
+  - x: 4
+    y: 1
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 1
+  - x: 4
+    y: 2
+    tile: {fileID: 9130934886052907233, guid: 1b23f77f1b30346479d83cf222274f05, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 3
+  - x: 3
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 0
+  - x: 2
+    y: 2
+    tile: {fileID: 6435338811587375429, guid: bb287cfbdad284e4d92a687711e0d655, type: 3}
+    skipSpawn: 0
+    spawnPoint: 0
+    rotationIndex: 0
