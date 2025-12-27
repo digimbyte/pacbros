@@ -72,6 +72,69 @@ public class TileAdjacencyAtlas : ScriptableObject
         }
     }
 
+    public void Crop()
+    {
+        if (cells == null || cells.Count == 0)
+        {
+            // No tiles: shrink to 1x1
+            width = 1;
+            height = 1;
+            placeables.Clear();
+            return;
+        }
+
+        // Find the bounding box of all placed tiles.
+        int minX = int.MaxValue;
+        int maxX = int.MinValue;
+        int minY = int.MaxValue;
+        int maxY = int.MinValue;
+
+        for (int i = 0; i < cells.Count; i++)
+        {
+            var c = cells[i];
+            if (c.tile == null) continue;
+            if (c.x < minX) minX = c.x;
+            if (c.x > maxX) maxX = c.x;
+            if (c.y < minY) minY = c.y;
+            if (c.y > maxY) maxY = c.y;
+        }
+
+        // If no valid tiles, shrink to 1x1.
+        if (minX == int.MaxValue || maxX == int.MinValue || minY == int.MaxValue || maxY == int.MinValue)
+        {
+            width = 1;
+            height = 1;
+            cells.Clear();
+            placeables.Clear();
+            return;
+        }
+
+        int newWidth = (maxX - minX) + 1;
+        int newHeight = (maxY - minY) + 1;
+
+        // Shift all cells and placeables to origin.
+        for (int i = 0; i < cells.Count; i++)
+        {
+            var c = cells[i];
+            c.x -= minX;
+            c.y -= minY;
+            cells[i] = c;
+        }
+        for (int i = 0; i < placeables.Count; i++)
+        {
+            var p = placeables[i];
+            p.x -= minX;
+            p.y -= minY;
+            placeables[i] = p;
+        }
+
+        width = newWidth;
+        height = newHeight;
+
+        // Remove any placeables outside the new bounds (shouldn't happen, but defensive).
+        placeables.RemoveAll(p => p.x < 0 || p.y < 0 || p.x >= width || p.y >= height);
+    }
+
     public Cell GetCell(int x, int y)
     {
         for (int i = 0; i < cells.Count; i++)

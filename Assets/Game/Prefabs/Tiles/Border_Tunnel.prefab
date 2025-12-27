@@ -13,7 +13,8 @@ GameObject:
   - component: {fileID: 3044284347961054705}
   - component: {fileID: 1481867827497930701}
   - component: {fileID: 3847592844252714852}
-  m_Layer: 0
+  - component: {fileID: -6240180108987185802}
+  m_Layer: 11
   m_Name: Border_Tunnel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -934,3 +935,17 @@ MonoBehaviour:
     rotation: 0
   - tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
     rotation: 0
+--- !u!114 &-6240180108987185802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5092839260583642815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 069538811f44f3b439a5a8f59f38eeaa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PortalSecurity
+  gateType: 0
+  requiredKey: 0

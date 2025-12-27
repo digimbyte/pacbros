@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2609167443647062679}
   - component: {fileID: 3923883622683435483}
   - component: {fileID: -3285165343615480943}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Floor Open Corner
   m_TagString: Untagged
   m_Icon: {fileID: 0}

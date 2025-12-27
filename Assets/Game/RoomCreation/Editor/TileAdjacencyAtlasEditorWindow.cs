@@ -55,6 +55,10 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
     private bool draggingVSplit;
     private bool draggingHSplit;
 
+    // Header / bottom scrolling so controls never get cropped in short windows.
+    private Vector2 scrollHeader;
+    private Vector2 scrollBottom;
+
     private int extendAmount = 1;
 
     private struct MarkerDef
@@ -154,12 +158,13 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         Rect vSplitRect = new Rect(leftRect.xMax, contentRect.y, SplitterThickness, contentRect.height);
         Rect rightRect = new Rect(vSplitRect.xMax, contentRect.y, Mathf.Max(0f, contentRect.width - leftRect.width - SplitterThickness), contentRect.height);
 
-        // Right side: header + grid + bake/report with horizontal split
-        float headerHeight = atlas == null ? 56f : 180f;
+        // Right side: header + grid + bake/report with horizontal split.
+        // Header gets a fixed target height, but can scroll internally so its controls never get cut off.
+        float headerHeight = atlas == null ? 56f : 160f;
         headerHeight = Mathf.Min(headerHeight, Mathf.Max(40f, rightRect.height * 0.35f));
         Rect headerRect = new Rect(rightRect.x, rightRect.y, rightRect.width, headerHeight);
 
-        float minBottom = 120f;
+        float minBottom = 100f; // a bit smaller to free space for the grid
         float maxBottom = Mathf.Max(minBottom, rightRect.height - headerRect.height - 60f);
         bottomPaneHeight = Mathf.Clamp(bottomPaneHeight, minBottom, maxBottom);
 
@@ -179,7 +184,9 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         GUILayout.EndArea();
 
         GUILayout.BeginArea(headerRect);
+        scrollHeader = EditorGUILayout.BeginScrollView(scrollHeader, GUILayout.ExpandHeight(true));
         DrawAtlasHeader();
+        EditorGUILayout.EndScrollView();
         GUILayout.EndArea();
 
         GUILayout.BeginArea(gridRect);
@@ -187,7 +194,9 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         GUILayout.EndArea();
 
         GUILayout.BeginArea(bottomRect);
+        scrollBottom = EditorGUILayout.BeginScrollView(scrollBottom, GUILayout.ExpandHeight(true));
         DrawBakeSection();
+        EditorGUILayout.EndScrollView();
         GUILayout.EndArea();
 
         // Splitters
@@ -329,38 +338,57 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         EditorGUILayout.LabelField($"Size: {atlas.width} x {atlas.height}", EditorStyles.boldLabel);
 
         EditorGUILayout.Space();
-        EditorGUILayout.LabelField("Extend Atlas:", EditorStyles.boldLabel);
-        extendAmount = Mathf.Max(1, EditorGUILayout.IntField("Blocks to Add", extendAmount));
+        // Extend / crop tools are tucked behind a foldout so they don't permanently eat vertical space.
+        showExtendTools = EditorGUILayout.Foldout(showExtendTools, "Extend / Crop Atlas", true);
+        if (showExtendTools)
+        {
+            EditorGUI.indentLevel++;
+            extendAmount = Mathf.Max(1, EditorGUILayout.IntField("Blocks to Add", extendAmount));
 
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button($"← West (+{extendAmount})"))
-        {
-            atlas.ExtendWest(extendAmount);
-            MarkDirty();
-        }
-        if (GUILayout.Button($"East (+{extendAmount}) →"))
-        {
-            atlas.ExtendEast(extendAmount);
-            MarkDirty();
-        }
-        EditorGUILayout.EndHorizontal();
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button($"← West (+{extendAmount})"))
+            {
+                atlas.ExtendWest(extendAmount);
+                MarkDirty();
+            }
+            if (GUILayout.Button($"East (+{extendAmount}) →"))
+            {
+                atlas.ExtendEast(extendAmount);
+                MarkDirty();
+            }
+            EditorGUILayout.EndHorizontal();
 
-        EditorGUILayout.BeginHorizontal();
-        if (GUILayout.Button($"↓ South (+{extendAmount})"))
-        {
-            atlas.ExtendSouth(extendAmount);
-            MarkDirty();
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button($"↓ South (+{extendAmount})"))
+            {
+                atlas.ExtendSouth(extendAmount);
+                MarkDirty();
+            }
+            if (GUILayout.Button($"North (+{extendAmount}) ↑"))
+            {
+                atlas.ExtendNorth(extendAmount);
+                MarkDirty();
+            }
+            EditorGUILayout.EndHorizontal();
+
+            EditorGUILayout.Space();
+            if (GUILayout.Button("Crop Atlas to Tiles"))
+            {
+                atlas.Crop();
+                MarkDirty();
+            }
+            EditorGUI.indentLevel--;
         }
-        if (GUILayout.Button($"North (+{extendAmount}) ↑"))
-        {
-            atlas.ExtendNorth(extendAmount);
-            MarkDirty();
-        }
-        EditorGUILayout.EndHorizontal();
 
         EditorGUILayout.Space();
         paintMode = (PaintMode)EditorGUILayout.EnumPopup("Paint Mode", paintMode);
 
+        // Paint tools can also be collapsed when you just want to inspect the grid.
+        showPaintTools = EditorGUILayout.Foldout(showPaintTools, "Paint Options", true);
+        if (!showPaintTools)
+            return;
+
+        EditorGUI.indentLevel++;
         if (paintMode == PaintMode.Tile)
         {
             paintRotation = EditorGUILayout.IntSlider("Paint Rotation (90° steps)", paintRotation, 0, 3);
@@ -400,6 +428,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
 
             paintPlaceableRotation = EditorGUILayout.IntSlider("Paint Rotation (90° steps)", paintPlaceableRotation, 0, 3);
         }
+        EditorGUI.indentLevel--;
     }
 
     private void DrawPalette()
@@ -641,6 +670,10 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
     private bool showPlaceables;
 
     private Vector2 scrollPlaceables;
+
+    // Foldouts to keep header more compact; some rarely-used tools are hidden behind these.
+    private bool showExtendTools;
+    private bool showPaintTools = true;
 
     private void DrawPlaceablesList()
     {

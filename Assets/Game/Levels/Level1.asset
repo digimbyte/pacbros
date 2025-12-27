@@ -1569,20 +1569,20 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 15
     y: 7
-    tile: {fileID: 9130934886052907233, guid: 1b23f77f1b30346479d83cf222274f05, type: 3}
-    rotationIndex: 0
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 2
   - x: 9
     y: 7
-    tile: {fileID: 9130934886052907233, guid: 1b23f77f1b30346479d83cf222274f05, type: 3}
-    rotationIndex: 1
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 2
   - x: 9
     y: 11
-    tile: {fileID: 9130934886052907233, guid: 1b23f77f1b30346479d83cf222274f05, type: 3}
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
     rotationIndex: 2
   - x: 15
     y: 11
-    tile: {fileID: 9130934886052907233, guid: 1b23f77f1b30346479d83cf222274f05, type: 3}
-    rotationIndex: 3
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 2
   - x: 9
     y: 10
     tile: {fileID: -2782204159839725589, guid: 6cd8688aa45274345bc94834b51f2e4c, type: 3}
@@ -1988,9 +1988,9 @@ MonoBehaviour:
     y: 10
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: 1
-    marker: 
-    markerColor: {r: 1, g: 1, b: 1, a: 1}
+    kind: 7
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
   - x: 9
     y: 9
     prefab: {fileID: 0}
@@ -2880,3 +2880,24 @@ MonoBehaviour:
     kind: 7
     marker: c
     markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 7
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 1
+    marker: 
+    markerColor: {r: 1, g: 1, b: 1, a: 1}
+  - x: 15
+    y: 7
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 0
+    marker: '*'
+    markerColor: {r: 1, g: 1, b: 1, a: 1}
+  - x: 15
+    y: 11
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: 0
+    marker: '*'
+    markerColor: {r: 1, g: 1, b: 1, a: 1}
