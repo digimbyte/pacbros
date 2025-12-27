@@ -16259,6 +16259,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6202345741848746256, guid: 1b23f77f1b30346479d83cf222274f05, type: 3}
   m_PrefabInstance: {fileID: 873337809}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &877702009 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4288906702942274071, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
+  m_PrefabInstance: {fileID: 1648234284}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &883645354
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20476,8 +20481,8 @@ MonoBehaviour:
   kelvinFull: 8000
   angleAtZero: -194
   angleAtFull: -226
-  energyAtZero: 2
-  energyAtFull: 0.2
+  energyAtZero: 1.5
+  energyAtFull: 0.1
 --- !u!1001 &1078320010
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -29760,10 +29765,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f8c698e0b7572849b9a67219022b9af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraControl
-  target: {fileID: 0}
+  target: {fileID: 877702009}
   targetBody: {fileID: 0}
   offset: {x: 0, y: 12, z: -10}
   lookAhead: 2
+  lookAheadAtSpeed: 8
   spring: 12
   damping: 18
   maxSpeed: 40
@@ -31519,6 +31525,38 @@ PrefabInstance:
     - target: {fileID: 1192167069655893957, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
       propertyPath: inventory.Array.size
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2236240212430822538, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
+      propertyPath: 'stageSpeedMultipliers.Array.data[0]'
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2236240212430822538, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
+      propertyPath: 'stageSpeedMultipliers.Array.data[2]'
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2236240212430822538, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
+      propertyPath: 'stageSpeedMultipliers.Array.data[3]'
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2236240212430822538, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
+      propertyPath: 'stageSpeedMultipliers.Array.data[4]'
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2236240212430822538, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
+      propertyPath: 'stageSpeedMultipliers.Array.data[5]'
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2236240212430822538, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
+      propertyPath: 'stageSpeedMultipliers.Array.data[6]'
+      value: 6.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2236240212430822538, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
+      propertyPath: 'stageSpeedMultipliers.Array.data[7]'
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2236240212430822538, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
+      propertyPath: 'stageSpeedMultipliers.Array.data[8]'
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 4288906702942274071, guid: f26879d7ec9835a42a3d47c9b765185d, type: 3}
       propertyPath: m_LocalPosition.x
