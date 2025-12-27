@@ -230,16 +230,12 @@ public class LevelRuntime : MonoBehaviour
                 GameObject prefab = p.prefab;
                 if (prefab == null)
                 {
-                    // Registry decides default; we do not add local fallbacks.
-                    if (!string.IsNullOrWhiteSpace(p.marker))
-                        prefab = GetRegistryPrefab(p.marker);
-                    // Try lookup by kind string (current behavior).
-                    if (prefab == null && p.kind != TileAdjacencyAtlas.PlaceableKind.None)
-                        prefab = GetRegistryPrefab(p.kind);
-
-                    
-
-                    // No legacy numeric-kind fallback: rely on explicit keys or registry defaults.
+                    // Use the registry API directly. Marker is an editor-only field and must not be
+                    // used at runtime; resolve only by `kind`.
+                    if (registryAsset is PrefabRegistry pr && !string.IsNullOrWhiteSpace(p.kind) && IsKnownPlaceableKind(p.kind))
+                    {
+                        prefab = pr.GetPrefab(p.kind);
+                    }
                 }
                 if (prefab == null) continue; // respect registry authority
 
@@ -261,6 +257,7 @@ public class LevelRuntime : MonoBehaviour
         // Registry is authoritative; by default spawn under `Entities`.
         return false;
     }
+
     // ---------- Registry API (singleton-friendly via LevelRuntime.Active) ----------
 
     public GameObject GetRegistryPrefab(string key)
