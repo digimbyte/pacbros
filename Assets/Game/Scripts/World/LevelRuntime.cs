@@ -255,10 +255,6 @@ public class LevelRuntime : MonoBehaviour
     static bool IsWorldPlaceable(string kind)
     {
         if (string.IsNullOrWhiteSpace(kind)) return false;
-        // Legacy support: door/portal were removed from current PlaceableKind constants,
-        // but some older atlases may still use these keys. Treat them as world-placeables.
-        return string.Equals(kind, "door", StringComparison.OrdinalIgnoreCase)
-               || string.Equals(kind, "portal", StringComparison.OrdinalIgnoreCase);
     }
     // ---------- Registry API (singleton-friendly via LevelRuntime.Active) ----------
 
