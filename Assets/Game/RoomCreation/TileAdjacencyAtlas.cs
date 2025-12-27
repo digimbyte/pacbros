@@ -216,7 +216,7 @@ public class TileAdjacencyAtlas : ScriptableObject
             if (placeables[i].x == x && placeables[i].y == y)
             {
                 var p = placeables[i];
-                return p.prefab != null || p.kind != PlaceableKind.None || !string.IsNullOrEmpty(p.marker);
+                return p.prefab != null || !string.Equals(p.kind, PlaceableKind.None, StringComparison.OrdinalIgnoreCase) || !string.IsNullOrEmpty(p.marker);
             }
         }
         return false;
@@ -227,7 +227,7 @@ public class TileAdjacencyAtlas : ScriptableObject
         int y,
         GameObject prefab,
         int rotationIndex = 0,
-        PlaceableKind kind = PlaceableKind.Prefab,
+        string kind = PlaceableKind.Prefab,
         string marker = null,
         Color? markerColor = null)
     {
@@ -283,18 +283,17 @@ public class TileAdjacencyAtlas : ScriptableObject
         public int rotationIndex; // 0=0°,1=+90°,2=+180°,3=+270°
     }
 
-    [Serializable]
-    public enum PlaceableKind
+    // Use string keys for placeable kinds so values can be data-matched reliably.
+    // Keep constants names similar to previous enum members.
+    public static class PlaceableKind
     {
-        None = 0,
-        Prefab = 1,
-        SpawnPlayer = 2,
-        Enemy = 3,
-        Door = 4,
-        Portal = 5,
-        Item = 6,
-        Coin = 7,
-        Gun = 8
+        public const string None = "none";
+        public const string Prefab = "prefab";
+        public const string SpawnPlayer = "player";
+        public const string Enemy = "enemy";
+        public const string Loot = "loot";
+        public const string Coin = "coin";
+        public const string Gun = "gun";
     }
 
     [Serializable]
@@ -304,8 +303,10 @@ public class TileAdjacencyAtlas : ScriptableObject
         public int y;
         public GameObject prefab;
         public int rotationIndex; // 0=0°,1=+90°,2=+180°,3=+270°
-        public PlaceableKind kind;
+        public string kind;
         public string marker;
         public Color markerColor;
     }
 }
+
+// (Placeable kinds are string constants in `PlaceableKind` above.)

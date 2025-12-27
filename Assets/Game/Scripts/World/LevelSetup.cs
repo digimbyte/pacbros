@@ -31,7 +31,7 @@ public class LevelSetup : MonoBehaviour
         }
     }
 
-    void PairPortals()
+    public void PairPortals()
     {
         var portals = GameObject.FindObjectsOfType<PairedPortal>(includeInactive: true);
         if (portals == null || portals.Length == 0) return;
@@ -75,7 +75,7 @@ public class LevelSetup : MonoBehaviour
         }
     }
 
-    void PairTunnels()
+    public void PairTunnels()
     {
         var tunnels = GameObject.FindObjectsOfType<PairedTunnel>(includeInactive: true);
         if (tunnels == null || tunnels.Length == 0) return;
@@ -101,7 +101,7 @@ public class LevelSetup : MonoBehaviour
         }
     }
 
-    void RegisterAstarPortalEdges()
+    public void RegisterAstarPortalEdges()
     {
         if (AstarPath.active == null) return;
 

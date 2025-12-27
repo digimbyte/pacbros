@@ -1587,4 +1587,1478 @@ MonoBehaviour:
     y: 16
     tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
     rotationIndex: 0
-  placeables: []
+  - x: 20
+    y: 8
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 20
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 19
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 18
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 17
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 16
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 16
+    y: 19
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 16
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 16
+    y: 20
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 17
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 18
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 19
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 20
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 20
+    y: 19
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 20
+    y: 20
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 0
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 0
+    y: 20
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 0
+    y: 19
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 0
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 1
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 2
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 3
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 4
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 4
+    y: 19
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 4
+    y: 20
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 4
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 3
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 2
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 1
+    y: 21
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 0
+    y: 8
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 6
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 6
+    y: 1
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 6
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 14
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 14
+    y: 1
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 14
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 13
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 12
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 11
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 10
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 9
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 8
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 7
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 7
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 8
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 9
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 10
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 11
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 12
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 13
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  placeables:
+  - x: 10
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: enemy
+    marker: E
+    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - x: 9
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: enemy
+    marker: E
+    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - x: 11
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: enemy
+    marker: E
+    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - x: 1
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: player
+    marker: SP
+    markerColor: {r: 0.15, g: 0.85, b: 0.15, a: 1}
+  - x: 19
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: player
+    marker: SP
+    markerColor: {r: 0.15, g: 0.85, b: 0.15, a: 1}
+  - x: 19
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: player
+    marker: SP
+    markerColor: {r: 0.15, g: 0.85, b: 0.15, a: 1}
+  - x: 1
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: player
+    marker: SP
+    markerColor: {r: 0.15, g: 0.85, b: 0.15, a: 1}
+  - x: 1
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: player
+    marker: SP
+    markerColor: {r: 0.15, g: 0.85, b: 0.15, a: 1}
+  - x: 19
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: player
+    marker: SP
+    markerColor: {r: 0.15, g: 0.85, b: 0.15, a: 1}
+  - x: 10
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: loot
+    marker: I
+    markerColor: {r: 0, g: 1, b: 1, a: 1}
+  - x: 9
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 7
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 7
+    y: 11
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 5
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 2
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 11
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 5
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 7
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 7
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 7
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 7
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 5
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 3
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 2
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 1
+    y: 1
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 2
+    y: 1
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 1
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 1
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 2
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 3
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 5
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 7
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 5
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 7
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 7
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 7
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 7
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 5
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 15
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 3
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 17
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 3
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 2
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 1
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 17
+    y: 1
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 1
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 2
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 5
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 6
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 7
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 7
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 17
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 15
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 9
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 11
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 13
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 11
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 17
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 19
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 19
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 17
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 15
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 14
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 12
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 13
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 14
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 15
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 10
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 11
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 15
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 18
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 17
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 17
+    y: 15
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 16
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 15
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 19
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 14
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 13
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 19
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 19
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 8
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 10
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 11
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 9
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 7
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 6
+    y: 19
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 5
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 4
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 2
+    y: 16
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 3
+    y: 15
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 10
+    y: 4
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 10
+    y: 8
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 19
+    y: 1
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}

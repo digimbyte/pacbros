@@ -35,7 +35,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
     private PaintMode paintMode;
     private GameObject paintPlaceable;
     private int paintPlaceableRotation;
-    private TileAdjacencyAtlas.PlaceableKind paintPlaceableKind = TileAdjacencyAtlas.PlaceableKind.Prefab;
+    private string paintPlaceableKind = TileAdjacencyAtlas.PlaceableKind.Prefab;
     private string paintPlaceableMarker;
     private Color paintPlaceableColor = Color.white;
 
@@ -63,40 +63,48 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
 
     private struct MarkerDef
     {
-        public TileAdjacencyAtlas.PlaceableKind kind;
+        public string kind;
         public string label;
         public Color color;
     }
 
-    private static readonly MarkerDef[] MarkerDefs = new[]
-    {
-        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Prefab, label = "*", color = Color.white },
+        private static readonly MarkerDef[] MarkerDefs = new[]
+        {
+        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Prefab, label = "", color = Color.white },
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.SpawnPlayer, label = "SP", color = new Color(0.15f, 0.85f, 0.15f) }, // Green
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Enemy, label = "E", color = Color.yellow },                         // Yellow
-        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Door, label = "D", color = Color.red },                             // Red
-        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Portal, label = "P", color = new Color(0.6f, 0.2f, 0.8f) },         // Purple
-        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Item, label = "I", color = Color.cyan },
+        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Loot, label = "I", color = Color.cyan },
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Coin, label = "c", color = new Color(1f, 0.86f, 0.25f) },
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Gun, label = "G", color = new Color(0.6f, 0.8f, 1f) }
     };
 
-    private static MarkerDef ResolveMarkerDef(TileAdjacencyAtlas.PlaceableKind kind)
+        private static readonly string[] PlaceableKindOptions = new[]
+        {
+            TileAdjacencyAtlas.PlaceableKind.Prefab,
+            TileAdjacencyAtlas.PlaceableKind.SpawnPlayer,
+            TileAdjacencyAtlas.PlaceableKind.Enemy,
+            TileAdjacencyAtlas.PlaceableKind.Loot,
+            TileAdjacencyAtlas.PlaceableKind.Coin,
+            TileAdjacencyAtlas.PlaceableKind.Gun
+        };
+
+    private static MarkerDef ResolveMarkerDef(string kind)
     {
         for (int i = 0; i < MarkerDefs.Length; i++)
         {
             if (MarkerDefs[i].kind == kind) return MarkerDefs[i];
         }
-        return new MarkerDef { kind = kind, label = "*", color = Color.white };
+        return new MarkerDef { kind = kind, label = "", color = Color.white };
     }
 
 
-    private void SetPaintMarker(TileAdjacencyAtlas.PlaceableKind kind)
+    private void SetPaintMarker(string kind)
     {
         paintPlaceableKind = kind;
         var def = ResolveMarkerDef(kind);
         paintPlaceableMarker = def.label;
         paintPlaceableColor = def.color;
-        if (kind != TileAdjacencyAtlas.PlaceableKind.Prefab)
+        if (!string.Equals(kind, TileAdjacencyAtlas.PlaceableKind.Prefab, StringComparison.OrdinalIgnoreCase))
         {
             // avoid carrying over prefab reference when switching to markers
             paintPlaceable = null;
@@ -105,7 +113,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
 
     private static bool HasPlaceable(TileAdjacencyAtlas.PlaceableCell p)
     {
-        return p.prefab != null || p.kind != TileAdjacencyAtlas.PlaceableKind.None || !string.IsNullOrEmpty(p.marker);
+        return p.prefab != null || !string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase) || !string.IsNullOrEmpty(p.marker);
     }
 
     [MenuItem("PacBros/Rooms/Tile Adjacency Atlas Editor")]
@@ -395,7 +403,10 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         }
         else
         {
-            var newKind = (TileAdjacencyAtlas.PlaceableKind)EditorGUILayout.EnumPopup("Placeable Kind", paintPlaceableKind);
+            int curIdx = Array.IndexOf(PlaceableKindOptions, paintPlaceableKind);
+            if (curIdx < 0) curIdx = 0;
+            int sel = EditorGUILayout.Popup("Placeable Kind", curIdx, PlaceableKindOptions);
+            var newKind = PlaceableKindOptions[Mathf.Clamp(sel, 0, PlaceableKindOptions.Length - 1)];
             if (newKind != paintPlaceableKind)
             {
                 SetPaintMarker(newKind);
@@ -404,7 +415,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             EditorGUILayout.BeginHorizontal();
             foreach (var def in MarkerDefs)
             {
-                if (def.kind == TileAdjacencyAtlas.PlaceableKind.Prefab) continue;
+                    if (def.kind == TileAdjacencyAtlas.PlaceableKind.Prefab) continue;
                 var prev = GUI.color;
                 GUI.color = def.color;
                 if (GUILayout.Button(def.label, GUILayout.Width(36), GUILayout.Height(22)))
@@ -415,7 +426,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             }
             EditorGUILayout.EndHorizontal();
 
-            if (paintPlaceableKind == TileAdjacencyAtlas.PlaceableKind.Prefab)
+                if (paintPlaceableKind == TileAdjacencyAtlas.PlaceableKind.Prefab)
             {
                 paintPlaceable = (GameObject)EditorGUILayout.ObjectField("Paint Prefab", paintPlaceable, typeof(GameObject), false);
             }
@@ -544,9 +555,9 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
                         if (HasPlaceable(placeable))
                         {
                             paintPlaceable = placeable.prefab;
-                            paintPlaceableKind = placeable.kind != TileAdjacencyAtlas.PlaceableKind.None
-                                ? placeable.kind
-                                : TileAdjacencyAtlas.PlaceableKind.Prefab;
+                                            paintPlaceableKind = !string.Equals(placeable.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase)
+                                                ? placeable.kind
+                                                : TileAdjacencyAtlas.PlaceableKind.Prefab;
 
                             paintPlaceableMarker = !string.IsNullOrEmpty(placeable.marker)
                                 ? placeable.marker
@@ -588,7 +599,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
                         else
                         {
                             // Placeable mode: if Prefab kind with null prefab, clear the placeable.
-                            if (paintPlaceableKind == TileAdjacencyAtlas.PlaceableKind.Prefab && paintPlaceable == null)
+                            if (string.Equals(paintPlaceableKind, TileAdjacencyAtlas.PlaceableKind.Prefab, StringComparison.OrdinalIgnoreCase) && paintPlaceable == null)
                             {
                                 atlas.SetPlaceable(x, y, null, 0);
                             }
@@ -696,14 +707,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             var p = atlas.placeables[i];
             EditorGUILayout.BeginHorizontal();
             EditorGUILayout.LabelField($"({p.x},{p.y})", GUILayout.Width(60));
-            if (p.prefab != null)
-            {
-                EditorGUILayout.ObjectField(p.prefab, typeof(GameObject), false);
-            }
-            else
-            {
-                EditorGUILayout.LabelField(p.marker ?? "-", GUILayout.Width(60));
-            }
+            EditorGUILayout.LabelField(p.marker ?? "-", GUILayout.Width(60));
 
             Rect swatch = GUILayoutUtility.GetRect(18, 14, GUILayout.Width(18), GUILayout.Height(14));
             EditorGUI.DrawRect(swatch, p.markerColor.a > 0.001f ? p.markerColor : ResolveMarkerDef(p.kind).color);
@@ -841,6 +845,20 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             atlas = loaded;
             atlasPath = projectPath;
             lastBakeReport = null;
+            // Sanitize loaded atlas to remove legacy '*' markers and explicit None entries.
+            if (atlas.placeables != null)
+            {
+                atlas.placeables.RemoveAll(p => string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase));
+                for (int i = 0; i < atlas.placeables.Count; i++)
+                {
+                    var p = atlas.placeables[i];
+                    if (!string.IsNullOrEmpty(p.marker) && p.marker.Trim() == "*")
+                    {
+                        p.marker = null;
+                        atlas.placeables[i] = p;
+                    }
+                }
+            }
         }
     }
 
@@ -868,7 +886,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         // Sanitize placeables: remove any explicit None entries before saving (None is used as a transient 'clear' value).
         if (atlas.placeables != null)
         {
-            atlas.placeables.RemoveAll(p => p.kind == TileAdjacencyAtlas.PlaceableKind.None);
+                atlas.placeables.RemoveAll(p => string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase));
         }
 
         EditorUtility.SetDirty(atlas);

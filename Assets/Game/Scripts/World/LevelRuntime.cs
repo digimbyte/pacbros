@@ -1,5 +1,5 @@
 using UnityEngine;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using Pathfinding; // A* Project
 
@@ -19,7 +19,7 @@ public class LevelRuntime : MonoBehaviour
     [Tooltip("Root that will hold runtime entities (players, coins, items, etc.). If null, a sibling/child named 'Entities' will be created or reused.")]
     public Transform entitiesRoot;
     [Header("Registries")]
-    [Tooltip("Primary registry ScriptableObject (e.g. Assets/Game/Entities.asset from Core.Registry).")]
+    [Tooltip("Primary registry ScriptableObject (e.g. Assets/Game/Entities.asset). Registry is authoritative; no local fallbacks are used.")]
     public ScriptableObject registryAsset;
 
     [Header("Grid (auto-computed from children)")]
@@ -87,6 +87,13 @@ public class LevelRuntime : MonoBehaviour
             portalLayers = LayerMask.GetMask("portal");
         if (doorLayers == 0)
             doorLayers = LayerMask.GetMask("door");
+        // Pair portals/tunnels now that the level is spawned (before graph build).
+        var setup = GetComponentInChildren<LevelSetup>();
+        if (setup != null)
+        {
+            setup.PairPortals();
+            setup.PairTunnels();
+        }
 
         // Auto-prime grid + collision from child data (tiles, walls, etc.).
         AutoConfigureFromChildren();
@@ -105,20 +112,15 @@ public class LevelRuntime : MonoBehaviour
             if (buildNavmeshOnAwake)
             {
                 astar.Scan();
-                // After scanning the graph, allow level-specific setup (portal/tunnel pairing, graph edges, etc.)
-                var setup = GetComponentInChildren<LevelSetup>();
+                // After scan, register graph edges for portals/tunnels.
                 if (setup != null)
-                {
-                    setup.Initialize();
-                }
+                    setup.RegisterAstarPortalEdges();
             }
         }
 
         // Drain any motors that awoke before this level (race-safe).
         GridMotor.FlushPendingMotorsTo(this);
 
-        // Build registry lookup late so it can be used by other components.
-        BuildRegistryCache();
 
         isReady = true;
 
@@ -163,11 +165,22 @@ public class LevelRuntime : MonoBehaviour
         return entitiesRoot;
     }
 
-    Transform ResolveLevelContainer()
+    Transform ResolveLevelContainer(string nameHint = null)
     {
         if (levelContainer != null) return levelContainer;
 
-        var go = new GameObject("Level");
+        // Try to find an existing child that matches the atlas name.
+        if (!string.IsNullOrEmpty(nameHint))
+        {
+            var existing = transform.Find(nameHint);
+            if (existing != null)
+            {
+                levelContainer = existing;
+                return levelContainer;
+            }
+        }
+
+        var go = new GameObject(string.IsNullOrEmpty(nameHint) ? "Level" : nameHint);
         go.transform.SetParent(transform, false);
         levelContainer = go.transform;
         return levelContainer;
@@ -177,7 +190,7 @@ public class LevelRuntime : MonoBehaviour
     {
         if (atlas == null) return;
 
-        var levelRoot = ResolveLevelContainer();
+        var levelRoot = ResolveLevelContainer(atlas.name);
         var entities = ResolveEntitiesRoot();
 
         // Clear previous children to avoid duplicates on reload.
@@ -199,7 +212,10 @@ public class LevelRuntime : MonoBehaviour
 
                 var inst = Instantiate(prefab, levelRoot);
                 Transform prefabT = c.tile.transform;
+                // Preserve prefab local position additively (grid + prefab local offset).
                 inst.transform.localPosition = new Vector3(c.x, 0f, c.y) + prefabT.localPosition;
+                if (Mathf.Abs(prefabT.localPosition.x) > 0.001f || Mathf.Abs(prefabT.localPosition.z) > 0.001f)
+                    Debug.Log($"Spawn Tile: cell=({c.x},{c.y}) prefab='{prefab.name}' localOffset={prefabT.localPosition} => worldLocal={inst.transform.localPosition}", prefab);
                 inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(c.rotationIndex) * 90f, 0f) * prefabT.localRotation;
                 inst.transform.localScale = prefabT.localScale;
             }
@@ -211,73 +227,47 @@ public class LevelRuntime : MonoBehaviour
             for (int i = 0; i < atlas.placeables.Count; i++)
             {
                 var p = atlas.placeables[i];
-                if (p.prefab == null) continue;
+                GameObject prefab = p.prefab;
+                if (prefab == null)
+                {
+                    // Registry decides default; we do not add local fallbacks.
+                    if (!string.IsNullOrWhiteSpace(p.marker))
+                        prefab = GetRegistryPrefab(p.marker);
+                    if (prefab == null && p.kind != TileAdjacencyAtlas.PlaceableKind.None)
+                        prefab = GetRegistryPrefab(p.kind.ToString());
+                }
+                if (prefab == null) continue; // respect registry authority
 
                 var target = IsWorldPlaceable(p.kind) ? levelRoot : entities;
 
-                var inst = Instantiate(p.prefab, target);
-                Transform prefabT = p.prefab.transform;
+                var inst = Instantiate(prefab, target);
+                Transform prefabT = prefab.transform;
+                // Preserve prefab local position additively (grid + prefab local offset).
                 inst.transform.localPosition = new Vector3(p.x, 0f, p.y) + prefabT.localPosition;
+                if (Mathf.Abs(prefabT.localPosition.x) > 0.001f || Mathf.Abs(prefabT.localPosition.z) > 0.001f)
+                    Debug.Log($"Spawn Placeable: cell=({p.x},{p.y}) prefab='{prefab.name}' localOffset={prefabT.localPosition} => worldLocal={inst.transform.localPosition}", prefab);
                 inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(p.rotationIndex) * 90f, 0f) * prefabT.localRotation;
                 inst.transform.localScale = prefabT.localScale;
             }
         }
     }
 
-    static bool IsWorldPlaceable(TileAdjacencyAtlas.PlaceableKind kind)
+    static bool IsWorldPlaceable(string kind)
     {
-        return kind == TileAdjacencyAtlas.PlaceableKind.Door ||
-               kind == TileAdjacencyAtlas.PlaceableKind.Portal;
+        if (string.IsNullOrWhiteSpace(kind)) return false;
+        // Legacy support: door/portal were removed from current PlaceableKind constants,
+        // but some older atlases may still use these keys. Treat them as world-placeables.
+        return string.Equals(kind, "door", StringComparison.OrdinalIgnoreCase)
+               || string.Equals(kind, "portal", StringComparison.OrdinalIgnoreCase);
     }
     // ---------- Registry API (singleton-friendly via LevelRuntime.Active) ----------
-
-    Dictionary<string, GameObject> _registryCache;
-
-    void BuildRegistryCache()
-    {
-        if (_registryCache != null) return;
-        _registryCache = new Dictionary<string, GameObject>(System.StringComparer.OrdinalIgnoreCase);
-
-        // Prefer Core.Registry asset if provided.
-        if (registryAsset != null)
-        {
-            TryPopulateFromCoreRegistry(registryAsset, _registryCache);
-        }
-    }
-
-    static void TryPopulateFromCoreRegistry(ScriptableObject so, Dictionary<string, GameObject> cache)
-    {
-        if (so == null || cache == null) return;
-
-        var t = so.GetType();
-        // Expect fields: List<itemEntries> with fields uid(string) asset(Object)
-        var entriesField = t.GetField("itemEntries", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-        if (entriesField == null) return;
-
-        if (entriesField.GetValue(so) is IEnumerable list)
-        {
-            foreach (var entry in list)
-            {
-                if (entry == null) continue;
-                var et = entry.GetType();
-                var uidField = et.GetField("uid", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                var assetField = et.GetField("asset", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-                if (uidField == null || assetField == null) continue;
-
-                var uid = uidField.GetValue(entry) as string;
-                var asset = assetField.GetValue(entry) as GameObject;
-                if (string.IsNullOrWhiteSpace(uid) || asset == null) continue;
-                cache[uid] = asset;
-            }
-        }
-    }
 
     public GameObject GetRegistryPrefab(string key)
     {
         if (string.IsNullOrWhiteSpace(key)) return null;
-        BuildRegistryCache();
-        if (_registryCache != null && _registryCache.TryGetValue(key, out var prefab))
-            return prefab;
+        // 1) Try registry asset API methods directly (preferred).
+        var fromApi = InvokeRegistryGetter(registryAsset, key);
+        if (fromApi != null) return fromApi;
         return null;
     }
 
@@ -294,6 +284,33 @@ public class LevelRuntime : MonoBehaviour
     {
         var go = InstantiateRegistryPrefab(key, position, rotation, parent);
         return go != null ? go.GetComponent<T>() : null;
+    }
+
+
+    // Try to call public/protected API methods on the registry ScriptableObject before reflection digging.
+    static GameObject InvokeRegistryGetter(ScriptableObject registry, string key)
+    {
+        if (registry == null || string.IsNullOrWhiteSpace(key)) return null;
+        var t = registry.GetType();
+        string[] methodNames =
+        {
+            "GetAsset", "Get", "GetItem", "GetByUid", "Find", "FindAsset", "Lookup"
+        };
+
+        foreach (var name in methodNames)
+        {
+            var m = t.GetMethod(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance, null, new[] { typeof(string) }, null);
+            if (m == null) continue;
+            try
+            {
+                var obj = m.Invoke(registry, new object[] { key }) as UnityEngine.Object;
+                var go = obj as GameObject;
+                if (go == null && obj is Component comp) go = comp.gameObject;
+                if (go != null) return go;
+            }
+            catch { /* ignore and continue */ }
+        }
+        return null;
     }
     void AutoConfigureFromChildren()
     {

@@ -1940,7 +1940,7 @@ MonoBehaviour:
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: 0
-    marker: '*'
+    marker: 
     markerColor: {r: 1, g: 1, b: 1, a: 1}
   - x: 12
     y: 16
@@ -2177,9 +2177,9 @@ MonoBehaviour:
     y: 18
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: 7
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
   - x: 3
     y: 19
     prefab: {fileID: 0}
@@ -2625,9 +2625,9 @@ MonoBehaviour:
     y: 18
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: 7
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
   - x: 20
     y: 18
     prefab: {fileID: 0}
@@ -2892,12 +2892,40 @@ MonoBehaviour:
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: 0
-    marker: '*'
+    marker: 
     markerColor: {r: 1, g: 1, b: 1, a: 1}
   - x: 15
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: 0
-    marker: '*'
+    marker: 
     markerColor: {r: 1, g: 1, b: 1, a: 1}
+  - x: 4
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 5
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 6
+    y: 18
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: coin
+    marker: c
+    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+  - x: 12
+    y: 20
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: gun
+    marker: G
+    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
