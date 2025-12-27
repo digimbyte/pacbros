@@ -214,8 +214,7 @@ public class LevelRuntime : MonoBehaviour
                 Transform prefabT = c.tile.transform;
                 // Preserve prefab local position additively (grid + prefab local offset).
                 inst.transform.localPosition = new Vector3(c.x, 0f, c.y) + prefabT.localPosition;
-                if (Mathf.Abs(prefabT.localPosition.x) > 0.001f || Mathf.Abs(prefabT.localPosition.z) > 0.001f)
-                    Debug.Log($"Spawn Tile: cell=({c.x},{c.y}) prefab='{prefab.name}' localOffset={prefabT.localPosition} => worldLocal={inst.transform.localPosition}", prefab);
+                // preserve prefab local position additively
                 inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(c.rotationIndex) * 90f, 0f) * prefabT.localRotation;
                 inst.transform.localScale = prefabT.localScale;
             }
@@ -227,14 +226,20 @@ public class LevelRuntime : MonoBehaviour
             for (int i = 0; i < atlas.placeables.Count; i++)
             {
                 var p = atlas.placeables[i];
+                
                 GameObject prefab = p.prefab;
                 if (prefab == null)
                 {
                     // Registry decides default; we do not add local fallbacks.
                     if (!string.IsNullOrWhiteSpace(p.marker))
                         prefab = GetRegistryPrefab(p.marker);
+                    // Try lookup by kind string (current behavior).
                     if (prefab == null && p.kind != TileAdjacencyAtlas.PlaceableKind.None)
-                        prefab = GetRegistryPrefab(p.kind.ToString());
+                        prefab = GetRegistryPrefab(p.kind);
+
+                    
+
+                    // No legacy numeric-kind fallback: rely on explicit keys or registry defaults.
                 }
                 if (prefab == null) continue; // respect registry authority
 
@@ -244,8 +249,7 @@ public class LevelRuntime : MonoBehaviour
                 Transform prefabT = prefab.transform;
                 // Preserve prefab local position additively (grid + prefab local offset).
                 inst.transform.localPosition = new Vector3(p.x, 0f, p.y) + prefabT.localPosition;
-                if (Mathf.Abs(prefabT.localPosition.x) > 0.001f || Mathf.Abs(prefabT.localPosition.z) > 0.001f)
-                    Debug.Log($"Spawn Placeable: cell=({p.x},{p.y}) prefab='{prefab.name}' localOffset={prefabT.localPosition} => worldLocal={inst.transform.localPosition}", prefab);
+                // preserve prefab local position additively
                 inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(p.rotationIndex) * 90f, 0f) * prefabT.localRotation;
                 inst.transform.localScale = prefabT.localScale;
             }
@@ -254,16 +258,16 @@ public class LevelRuntime : MonoBehaviour
 
     static bool IsWorldPlaceable(string kind)
     {
-        if (string.IsNullOrWhiteSpace(kind)) return false;
+        // Registry is authoritative; by default spawn under `Entities`.
+        return false;
     }
     // ---------- Registry API (singleton-friendly via LevelRuntime.Active) ----------
 
     public GameObject GetRegistryPrefab(string key)
     {
         if (string.IsNullOrWhiteSpace(key)) return null;
-        // 1) Try registry asset API methods directly (preferred).
-        var fromApi = InvokeRegistryGetter(registryAsset, key);
-        if (fromApi != null) return fromApi;
+        if (registryAsset is PrefabRegistry pr)
+            return pr.GetPrefab(key);
         return null;
     }
 
@@ -283,31 +287,7 @@ public class LevelRuntime : MonoBehaviour
     }
 
 
-    // Try to call public/protected API methods on the registry ScriptableObject before reflection digging.
-    static GameObject InvokeRegistryGetter(ScriptableObject registry, string key)
-    {
-        if (registry == null || string.IsNullOrWhiteSpace(key)) return null;
-        var t = registry.GetType();
-        string[] methodNames =
-        {
-            "GetAsset", "Get", "GetItem", "GetByUid", "Find", "FindAsset", "Lookup"
-        };
-
-        foreach (var name in methodNames)
-        {
-            var m = t.GetMethod(name, System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance, null, new[] { typeof(string) }, null);
-            if (m == null) continue;
-            try
-            {
-                var obj = m.Invoke(registry, new object[] { key }) as UnityEngine.Object;
-                var go = obj as GameObject;
-                if (go == null && obj is Component comp) go = comp.gameObject;
-                if (go != null) return go;
-            }
-            catch { /* ignore and continue */ }
-        }
-        return null;
-    }
+    // No reflection: registry must implement a direct API (e.g. `PrefabRegistry`).
     void AutoConfigureFromChildren()
     {
         // Use child colliders; rely on explicit wall/floor layers you set in the scene.
