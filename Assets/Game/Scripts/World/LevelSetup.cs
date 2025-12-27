@@ -9,6 +9,14 @@ using Pathfinding;
 [DisallowMultipleComponent]
 public class LevelSetup : MonoBehaviour
 {
+    [Header("References")]
+    [Tooltip("Main player entity in this level.")]
+    public PlayerEntity player;
+    [Tooltip("Ordered list of enemies to position from EnemySpawnPoints (e.g. 4 Pac ghosts).")]
+    public EnemyEntity[] enemies;
+    [Tooltip("Camera control to retarget; pivot is read from this component.")]
+    public CameraControl cameraControl;
+
     [Header("Pairing")]
     public bool randomizePortals = true;
     public bool randomizeTunnels = true;
@@ -28,6 +36,123 @@ public class LevelSetup : MonoBehaviour
         if (registerAstarPortalEdges)
         {
             RegisterAstarPortalEdges();
+        }
+
+        // After level geometry + entities are spawned and portals linked,
+        // snap the player (and camera) to a SpawnPlayer anchor.
+        PositionPlayersAndCamera();
+    }
+
+    /// <summary>
+    /// Find a SpawnPlayer anchor (PlayerSpawnPoint) and move the player entity and camera to it.
+    /// </summary>
+    public void PositionPlayersAndCamera(int playerIndex = 0)
+    {
+        // Find all spawn markers in the active level.
+        var spawns = GameObject.FindObjectsOfType<PlayerSpawnPoint>(includeInactive: true);
+        if (spawns == null || spawns.Length == 0)
+            return;
+
+        PlayerSpawnPoint chosen = null;
+
+        // Prefer exact index match.
+        for (int i = 0; i < spawns.Length; i++)
+        {
+            var s = spawns[i];
+            if (s != null && s.playerIndex == playerIndex)
+            {
+                chosen = s;
+                break;
+            }
+        }
+
+        // Fallback: any spawn with playerIndex < 0.
+        if (chosen == null)
+        {
+            for (int i = 0; i < spawns.Length; i++)
+            {
+                var s = spawns[i];
+                if (s != null && s.playerIndex < 0)
+                {
+                    chosen = s;
+                    break;
+                }
+            }
+        }
+
+        if (chosen == null)
+            return;
+
+        // Move the primary player entity.
+        var pEntity = player != null ? player : GameObject.FindObjectOfType<PlayerEntity>(includeInactive: true);
+        if (pEntity != null)
+        {
+            var t = pEntity.transform;
+            var pos = chosen.transform.position;
+            t.position = new Vector3(pos.x, t.position.y, pos.z);
+        }
+
+        // Retarget the camera control if present.
+        var cam = cameraControl != null ? cameraControl : GameObject.FindObjectOfType<CameraControl>(includeInactive: true);
+        if (cam != null && pEntity != null)
+        {
+            cam.target = pEntity.transform;
+        }
+
+        // Position enemies from EnemySpawnPoints.
+        PositionEnemies();
+    }
+
+    public void PositionEnemies()
+    {
+        if (enemies == null || enemies.Length == 0)
+            return;
+
+        var eSpawns = GameObject.FindObjectsOfType<EnemySpawnPoint>(includeInactive: true);
+        if (eSpawns == null || eSpawns.Length == 0)
+            return;
+
+        // Simple strategy: for each enemy in order, find the first compatible spawn.
+        for (int ei = 0; ei < enemies.Length; ei++)
+        {
+            var enemy = enemies[ei];
+            if (enemy == null) continue;
+
+            EnemySpawnPoint chosen = null;
+            int typeId = enemy.enemyTypeId;
+
+            // Prefer exact enemyTypeId match.
+            for (int si = 0; si < eSpawns.Length; si++)
+            {
+                var s = eSpawns[si];
+                if (s == null) continue;
+                if (typeId >= 0 && s.enemyTypeId == typeId)
+                {
+                    chosen = s;
+                    break;
+                }
+            }
+
+            // Fallback: any spawn with enemyTypeId < 0.
+            if (chosen == null)
+            {
+                for (int si = 0; si < eSpawns.Length; si++)
+                {
+                    var s = eSpawns[si];
+                    if (s == null) continue;
+                    if (s.enemyTypeId < 0)
+                    {
+                        chosen = s;
+                        break;
+                    }
+                }
+            }
+
+            if (chosen == null) continue;
+
+            var t = enemy.transform;
+            var pos = chosen.transform.position;
+            t.position = new Vector3(pos.x, t.position.y, pos.z);
         }
     }
 

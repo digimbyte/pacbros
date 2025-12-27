@@ -15,6 +15,9 @@ public class PrefabRegistry : ScriptableObject
     [Tooltip("List of key → prefab mappings.")]
     public List<Entry> entries = new List<Entry>();
 
+    [Tooltip("Default/fallback prefab. Returned when a key is missing or maps to null.")]
+    public GameObject defaultPrefab;
+
     Dictionary<string, GameObject> _map;
 
     public void BuildIndexIfNeeded()
@@ -33,8 +36,26 @@ public class PrefabRegistry : ScriptableObject
     public GameObject GetPrefab(string key)
     {
         BuildIndexIfNeeded();
-        if (string.IsNullOrWhiteSpace(key) || _map == null) return null;
-        _map.TryGetValue(key, out var prefab);
-        return prefab;
+
+        // Registry is authoritative: must always return a valid prefab or hard-error.
+        GameObject ResolveOrFail()
+        {
+            if (defaultPrefab != null)
+                return defaultPrefab;
+
+            Debug.LogError($"PrefabRegistry '{name}' has no defaultPrefab assigned but GetPrefab was called with key='{key}'." , this);
+            throw new InvalidOperationException($"PrefabRegistry '{name}' has no default prefab configured.");
+        }
+
+        if (_map == null)
+            return ResolveOrFail();
+
+        if (string.IsNullOrWhiteSpace(key))
+            return ResolveOrFail();
+
+        if (_map.TryGetValue(key, out var prefab) && prefab != null)
+            return prefab;
+
+        return ResolveOrFail();
     }
 }

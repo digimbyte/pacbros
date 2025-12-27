@@ -227,7 +227,7 @@ public class TileAdjacencyAtlas : ScriptableObject
         int y,
         GameObject prefab,
         int rotationIndex = 0,
-        string kind = PlaceableKind.Prefab,
+        string kind = PlaceableKind.None,
         string marker = null,
         Color? markerColor = null)
     {
@@ -245,7 +245,7 @@ public class TileAdjacencyAtlas : ScriptableObject
         }
 
         // If no prefab, no marker, and kind is the default Prefab (common clear path), treat as delete.
-        bool isEmptyDefaultClear = prefab == null && string.IsNullOrEmpty(marker) && kind == PlaceableKind.Prefab;
+        bool isEmptyDefaultClear = prefab == null && string.IsNullOrEmpty(marker) && kind == PlaceableKind.None;
         if (isEmptyDefaultClear)
         {
             if (index >= 0) placeables.RemoveAt(index);
@@ -288,7 +288,6 @@ public class TileAdjacencyAtlas : ScriptableObject
     public static class PlaceableKind
     {
         public const string None = "none";
-        public const string Prefab = "prefab";
         public const string SpawnPlayer = "player";
         public const string Enemy = "enemy";
         public const string Loot = "loot";

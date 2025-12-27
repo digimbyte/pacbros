@@ -1,7 +1,8 @@
-using UnityEngine;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Pathfinding; // A* Project
+using Core.Registry; // for Registry (Entities.asset)
 
 /// <summary>
 /// Runtime data + hooks for the currently loaded level instance.
@@ -19,8 +20,8 @@ public class LevelRuntime : MonoBehaviour
     [Tooltip("Root that will hold runtime entities (players, coins, items, etc.). If null, a sibling/child named 'Entities' will be created or reused.")]
     public Transform entitiesRoot;
     [Header("Registries")]
-    [Tooltip("Primary registry ScriptableObject (e.g. Assets/Game/Entities.asset). Registry is authoritative; no local fallbacks are used.")]
-    public ScriptableObject registryAsset;
+    [Tooltip("Primary registry (Assets/Game/Entities.asset created via Core/Data/Registry). Must be a Core.Registry.Registry instance.")]
+    public Registry entityRegistry;
 
     [Header("Grid (auto-computed from children)")]
     [HideInInspector] public float cellSize = 1f;
@@ -112,9 +113,12 @@ public class LevelRuntime : MonoBehaviour
             if (buildNavmeshOnAwake)
             {
                 astar.Scan();
-                // After scan, register graph edges for portals/tunnels.
+                // After scan, register graph edges for portals/tunnels and snap player to spawn.
                 if (setup != null)
+                {
                     setup.RegisterAstarPortalEdges();
+                    setup.PositionPlayersAndCamera();
+                }
             }
         }
 
@@ -190,13 +194,22 @@ public class LevelRuntime : MonoBehaviour
     {
         if (atlas == null) return;
 
-        var levelRoot = ResolveLevelContainer(atlas.name);
+        var levelRoot = ResolveLevelContainer();
+        // Create/ensure a child named after the atlas to hold all spawned tiles/placeables
+        Transform atlasRoot = levelRoot.Find(atlas.name);
+        if (atlasRoot == null)
+        {
+            var go = new GameObject(atlas.name);
+            go.transform.SetParent(levelRoot, false);
+            atlasRoot = go.transform;
+        }
+
         var entities = ResolveEntitiesRoot();
 
         // Clear previous children to avoid duplicates on reload.
-        for (int i = levelRoot.childCount - 1; i >= 0; i--)
+        for (int i = atlasRoot.childCount - 1; i >= 0; i--)
         {
-            Destroy(levelRoot.GetChild(i).gameObject);
+            Destroy(atlasRoot.GetChild(i).gameObject);
         }
 
         // Tiles (world geometry)
@@ -210,7 +223,7 @@ public class LevelRuntime : MonoBehaviour
                 var prefab = c.tile.gameObject;
                 if (prefab == null) continue;
 
-                var inst = Instantiate(prefab, levelRoot);
+                var inst = Instantiate(prefab, atlasRoot);
                 Transform prefabT = c.tile.transform;
                 // Preserve prefab local position additively (grid + prefab local offset).
                 inst.transform.localPosition = new Vector3(c.x, 0f, c.y) + prefabT.localPosition;
@@ -226,20 +239,11 @@ public class LevelRuntime : MonoBehaviour
             for (int i = 0; i < atlas.placeables.Count; i++)
             {
                 var p = atlas.placeables[i];
-                
-                GameObject prefab = p.prefab;
-                if (prefab == null)
-                {
-                    // Use the registry API directly. Marker is an editor-only field and must not be
-                    // used at runtime; resolve only by `kind`.
-                    if (registryAsset is PrefabRegistry pr && !string.IsNullOrWhiteSpace(p.kind))
-                    {
-                        prefab = pr.GetPrefab(p.kind);
-                    }
-                }
-                if (prefab == null) continue; // respect registry authority
 
-                var target = IsWorldPlaceable(p.kind) ? levelRoot : entities;
+                // Registry is responsible for providing a valid prefab or its own fallback.
+                // We always call by kind and instantiate blindly.
+                GameObject prefab = GetRegistryPrefab(p.kind);
+                var target = entities; // all placeables go under Entities
 
                 var inst = Instantiate(prefab, target);
                 Transform prefabT = prefab.transform;
@@ -252,20 +256,19 @@ public class LevelRuntime : MonoBehaviour
         }
     }
 
-    static bool IsWorldPlaceable(string kind)
-    {
-        // Registry is authoritative; by default spawn under `Entities`.
-        return false;
-    }
 
     // ---------- Registry API (singleton-friendly via LevelRuntime.Active) ----------
 
-    public GameObject GetRegistryPrefab(string key)
+    public GameObject GetRegistryPrefab(string uid)
     {
-        if (string.IsNullOrWhiteSpace(key)) return null;
-        if (registryAsset is PrefabRegistry pr)
-            return pr.GetPrefab(key);
-        return null;
+        if (entityRegistry == null)
+        {
+            Debug.LogError($"LevelRuntime '{name}' has no entityRegistry assigned; cannot resolve uid '{uid}'.", this);
+            return null; // explicit config error; avoids immediate null-ref crash
+        }
+
+        // Core.Registry.Registry already handles missing UIDs by returning its default prefab.
+        return entityRegistry.GetPrefabByUID(uid);
     }
 
     public GameObject InstantiateRegistryPrefab(string key, Vector3 position, Quaternion rotation, Transform parent = null)
@@ -284,7 +287,7 @@ public class LevelRuntime : MonoBehaviour
     }
 
 
-    // No reflection: registry must implement a direct API (e.g. `PrefabRegistry`).
+    // No reflection into fields: registry must implement a direct API.
     void AutoConfigureFromChildren()
     {
         // Use child colliders; rely on explicit wall/floor layers you set in the scene.

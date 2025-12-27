@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3489647428217073734}
   - component: {fileID: 7242115553091643686}
   m_Layer: 0
-  m_Name: Player 1
+  m_Name: Player_1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -30,7 +30,7 @@ Transform:
   m_GameObject: {fileID: 2584990566347290654}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -10, y: 0, z: -15.97}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -111,9 +111,9 @@ CharacterController:
   serializedVersion: 3
   m_Height: 1.2
   m_Radius: 0.35
-  m_SlopeLimit: 89
-  m_StepOffset: 0.05
-  m_SkinWidth: 0.02
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0.6, z: 0}
 --- !u!114 &3489647428217073734
