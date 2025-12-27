@@ -232,7 +232,7 @@ public class LevelRuntime : MonoBehaviour
                 {
                     // Use the registry API directly. Marker is an editor-only field and must not be
                     // used at runtime; resolve only by `kind`.
-                    if (registryAsset is PrefabRegistry pr && !string.IsNullOrWhiteSpace(p.kind) && IsKnownPlaceableKind(p.kind))
+                    if (registryAsset is PrefabRegistry pr && !string.IsNullOrWhiteSpace(p.kind))
                     {
                         prefab = pr.GetPrefab(p.kind);
                     }
