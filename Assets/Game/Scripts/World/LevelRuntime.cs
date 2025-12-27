@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 using Pathfinding; // A* Project
 
@@ -10,6 +11,16 @@ using Pathfinding; // A* Project
 public class LevelRuntime : MonoBehaviour
 {
     public static LevelRuntime Active { get; private set; }
+    [Header("Level Asset")]
+    [Tooltip("TileAdjacencyAtlas to instantiate as level geometry under this runtime root.")]
+    public TileAdjacencyAtlas levelAtlas;
+    [Tooltip("Optional explicit container for spawned level geometry. Will be created if null.")]
+    public Transform levelContainer;
+    [Tooltip("Root that will hold runtime entities (players, coins, items, etc.). If null, a sibling/child named 'Entities' will be created or reused.")]
+    public Transform entitiesRoot;
+    [Header("Registries")]
+    [Tooltip("Primary registry ScriptableObject (e.g. Assets/Game/Entities.asset from Core.Registry).")]
+    public ScriptableObject registryAsset;
 
     [Header("Grid (auto-computed from children)")]
     [HideInInspector] public float cellSize = 1f;
@@ -61,6 +72,12 @@ public class LevelRuntime : MonoBehaviour
     {
         Active = this;
 
+        // Instantiate the level geometry/placeables from atlas before scanning grid/collision.
+        if (levelAtlas != null)
+        {
+            SpawnLevelFromAtlas(levelAtlas);
+        }
+
         // Auto-detect named layers for wall/floor.
         if (wallLayers == 0)
             wallLayers = LayerMask.GetMask("wall");
@@ -88,11 +105,20 @@ public class LevelRuntime : MonoBehaviour
             if (buildNavmeshOnAwake)
             {
                 astar.Scan();
+                // After scanning the graph, allow level-specific setup (portal/tunnel pairing, graph edges, etc.)
+                var setup = GetComponentInChildren<LevelSetup>();
+                if (setup != null)
+                {
+                    setup.Initialize();
+                }
             }
         }
 
         // Drain any motors that awoke before this level (race-safe).
         GridMotor.FlushPendingMotorsTo(this);
+
+        // Build registry lookup late so it can be used by other components.
+        BuildRegistryCache();
 
         isReady = true;
 
@@ -111,6 +137,164 @@ public class LevelRuntime : MonoBehaviour
             Active = null;
     }
 
+    Transform ResolveEntitiesRoot()
+    {
+        if (entitiesRoot != null) return entitiesRoot;
+
+        Transform candidate = null;
+
+        if (transform.parent != null)
+            candidate = transform.parent.Find("Entities");
+
+        if (candidate == null)
+            candidate = transform.Find("Entities");
+
+        if (candidate == null)
+        {
+            var go = new GameObject("Entities");
+            if (transform.parent != null)
+                go.transform.SetParent(transform.parent, false);
+            else
+                go.transform.SetParent(transform, false);
+            candidate = go.transform;
+        }
+
+        entitiesRoot = candidate;
+        return entitiesRoot;
+    }
+
+    Transform ResolveLevelContainer()
+    {
+        if (levelContainer != null) return levelContainer;
+
+        var go = new GameObject("Level");
+        go.transform.SetParent(transform, false);
+        levelContainer = go.transform;
+        return levelContainer;
+    }
+
+    void SpawnLevelFromAtlas(TileAdjacencyAtlas atlas)
+    {
+        if (atlas == null) return;
+
+        var levelRoot = ResolveLevelContainer();
+        var entities = ResolveEntitiesRoot();
+
+        // Clear previous children to avoid duplicates on reload.
+        for (int i = levelRoot.childCount - 1; i >= 0; i--)
+        {
+            Destroy(levelRoot.GetChild(i).gameObject);
+        }
+
+        // Tiles (world geometry)
+        if (atlas.cells != null)
+        {
+            for (int i = 0; i < atlas.cells.Count; i++)
+            {
+                var c = atlas.cells[i];
+                if (c.tile == null) continue;
+
+                var prefab = c.tile.gameObject;
+                if (prefab == null) continue;
+
+                var inst = Instantiate(prefab, levelRoot);
+                Transform prefabT = c.tile.transform;
+                inst.transform.localPosition = new Vector3(c.x, 0f, c.y) + prefabT.localPosition;
+                inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(c.rotationIndex) * 90f, 0f) * prefabT.localRotation;
+                inst.transform.localScale = prefabT.localScale;
+            }
+        }
+
+        // Placeables
+        if (atlas.placeables != null && atlas.placeables.Count > 0)
+        {
+            for (int i = 0; i < atlas.placeables.Count; i++)
+            {
+                var p = atlas.placeables[i];
+                if (p.prefab == null) continue;
+
+                var target = IsWorldPlaceable(p.kind) ? levelRoot : entities;
+
+                var inst = Instantiate(p.prefab, target);
+                Transform prefabT = p.prefab.transform;
+                inst.transform.localPosition = new Vector3(p.x, 0f, p.y) + prefabT.localPosition;
+                inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(p.rotationIndex) * 90f, 0f) * prefabT.localRotation;
+                inst.transform.localScale = prefabT.localScale;
+            }
+        }
+    }
+
+    static bool IsWorldPlaceable(TileAdjacencyAtlas.PlaceableKind kind)
+    {
+        return kind == TileAdjacencyAtlas.PlaceableKind.Door ||
+               kind == TileAdjacencyAtlas.PlaceableKind.Portal;
+    }
+    // ---------- Registry API (singleton-friendly via LevelRuntime.Active) ----------
+
+    Dictionary<string, GameObject> _registryCache;
+
+    void BuildRegistryCache()
+    {
+        if (_registryCache != null) return;
+        _registryCache = new Dictionary<string, GameObject>(System.StringComparer.OrdinalIgnoreCase);
+
+        // Prefer Core.Registry asset if provided.
+        if (registryAsset != null)
+        {
+            TryPopulateFromCoreRegistry(registryAsset, _registryCache);
+        }
+    }
+
+    static void TryPopulateFromCoreRegistry(ScriptableObject so, Dictionary<string, GameObject> cache)
+    {
+        if (so == null || cache == null) return;
+
+        var t = so.GetType();
+        // Expect fields: List<itemEntries> with fields uid(string) asset(Object)
+        var entriesField = t.GetField("itemEntries", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+        if (entriesField == null) return;
+
+        if (entriesField.GetValue(so) is IEnumerable list)
+        {
+            foreach (var entry in list)
+            {
+                if (entry == null) continue;
+                var et = entry.GetType();
+                var uidField = et.GetField("uid", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                var assetField = et.GetField("asset", System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+                if (uidField == null || assetField == null) continue;
+
+                var uid = uidField.GetValue(entry) as string;
+                var asset = assetField.GetValue(entry) as GameObject;
+                if (string.IsNullOrWhiteSpace(uid) || asset == null) continue;
+                cache[uid] = asset;
+            }
+        }
+    }
+
+    public GameObject GetRegistryPrefab(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key)) return null;
+        BuildRegistryCache();
+        if (_registryCache != null && _registryCache.TryGetValue(key, out var prefab))
+            return prefab;
+        return null;
+    }
+
+    public GameObject InstantiateRegistryPrefab(string key, Vector3 position, Quaternion rotation, Transform parent = null)
+    {
+        var prefab = GetRegistryPrefab(key);
+        if (prefab == null) return null;
+
+        var targetParent = parent ?? ResolveEntitiesRoot();
+        return Instantiate(prefab, position, rotation, targetParent);
+    }
+
+    public T InstantiateRegistryPrefab<T>(string key, Vector3 position, Quaternion rotation, Transform parent = null) where T : Component
+    {
+        var go = InstantiateRegistryPrefab(key, position, rotation, parent);
+        return go != null ? go.GetComponent<T>() : null;
+    }
     void AutoConfigureFromChildren()
     {
         // Use child colliders; rely on explicit wall/floor layers you set in the scene.

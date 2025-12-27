@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1481867827497930701}
   - component: {fileID: 3847592844252714852}
   - component: {fileID: -6240180108987185802}
+  - component: {fileID: 2762224662898303185}
   m_Layer: 11
   m_Name: Border_Tunnel
   m_TagString: Untagged
@@ -107,7 +108,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -949,3 +950,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PortalSecurity
   gateType: 0
   requiredKey: 0
+--- !u!114 &2762224662898303185
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5092839260583642815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8d3cf3fe35502e40a105053bf17f12f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PairedTunnel
+  paired: {fileID: 0}
+  allowGhosts: 1
+  exitWorldOffset: {x: 0, y: 0, z: 0}
+  cooldownSeconds: 0.2
+  activationRadius: 0.45

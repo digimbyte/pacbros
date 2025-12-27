@@ -1,84 +1,94 @@
 using UnityEngine;
 
 /// <summary>
-/// World-space camera follow with elastic (spring) motion and speed-based FOV.
-/// Keeps the target within a 20% deadzone of the viewport before applying acceleration.
+/// Simple dolly camera: snaps at start, smooth-follow via SmoothDamp, optional look-ahead,
+/// and a small viewport clamp so the player stays on screen.
+/// Designed to be simple and stable for fast lateral action.
 /// </summary>
 [DisallowMultipleComponent]
 public class CameraControl : MonoBehaviour
 {
     [Header("Target")]
-    [Tooltip("Primary target (e.g., player).")]
     public Transform target;
 
     [Header("Offset")]
-    [Tooltip("World-space offset from target (in camera space forward/right/up).")]
-    public Vector3 offset = new Vector3(0f, 12f, -10f);
+    [Tooltip("World-space offset from target (applied in camera rotation).")]
+    public Vector3 offset = new Vector3(0f, 6f, -10f);
 
-    [Tooltip("How far ahead along the target move direction to bias the camera (world units).")]
-    public float lookAhead = 2f;
+    [Header("Follow")]
+    [Tooltip("Smooth time for camera follow. Lower = snappier.")]
+    public float smoothTime = 0.12f;
 
-    [Tooltip("Target speed that yields full lookAhead. Below this, look-ahead scales down.")]
-    public float lookAheadAtSpeed = 8f;
-
-    [Header("Elastic Motion")]
-    [Tooltip("Spring strength pulling camera toward desired position.")]
-    public float spring = 12f;
-
-    [Tooltip("Damping factor (critically damped ~2*sqrt(spring)).")]
-    public float damping = 18f;
-
-    [Tooltip("Max translation speed of the camera (units/sec). 0 = unlimited.")]
+    [Tooltip("Maximum speed for SmoothDamp (0 = unlimited).")]
     public float maxSpeed = 40f;
 
-    [Tooltip("Half-size of the center box in viewport fraction. 0.166 = player stays within center third.")]
-    [Range(0f, 0.5f)] public float deadzoneBox = 1f / 6f;
-    [Tooltip("Fraction of spring/damping applied even when inside deadzone (prevents drift when standing still).")]
-    [Range(0f, 1f)] public float recenterFactor = 0.35f;
-    [Header("Velocity Smoothing")]
-    [Tooltip("How quickly target velocity estimate follows position deltas. Higher = snappier, lower = smoother.")]
-    public float velocityLerp = 10f;
+    [Header("Look Ahead")]
+    [Tooltip("How far ahead along velocity to bias the camera (world units).")]
+    public float lookAhead = 2f;
+    [Tooltip("Player speed that yields full lookAhead.")]
+    public float lookAheadAtSpeed = 8f;
 
-    [Header("FOV")]
-    [Tooltip("Camera Field of View at zero speed.")]
-    public float fovMin = 55f;
-
-    [Tooltip("Camera Field of View at maxSpeedForFov or higher.")]
-    public float fovMax = 70f;
-
-    [Tooltip("Target speed that maps to fovMax.")]
-    public float maxSpeedForFov = 12f;
-
-    [Tooltip("How quickly FOV interpolates to its target.")]
-    public float fovLerpSpeed = 6f;
+    [Header("Viewport")]
+    [Range(0f, 0.5f)] public float deadzoneRadius = 0.16f;
 
     private Camera _cam;
-    private Vector3 _vel; // camera velocity (for our spring)
+    private Vector3 _velocity;
     private Vector3 _lastTargetPos;
     private bool _hasLast;
-    private float _fovVel;
+    private Vector3 _virtualFocus;
+    private Vector3 _virtualFocusVel;
     private Vector3 _smoothedTargetVel;
+    private Vector3 _smoothedTargetVelVel;
+    [Header("Velocity Smoothing")]
+    [Tooltip("Smooth time for target velocity smoothing. Lower = snappier.")]
+    public float velocitySmoothTime = 0.12f;
+    [Tooltip("If the target speed is below this value, smooth toward zero faster.")]
+    public float velocityZeroSpeed = 0.5f;
+    [Tooltip("Multiplier applied to smooth time when zeroing (0..1). Lower = faster zeroing.")]
+    [Range(0.01f,1f)] public float velocityZeroSmoothFactor = 0.3f;
+    [Header("Pivot")]
+    [Tooltip("Optional pivot Transform. If set, the script will move the pivot (XZ) toward the virtual focus and leave the camera as a child to keep its local offset.")]
+    public Transform pivot;
+    private Vector3 _pivotVel;
+    private bool _warnedNoPivot = false;
+    [Tooltip("Unused: smoothing removed; offset follows smoothed velocity proportionally.")]
+    private const float _unused_offsetSmooth = 0f;
+    [Tooltip("Invert the look-ahead direction (subtract instead of add).")]
+    public bool invertLookAhead = false;
+    [Tooltip("How quickly the virtual focal point follows the player (seconds). Lower = snappier)")]
+    public float focusSmoothTime = 0.12f;
+    [Tooltip("Maximum allowed world magnitude for camera/virtual focus to avoid runaway values")]
+    public float maxWorldRadius = 100000f;
 
     void Awake()
     {
         _cam = GetComponentInChildren<Camera>();
-        if (_cam == null)
-            _cam = Camera.main;
+        if (_cam == null) _cam = Camera.main;
     }
 
     void Start()
     {
-        // On start, immediately snap camera to desired position so the player starts centered
         if (target == null || _cam == null) return;
-        Vector3 targetPos = target.position;
-        // compute desired using the actual camera rotation (safer if camera is child)
-        Vector3 desired = targetPos + _cam.transform.rotation * offset;
-        transform.position = desired;
-        _vel = Vector3.zero;
-        // initialize velocity tracking
-        _lastTargetPos = targetPos;
+        // Snap camera to desired start position
+        Vector3 targetFlat = new Vector3(target.position.x, 0f, target.position.z);
+        _virtualFocus = targetFlat;
+        _virtualFocusVel = Vector3.zero;
+        // Require a pivot: we will never move the camera transform directly.
+        if (pivot != null)
+        {
+            pivot.position = new Vector3(_virtualFocus.x, pivot.position.y, _virtualFocus.z);
+        }
+        else
+        {
+            if (!_warnedNoPivot)
+            {
+                Debug.LogWarning("CameraControl: No `pivot` assigned — script will not move the camera transform. Assign a pivot (parent of the camera) to enable movement.");
+                _warnedNoPivot = true;
+            }
+        }
+        _velocity = Vector3.zero;
+        _lastTargetPos = target.position;
         _hasLast = true;
-        _smoothedTargetVel = Vector3.zero;
     }
 
     void LateUpdate()
@@ -87,90 +97,92 @@ public class CameraControl : MonoBehaviour
 
         Vector3 rawTargetPos = target.position;
         Vector3 targetVel = GetTargetVelocity(rawTargetPos);
-        // For camera placement/clamping assume player Y = 0 (flat ground)
-        Vector3 targetPos = new Vector3(rawTargetPos.x, 0f, rawTargetPos.z);
 
-        // Desired point: target + look-ahead in move dir + offset in camera space
+        // compute desired virtual focal on ground (player pos + movement vector scaled)
+        Vector3 playerFlat = new Vector3(rawTargetPos.x, 0f, rawTargetPos.z);
         float speed = targetVel.magnitude;
-        float lookAheadDist = lookAheadAtSpeed > 0.0001f
-            ? Mathf.Lerp(0f, lookAhead, Mathf.InverseLerp(0f, lookAheadAtSpeed, speed))
-            : lookAhead;
+        float lookScale = lookAheadAtSpeed > 0f ? Mathf.Clamp01(speed / lookAheadAtSpeed) : 1f;
+        Vector3 look = (targetVel.sqrMagnitude > 0.0001f) ? targetVel * (lookAhead * lookScale) : Vector3.zero;
 
-        // Use camera-plane velocity (right/forward, ignore vertical) so look-ahead matches view angle.
-        Vector3 camRight = _cam.transform.right;
-        Vector3 camForward = Vector3.ProjectOnPlane(_cam.transform.forward, Vector3.up).normalized;
-        Vector3 velOnPlane = camRight * Vector3.Dot(targetVel, camRight) + camForward * Vector3.Dot(targetVel, camForward);
+        Vector3 desiredVirtual = playerFlat + new Vector3(look.x, 0f, look.z);
+        // clamp runaway desiredVirtual
+        if (desiredVirtual.sqrMagnitude > maxWorldRadius * maxWorldRadius) desiredVirtual = desiredVirtual.normalized * maxWorldRadius;
 
-        Vector3 ahead = velOnPlane.sqrMagnitude > 0.01f ? velOnPlane.normalized * lookAheadDist : Vector3.zero;
-        Vector3 desired = targetPos + ahead + _cam.transform.rotation * offset;
+        // SmoothDamp the virtual focus on the ground
+        _virtualFocus = Vector3.SmoothDamp(_virtualFocus, desiredVirtual, ref _virtualFocusVel, focusSmoothTime, maxSpeed, Time.deltaTime);
 
-        // Apply deadzone in viewport: if target is within deadzone, freeze acceleration.
-        Vector3 viewport = _cam.WorldToViewportPoint(targetPos);
-        float cx = viewport.x - 0.5f;
-        float cy = viewport.y - 0.5f;
-        bool insideDeadzone = Mathf.Abs(cx) <= deadzoneBox && Mathf.Abs(cy) <= deadzoneBox;
-        // If nearly stopped, always recenter (ignore deadzone).
-        if (speed < 0.1f) insideDeadzone = false;
+        // Compute desired camera pos from virtual focus and rotated horizontal offset; lock camera Y to offset.y above ground
+        Vector3 desired = ComputeDesiredPosition(rawTargetPos, look, _virtualFocus);
 
-        Vector3 toDesired = desired - transform.position;
-        Vector3 accel = Vector3.zero;
-        float springScale = insideDeadzone ? recenterFactor : 1f;
-        // Boost spring with horizontal speed for snappier lateral camera at higher player speeds
-        float speedFactor = lookAheadAtSpeed > 0f ? Mathf.Clamp01(speed / lookAheadAtSpeed) : 0f;
-        float effectiveSpring = Mathf.Lerp(spring, spring * 1.8f, speedFactor) * springScale;
-        float effectiveDamping = Mathf.Lerp(damping, damping * 1.4f, speedFactor) * springScale;
-        accel = toDesired * effectiveSpring - _vel * effectiveDamping;
-
-        _vel += accel * Time.deltaTime;
-        if (maxSpeed > 0f)
-            _vel = Vector3.ClampMagnitude(_vel, maxSpeed);
-
-        transform.position += _vel * Time.deltaTime;
-
-        // Ensure the target remains within the viewport deadzone: if it's outside, correct
-        // the camera by using a ray -> ground (y=0) intersection as the camera's focal point
-        // and moving the camera in XZ so that the focal point moves toward the player.
-        Vector3 vp = _cam.WorldToViewportPoint(rawTargetPos);
-        float cx2 = vp.x - 0.5f;
-        float cy2 = vp.y - 0.5f;
-        bool outsideDeadzone = Mathf.Abs(cx2) > deadzoneBox || Mathf.Abs(cy2) > deadzoneBox;
-        if (outsideDeadzone)
+        // If a pivot is provided, move the pivot toward the virtual focus (XZ) and leave the camera child offset alone.
+        if (pivot != null)
         {
-            // Ray from camera along forward to intersect Y=0 plane
-            Vector3 camPos = _cam.transform.position;
-            Vector3 camFwd = _cam.transform.forward;
-            Vector3 focal;
-            if (Mathf.Abs(camFwd.y) > 1e-5f)
+            Vector3 pivotTarget = new Vector3(_virtualFocus.x, pivot.position.y, _virtualFocus.z);
+            pivot.position = Vector3.SmoothDamp(pivot.position, pivotTarget, ref _pivotVel, focusSmoothTime, maxSpeed, Time.deltaTime);
+            // also gently damp camera velocity so local spring doesn't fight
+            _velocity *= 0.8f;
+        }
+        else
+        {
+            if (!_warnedNoPivot)
             {
-                float tau = (0f - camPos.y) / camFwd.y;
-                focal = camPos + camFwd * tau;
+                Debug.LogWarning("CameraControl: No `pivot` assigned — script will not move the camera transform. Assign a pivot (parent of the camera) to enable movement.");
+                _warnedNoPivot = true;
+            }
+        }
+
+        // Simple XZ-only pivot target using last-known smoothed velocity.
+        if (pivot != null)
+        {
+            Vector3 targetXZ = new Vector3(rawTargetPos.x, pivot.position.y, rawTargetPos.z);
+            Vector3 velXZ = new Vector3(_smoothedTargetVel.x, 0f, _smoothedTargetVel.z);
+            float speedVel = velXZ.magnitude;
+            // Compute offset proportional to velocity so it naturally goes to zero when the target stops.
+            float lookK = (lookAheadAtSpeed > 0f) ? (lookAhead / Mathf.Max(lookAheadAtSpeed, 0.0001f)) : 0f;
+            Vector3 offsetXZ = velXZ * lookK;
+            // Clamp magnitude to avoid exceeding configured lookAhead
+            if (offsetXZ.magnitude > lookAhead) offsetXZ = offsetXZ.normalized * lookAhead;
+            if (invertLookAhead) offsetXZ = -offsetXZ;
+            Vector3 desiredPivot = targetXZ + offsetXZ;
+            // clamp runaway
+            if (desiredPivot.sqrMagnitude > maxWorldRadius * maxWorldRadius) desiredPivot = desiredPivot.normalized * maxWorldRadius;
+            // Apply deadzone (slop): only move pivot when desiredPivot is outside `deadzoneRadius`.
+            Vector3 delta = desiredPivot - pivot.position;
+            float dz = Mathf.Max(0f, deadzoneRadius);
+            if (delta.sqrMagnitude <= dz * dz)
+            {
+                // inside deadzone: don't move pivot (keeps the character "locked" with slop)
+                // lightly damp camera velocity so local spring doesn't fight
+                _velocity *= 0.9f;
             }
             else
             {
-                // fallback: project camera position down to ground
-                focal = new Vector3(camPos.x, 0f, camPos.z);
+                // Move pivot toward desiredPivot but keep it at the edge of the deadzone to provide slop
+                Vector3 pivotTarget = desiredPivot - delta.normalized * dz;
+                pivot.position = Vector3.SmoothDamp(pivot.position, pivotTarget, ref _pivotVel, focusSmoothTime, maxSpeed, Time.deltaTime);
+                // damp camera velocity lightly to avoid fight
+                _velocity *= 0.8f;
             }
-
-            Vector3 playerFlat = new Vector3(rawTargetPos.x, 0f, rawTargetPos.z);
-            Vector3 correction = playerFlat - focal; // in world XZ
-            Vector3 correctionXZ = new Vector3(correction.x, 0f, correction.z);
-
-            // Safety: avoid massive teleports from bad math
-            float maxCorrection = 50f;
-            if (correctionXZ.magnitude > maxCorrection)
-                correctionXZ = correctionXZ.normalized * maxCorrection;
-
-            transform.position += correctionXZ;
-            _vel = Vector3.zero;
         }
+        else
+        {
+            if (!_warnedNoPivot)
+            {
+                Debug.LogWarning("CameraControl: No `pivot` assigned — script will not move the camera transform. Assign a pivot (parent of the camera) to enable movement.");
+                _warnedNoPivot = true;
+            }
+        }
+    }
 
-        // Always face same yaw/pitch as current rotation; do not spin.
-        // If you want to keep a fixed roll of 0, ensure rotation is managed in editor.
-
-        // FOV based on speed
-        float t = Mathf.InverseLerp(0f, maxSpeedForFov, speed);
-        float targetFov = Mathf.Lerp(fovMin, fovMax, t);
-        _cam.fieldOfView = Mathf.SmoothDamp(_cam.fieldOfView, targetFov, ref _fovVel, 1f / Mathf.Max(0.0001f, fovLerpSpeed));
+    Vector3 ComputeDesiredPosition(Vector3 rawTargetPosition, Vector3 lookAheadWorld, Vector3 virtualFocus)
+    {
+        // We treat the virtual focus as the ground focal point (y = 0)
+        Vector3 focus = virtualFocus;
+        // Use camera yaw to rotate horizontal offset so camera stays oriented
+        Quaternion camYaw = (_cam != null) ? Quaternion.Euler(0f, _cam.transform.eulerAngles.y, 0f) : Quaternion.identity;
+        Vector3 horizontalOffset = camYaw * new Vector3(offset.x, 0f, offset.z);
+        // Camera y is focus.y + offset.y (locking camera height)
+        return focus + horizontalOffset + Vector3.up * offset.y;
     }
 
     Vector3 GetTargetVelocity(Vector3 targetPos)
@@ -180,8 +192,10 @@ public class CameraControl : MonoBehaviour
             float dt = Mathf.Max(Time.deltaTime, 0.0001f);
             Vector3 vel = (targetPos - _lastTargetPos) / dt;
             _lastTargetPos = targetPos;
-            float lerp = Mathf.Clamp01(velocityLerp * dt);
-            _smoothedTargetVel = Vector3.Lerp(_smoothedTargetVel, vel, lerp);
+            // If target is nearly stopped, allow faster smoothing toward zero to avoid whiplash
+            float smoothTime = velocitySmoothTime;
+            if (vel.magnitude < velocityZeroSpeed) smoothTime *= velocityZeroSmoothFactor;
+            _smoothedTargetVel = Vector3.SmoothDamp(_smoothedTargetVel, vel, ref _smoothedTargetVelVel, smoothTime, maxSpeed, dt);
             return _smoothedTargetVel;
         }
         _lastTargetPos = targetPos;

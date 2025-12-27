@@ -23,6 +23,13 @@
         "com.unity.ugui": "1.0.0"
       }
     },
+    "com.digimbyte.core": {
+      "version": "https://github.com/digimbyte/core-framework.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "6e6ed6eb0ef17fa66456a006d89b7f7fd3b6ae1a"
+    },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
       "depth": 0,

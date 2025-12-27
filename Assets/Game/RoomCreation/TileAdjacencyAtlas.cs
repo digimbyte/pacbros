@@ -237,8 +237,16 @@ public class TileAdjacencyAtlas : ScriptableObject
         int rot = NormalizeRot(rotationIndex);
         int index = placeables.FindIndex(p => p.x == x && p.y == y);
 
-        bool isEmpty = prefab == null && kind == PlaceableKind.None && string.IsNullOrEmpty(marker);
-        if (isEmpty)
+        // If caller explicitly specifies `None`, remove any existing entry (treat as delete).
+        if (kind == PlaceableKind.None)
+        {
+            if (index >= 0) placeables.RemoveAt(index);
+            return;
+        }
+
+        // If no prefab, no marker, and kind is the default Prefab (common clear path), treat as delete.
+        bool isEmptyDefaultClear = prefab == null && string.IsNullOrEmpty(marker) && kind == PlaceableKind.Prefab;
+        if (isEmptyDefaultClear)
         {
             if (index >= 0) placeables.RemoveAt(index);
             return;

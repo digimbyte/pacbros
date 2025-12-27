@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec28cba68961ef0469fb2ad9e02831b1, type: 3}
+  m_Name: Entities
+  m_EditorClassIdentifier: Core.Registry::Core.Registry.Registry
+  assetType: 0
+  defaultAsset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+  description: Registry for managing asset references.
+  itemEntries:
+  - uid: SpawnPlayer
+    asset: {fileID: 2584990566347290654, guid: 9ef0cc05eeed81a4a889bdcf08d41489, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Ghost_Green
+    asset: {fileID: 8400212119263442475, guid: 92020d6e24480954ea121fc85ddd36d0, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Ghost_Yellow
+    asset: {fileID: 8400212119263442475, guid: 92020d6e24480954ea121fc85ddd36d0, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Ghost_Red
+    asset: {fileID: 8400212119263442475, guid: 92020d6e24480954ea121fc85ddd36d0, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Ghost_Purple
+    asset: {fileID: 8400212119263442475, guid: 92020d6e24480954ea121fc85ddd36d0, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Coin
+    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Gun
+    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Loot
+    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Key_Green
+    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Key_Yellow
+    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Key_Red
+    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Key_Purple
+    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Fire
+    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Gunshot
+    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []

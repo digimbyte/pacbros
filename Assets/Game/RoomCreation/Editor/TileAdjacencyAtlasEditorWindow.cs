@@ -865,6 +865,12 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             AssetDatabase.CreateAsset(atlas, atlasPath);
         }
 
+        // Sanitize placeables: remove any explicit None entries before saving (None is used as a transient 'clear' value).
+        if (atlas.placeables != null)
+        {
+            atlas.placeables.RemoveAll(p => p.kind == TileAdjacencyAtlas.PlaceableKind.None);
+        }
+
         EditorUtility.SetDirty(atlas);
         AssetDatabase.SaveAssets();
         AssetDatabase.Refresh();

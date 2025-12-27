@@ -76,6 +76,8 @@ public class GridMotor : MonoBehaviour
     Vector2Int _queuedDir;
 
     Vector3 _velocity;
+    Vector3 _lastSafePos;
+    Vector2Int _lastSafeCell;
 
     public void HardTeleport(Vector3 worldPosition)
     {
@@ -185,6 +187,10 @@ public class GridMotor : MonoBehaviour
         float dt = Time.deltaTime;
         if (dt <= 0f) return;
 
+        // Track last safe at the start of the frame; will be overwritten after a successful move.
+        _lastSafePos = transform.position;
+        _lastSafeCell = CurrentCell();
+
         // 1) Derive desired cardinal direction from input (if any)
         Vector2Int inputDir = GetCardinalFromInput(_desiredInput, directionDeadzone);
         if (stopOnBlocked && inputDir != Vector2Int.zero && IsBlocked(inputDir))
@@ -244,6 +250,13 @@ public class GridMotor : MonoBehaviour
             }
         }
 
+        // 3b) Re-validate current forward cell every frame; stop if newly blocked.
+        if (_moveDir != Vector2Int.zero && IsBlocked(_moveDir))
+        {
+            _moveDir = Vector2Int.zero;
+            _velocity = Vector3.zero;
+        }
+
         // 4) Build desired velocity: cardinal-only motion (no diagonals)
         Vector3 desiredVel = Vector3.zero;
         if (_moveDir != Vector2Int.zero)
@@ -265,15 +278,32 @@ public class GridMotor : MonoBehaviour
         {
             _velocity = Vector3.MoveTowards(_velocity, desiredVel, accel * dt);
         }
+        // 6) Clamp displacement against walls as a fallback to avoid sticking/penetration.
+        Vector3 displacement = _velocity * dt;
+        displacement = ClampDisplacement(displacement);
 
-        // 6) Move via CharacterController (preferred) or fallback to transform
+        // 7) Move via CharacterController (preferred) or fallback to transform
         if (characterController != null && characterController.enabled)
         {
-            characterController.Move(_velocity * dt);
+            characterController.Move(displacement);
         }
         else
         {
-            transform.position += _velocity * dt;
+            transform.position += displacement;
+        }
+
+        // 8) If we ended up inside a wall, snap back to last safe position.
+        if (IsInsideWall())
+        {
+            HardTeleport(_lastSafePos);
+            _velocity = Vector3.zero;
+            _moveDir = Vector2Int.zero;
+            _queuedDir = Vector2Int.zero;
+        }
+        else
+        {
+            _lastSafePos = transform.position;
+            _lastSafeCell = CurrentCell();
         }
     }
 
@@ -307,6 +337,14 @@ public class GridMotor : MonoBehaviour
         {
             transform.position = pos;
         }
+    }
+
+    /// <summary>
+    /// Expose current velocity for external systems (teleporters, effects).
+    /// </summary>
+    public Vector3 GetVelocity()
+    {
+        return _velocity;
     }
 
     bool IsTurnAligned(Vector2Int turningTo)
@@ -373,6 +411,60 @@ public class GridMotor : MonoBehaviour
         Vector3 target = transform.position + dirWorld.normalized * step;
         Bounds b = LevelRuntime.Active.levelBoundsXZ;
         return target.x < b.min.x || target.x > b.max.x || target.z < b.min.z || target.z > b.max.z;
+    }
+
+    Vector3 ClampDisplacement(Vector3 displacement)
+    {
+        if (displacement.sqrMagnitude < 0.000001f) return displacement;
+
+        float radius, height;
+        GetCapsuleDims(out radius, out height);
+
+        Vector3 center = transform.position;
+        float half = Mathf.Max(0f, (height * 0.5f) - radius);
+        Vector3 p1 = center + Vector3.up * half;
+        Vector3 p2 = center - Vector3.up * half;
+
+        float dist = displacement.magnitude;
+        Vector3 dir = displacement / dist;
+
+        float probeRadius = Mathf.Max(0.001f, radius * cornerRadiusScale - skin);
+        if (Physics.CapsuleCast(p1, p2, probeRadius, dir, out RaycastHit hit, dist + skin, solidMask, QueryTriggerInteraction.Ignore))
+        {
+            // Clamp to just before contact and zero velocity along blocked axis.
+            float allowed = Mathf.Max(0f, hit.distance - skin);
+            // If basically touching, cancel motion and clear velocity into the wall to avoid jitter.
+            if (allowed <= 0.0001f)
+            {
+                _velocity -= dir * Vector3.Dot(_velocity, dir);
+                return Vector3.zero;
+            }
+
+            _velocity -= dir * Vector3.Dot(_velocity, dir);
+            return dir * allowed;
+        }
+
+        return displacement;
+    }
+
+    bool IsInsideWall()
+    {
+        float radius, height;
+        GetCapsuleDims(out radius, out height);
+        Vector3 center = transform.position;
+        float half = Mathf.Max(0f, (height * 0.5f) - radius);
+        Vector3 p1 = center + Vector3.up * half;
+        Vector3 p2 = center - Vector3.up * half;
+        float probeRadius = Mathf.Max(0.001f, radius * cornerRadiusScale - skin * 0.5f);
+        return Physics.CheckCapsule(p1, p2, probeRadius, solidMask, QueryTriggerInteraction.Ignore);
+    }
+
+    Vector2Int CurrentCell()
+    {
+        Vector3 origin = EffectiveOrigin();
+        float tX = (transform.position.x - origin.x) / Mathf.Max(0.0001f, cellSize);
+        float tZ = (transform.position.z - origin.z) / Mathf.Max(0.0001f, cellSize);
+        return new Vector2Int(Mathf.RoundToInt(tX), Mathf.RoundToInt(tZ));
     }
 
     static Vector2Int GetCardinalFromInput(Vector2 input, float deadzone)
