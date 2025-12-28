@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 288882708505670336}
   - component: {fileID: 4694529873367521260}
   - component: {fileID: 511541837041713926}
+  - component: {fileID: 8873897638578494147}
   m_Layer: 12
   m_Name: EnemySpawn
   m_TagString: Untagged
@@ -111,3 +112,15 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8873897638578494147
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5899738003039467554}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b38053fbfdffda44816116abdb85221, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'

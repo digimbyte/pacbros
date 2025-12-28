@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 2527624984478347847}
   - component: {fileID: 7766518045613671595}
   - component: {fileID: 3934065628131784414}
-  - component: {fileID: 7973377967676121603}
   m_Layer: 8
   m_Name: Square
   m_TagString: Untagged
@@ -81,7 +80,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 1608996028, guid: 1892e16f0dfc8f740a4f03ac5517e33f, type: 3}
+  m_Sprite: {fileID: -338207595, guid: 3f8a8d410e7a0a44aa761be2c1245738, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -114,20 +113,6 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!114 &7973377967676121603
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2348840176091687288}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc63db6b4f9890b4e953efb778bc3f77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SkinSwap
-  skinTexture: {fileID: 2800000, guid: 3f8a8d410e7a0a44aa761be2c1245738, type: 3}
-  applyDuringAnimation: 1
 --- !u!1 &6081089341591554248
 GameObject:
   m_ObjectHideFlags: 0
@@ -137,11 +122,12 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 47722320972896316}
-  - component: {fileID: 4869737057728636031}
   - component: {fileID: 6900743032598973765}
   - component: {fileID: 2153044852385526397}
   - component: {fileID: 3908160944877652555}
+  - component: {fileID: 8241190991842302216}
   - component: {fileID: 6358558277448211888}
+  - component: {fileID: 4161584084102729630}
   m_Layer: 8
   m_Name: Ghost_Green
   m_TagString: Untagged
@@ -165,20 +151,6 @@ Transform:
   - {fileID: 2527624984478347847}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4869737057728636031
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6081089341591554248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d5ea5d5108dc2a4398a14221f25c741, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EntityBase
-  isGhost: 0
-  inventory: 
 --- !u!114 &6900743032598973765
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -258,9 +230,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9cb2048005e07546b231c7db7a4f87c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyEntity
-  isGhost: 0
+  isGhost: 1
+  isDead: 0
   inventory: 
   enemyTypeId: 0
+--- !u!114 &8241190991842302216
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6081089341591554248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3c2d9f9f5c1446178a4c46df1742bb1a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  brainType: 0
+  repathInterval: 1.2
+  targetShuffleInterval: 30
+  destinationUpdateThreshold: 0.75
+  snifferChaseDistance: 3.5
+  curiousWanderDuration: 4
+  curiousInterceptDuration: 3
+  curiousWanderRadius: 6
+  curiousLeadTime: 1.25
+  assaultLeadTime: 2
+  assaultHoldSeconds: 1.75
+  assaultTriggerDistance: 3
+  assaultResetDistance: 1.25
+  afraidDesiredRadius: 5
+  afraidInnerRadius: 2.5
+  afraidPanicChaseDistance: 1.5
+  afraidFleeDistance: 4
 --- !u!114 &6358558277448211888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -275,3 +277,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PathFinding
   motor: {fileID: 6900743032598973765}
   waypointReachRadius: 0.15
+--- !u!114 &4161584084102729630
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6081089341591554248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aaa714f04caf424aa9665992823a1c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::kill
+  killPlayers: 1
+  killEnemies: 0
+  destroySelfOnTouch: 0
+  selfDestructAfterSeconds: 0

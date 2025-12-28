@@ -66,56 +66,56 @@ MonoBehaviour:
       keys: []
       values: []
   - uid: Ammo
-    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    asset: {fileID: 5899738003039467554, guid: b8d16f7c46c8f8d4b8f221a65a7ef96d, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Loot
-    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    asset: {fileID: 5899738003039467554, guid: 8afafd402ec38904bbd0f7ac3b99e2ab, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Key_Green
-    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    asset: {fileID: 5899738003039467554, guid: 6cea3ecf161d96d449ea79870224bb9b, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Key_Yellow
-    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    asset: {fileID: 5899738003039467554, guid: c0f71c668b10a164dbfe0ba8ab87e900, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Key_Red
-    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    asset: {fileID: 5899738003039467554, guid: 9afc5525d59dde143891273624ae17e0, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Key_Purple
-    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    asset: {fileID: 5899738003039467554, guid: 0928167c32f32094db16c50174c3db97, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Fire
-    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    asset: {fileID: 5899738003039467554, guid: 09293fd53b736bc42a22c8ff5b5b7bba, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Gunshot
-    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    asset: {fileID: 5899738003039467554, guid: a15c031ff166f7d42a80508746653a77, type: 3}
     tags: []
     description: 
     metadata:

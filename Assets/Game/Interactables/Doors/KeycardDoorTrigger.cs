@@ -28,14 +28,13 @@ public class KeycardDoorTrigger : MonoBehaviour
     // Legacy authorized inventories (older component).
     readonly HashSet<KeycardInventory> _authorizedLegacy = new();
 
-    // Hashable token for EntityBase reference identity.
+    // Hashable token for entity identity.
     readonly struct AuthorizedToken
     {
         readonly int _instanceId;
 
         AuthorizedToken(int instanceId) => _instanceId = instanceId;
-
-        public static AuthorizedToken For(EntityBase e) => new AuthorizedToken(e.GetInstanceID());
+        public static AuthorizedToken For(EntityIdentity e) => new AuthorizedToken(e.InstanceId);
 
         public override int GetHashCode() => _instanceId;
         public override bool Equals(object obj) => obj is AuthorizedToken t && t._instanceId == _instanceId;
@@ -71,17 +70,23 @@ public class KeycardDoorTrigger : MonoBehaviour
             return;
 
         // New entity system (preferred)
-        EntityBase entity = other.GetComponentInParent<EntityBase>();
-        if (entity != null)
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        if (identity.IsValid)
         {
-            if (entity.isGhost)
+            if (identity.IsGhost)
+            {
+                Debug.LogWarning($"{name}: Ghost entity '{identity.Name}' attempted to open {door.requiredKey} door. Ignoring.");
                 return;
+            }
 
-            if (!entity.HasKeycard(door.requiredKey, door.allowHigherKeys))
+            if (!identity.HasKeycard(door.requiredKey, door.allowHigherKeys))
+            {
+                Debug.LogWarning($"{name}: '{identity.Name}' is missing key {door.requiredKey} (allowHigherKeys={door.allowHigherKeys}); door stays closed.");
                 return;
+            }
 
             // Track authorization by entity via a lightweight shim (see AuthorizedToken).
-            AuthorizedToken token = AuthorizedToken.For(entity);
+            AuthorizedToken token = AuthorizedToken.For(identity);
             _authorizedTokens.Add(token);
             if (_authorizedTokens.Count == 1)
                 door.Open();
@@ -99,7 +104,10 @@ public class KeycardDoorTrigger : MonoBehaviour
 
         _authorizedLegacy.Add(inv);
         if (_authorizedLegacy.Count == 1)
+        {
+            Debug.LogWarning($"{name}: Legacy KeycardInventory '{inv.name}' authorized {door.requiredKey} door. Consider migrating to PlayerEntity inventory.");
             door.Open();
+        }
     }
 
     void OnTriggerExit(Collider other)
@@ -115,13 +123,13 @@ public class KeycardDoorTrigger : MonoBehaviour
         if (door == null)
             return;
 
-        EntityBase entity = other.GetComponentInParent<EntityBase>();
-        if (entity != null)
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        if (identity.IsValid)
         {
-            if (entity.isGhost)
+            if (identity.IsGhost)
                 return;
 
-            AuthorizedToken token = AuthorizedToken.For(entity);
+            AuthorizedToken token = AuthorizedToken.For(identity);
             if (_authorizedTokens.Remove(token) && _authorizedTokens.Count == 0 && _authorizedLegacy.Count == 0)
                 door.Close();
 
@@ -144,8 +152,8 @@ public class KeycardDoorTrigger : MonoBehaviour
             if (c == null) continue;
 
             // Ghosts should not be pushed by doors.
-            EntityBase entity = c.GetComponentInParent<EntityBase>();
-            if (entity != null && entity.isGhost)
+            EntityIdentity identity = EntityIdentityUtility.From(c);
+            if (identity.IsValid && identity.IsGhost)
                 continue;
 
             Transform t = c.transform;

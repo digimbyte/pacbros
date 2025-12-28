@@ -62,6 +62,21 @@ public class LevelRuntime : MonoBehaviour
     public int startingLives = 3;
     [Tooltip("If true, LevelRuntime will respawn the local player at the last chosen spawn point until lives are exhausted.")]
     public bool enableRespawn = true;
+    [Header("Ghost Enemy Auto-Spawn")]
+    [Tooltip("If true, LevelRuntime will spawn each ghost registry key once at random enemy spawn points when the level boots.")]
+    public bool spawnGhostEnemiesOnAwake = true;
+    [Tooltip("Registry keys (from entityRegistry) used for ghost auto-spawn.")]
+    public string[] ghostEnemyRegistryKeys = new string[]
+    {
+        "Ghost_Green",
+        "Ghost_Yellow",
+        "Ghost_Red",
+        "Ghost_Purple"
+    };
+    [Tooltip("If true, prefer EnemySpawnPoints flagged as ghostEnemySpawn; falls back to any enemy spawn if none exist.")]
+    public bool restrictGhostAutoSpawnsToGhostMarkers = true;
+    [Tooltip("If true, attempt to use unique spawn tiles per ghost until the pool is exhausted.")]
+    public bool enforceUniqueGhostSpawnTiles = true;
 
     [Header("Multiplayer Role")]
     [Tooltip("If true, force this runtime to behave as a CLIENT even when no ClientSessionMarker is present in the scene.")]
@@ -75,6 +90,7 @@ public class LevelRuntime : MonoBehaviour
     [HideInInspector] public PlayerSpawnPoint lastPlayerSpawnPoint;
 
     readonly List<GridMotor> _motors = new();
+    bool _ghostEnemiesSpawned;
 
     public void RegisterMotor(GridMotor motor)
     {
@@ -95,6 +111,7 @@ public class LevelRuntime : MonoBehaviour
     void Awake()
     {
         Active = this;
+        PlayerTracker.EnsureInstance();
 
         // Determine host vs client role.
         // If a ClientSessionMarker singleton exists, consult its SessionMode.
@@ -132,6 +149,11 @@ public class LevelRuntime : MonoBehaviour
         if (levelAtlas != null)
         {
             SpawnLevelFromAtlas(levelAtlas);
+        }
+
+        if (spawnGhostEnemiesOnAwake)
+        {
+            SpawnInitialGhostEnemies();
         }
 
         // Auto-detect named layers for wall/floor.
@@ -280,6 +302,22 @@ public class LevelRuntime : MonoBehaviour
                         marker = inst.AddComponent<PlayerSpawnPoint>();
                         marker.playerIndex = -1;   // default: any player
                         marker.weight = 1f;
+                    }
+                }
+                else if (string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.Enemy, StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(p.kind, "EnemySpawn", StringComparison.OrdinalIgnoreCase))
+                {
+                    var marker = inst.GetComponent<EnemySpawnPoint>();
+                    if (marker == null)
+                    {
+                        marker = inst.AddComponent<EnemySpawnPoint>();
+                        marker.enemyTypeId = -1;
+                        marker.weight = 1f;
+                    }
+
+                    if (restrictGhostAutoSpawnsToGhostMarkers && !marker.ghostEnemySpawn)
+                    {
+                        marker.ghostEnemySpawn = true;
                     }
                 }
             }
@@ -664,5 +702,177 @@ public class LevelRuntime : MonoBehaviour
         graph.uniformEdgeCosts = true;
         graph.nodeSize = 1f;
         return graph;
+    }
+
+    void SpawnInitialGhostEnemies()
+    {
+        if (_ghostEnemiesSpawned)
+            return;
+
+        _ghostEnemiesSpawned = true;
+
+        if (ghostEnemyRegistryKeys == null || ghostEnemyRegistryKeys.Length == 0)
+            return;
+
+        var spawnPool = AcquireEnemySpawnPoints(restrictGhostAutoSpawnsToGhostMarkers);
+        if (spawnPool == null || spawnPool.Count == 0)
+        {
+            Debug.LogWarning("LevelRuntime: No EnemySpawnPoint instances available for ghost auto-spawn.", this);
+            return;
+        }
+
+        var uniquePool = enforceUniqueGhostSpawnTiles ? new List<EnemySpawnPoint>(spawnPool) : spawnPool;
+
+        for (int i = 0; i < ghostEnemyRegistryKeys.Length; i++)
+        {
+            string rawKey = ghostEnemyRegistryKeys[i];
+            if (string.IsNullOrWhiteSpace(rawKey))
+                continue;
+
+            string key = rawKey.Trim();
+            EnemySpawnPoint spawn = null;
+
+            if (enforceUniqueGhostSpawnTiles && uniquePool.Count > 0)
+            {
+                spawn = ChooseRandomEnemySpawn(uniquePool, consume: true);
+            }
+
+            if (spawn == null)
+            {
+                spawn = ChooseRandomEnemySpawn(spawnPool, consume: false);
+            }
+
+            if (spawn == null)
+                break;
+
+            Vector3 position = spawn.transform.position;
+            Quaternion rotation = spawn.transform.rotation;
+            GameObject ghost = InstantiateRegistryPrefab(key, position, rotation);
+            if (ghost == null)
+            {
+                Debug.LogError($"LevelRuntime: Failed to auto-spawn ghost '{key}'. Verify the registry entry exists.", this);
+            }
+        }
+    }
+
+    List<EnemySpawnPoint> AcquireEnemySpawnPoints(bool preferGhostMarkers)
+    {
+        var primary = GatherEnemySpawnPoints(preferGhostMarkers);
+        if (primary.Count == 0 && preferGhostMarkers)
+        {
+            return GatherEnemySpawnPoints(false);
+        }
+        return primary;
+    }
+
+    List<EnemySpawnPoint> GatherEnemySpawnPoints(bool ghostOnly)
+    {
+        var result = new List<EnemySpawnPoint>();
+
+        var registry = FindObjectOfType<SpawnPointsRegistry>(includeInactive: true);
+        if (registry != null)
+        {
+            var registered = registry.GetEnemySpawns(-1, ghostOnly ? true : (bool?)null);
+            if (registered != null)
+            {
+                for (int i = 0; i < registered.Count; i++)
+                {
+                    var spawn = registered[i];
+                    if (spawn == null)
+                        continue;
+                    if (ghostOnly && !spawn.ghostEnemySpawn)
+                        continue;
+                    if (!result.Contains(spawn))
+                        result.Add(spawn);
+                }
+            }
+        }
+
+        if (result.Count == 0)
+        {
+            var found = GameObject.FindObjectsOfType<EnemySpawnPoint>(includeInactive: true);
+            if (found != null)
+            {
+                for (int i = 0; i < found.Length; i++)
+                {
+                    var spawn = found[i];
+                    if (spawn == null)
+                        continue;
+                    if (ghostOnly && !spawn.ghostEnemySpawn)
+                        continue;
+                    if (!result.Contains(spawn))
+                        result.Add(spawn);
+                }
+            }
+        }
+
+        if (result.Count == 0 && ghostOnly)
+        {
+            return GatherEnemySpawnPoints(false);
+        }
+
+        return result;
+    }
+
+    EnemySpawnPoint ChooseRandomEnemySpawn(List<EnemySpawnPoint> pool, bool consume)
+    {
+        if (pool == null || pool.Count == 0)
+            return null;
+
+        EnemySpawnPoint chosen = null;
+        float totalWeight = 0f;
+        bool anyPositive = false;
+        for (int i = pool.Count - 1; i >= 0; i--)
+        {
+            var spawn = pool[i];
+            if (spawn == null)
+            {
+                pool.RemoveAt(i);
+                continue;
+            }
+            float w = Mathf.Max(0f, spawn.weight);
+            if (w > 0f)
+            {
+                anyPositive = true;
+                totalWeight += w;
+            }
+        }
+
+        if (pool.Count == 0)
+            return null;
+
+        if (anyPositive && totalWeight > 0f)
+        {
+            float r = UnityEngine.Random.Range(0f, totalWeight);
+            float accum = 0f;
+            for (int i = 0; i < pool.Count; i++)
+            {
+                var spawn = pool[i];
+                float w = Mathf.Max(0f, spawn.weight);
+                if (w <= 0f) continue;
+                accum += w;
+                if (r <= accum)
+                {
+                    chosen = spawn;
+                    break;
+                }
+            }
+        }
+
+        if (chosen == null)
+        {
+            int idx = UnityEngine.Random.Range(0, pool.Count);
+            chosen = pool[idx];
+            if (consume)
+                pool.RemoveAt(idx);
+            return chosen;
+        }
+
+        if (consume)
+        {
+            pool.Remove(chosen);
+        }
+
+        return chosen;
     }
 }

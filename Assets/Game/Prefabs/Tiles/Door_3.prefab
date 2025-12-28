@@ -950,7 +950,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PortalSecurity
   gateType: 1
-  requiredKey: 1
+  requiredKey: 3
 --- !u!114 &-764565447242900677
 MonoBehaviour:
   m_ObjectHideFlags: 0

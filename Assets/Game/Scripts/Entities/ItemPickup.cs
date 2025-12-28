@@ -29,7 +29,7 @@ public class ItemPickup : MonoBehaviour
     [Tooltip("When effectIsUniversal is true: apply effect to all PlayerEntity instances.")]
     public bool applyToAllPlayers = true;
 
-    [Tooltip("When effectIsUniversal is true: apply effect to all entities where EntityBase.isGhost == true.")]
+    [Tooltip("When effectIsUniversal is true: apply effect to all entities flagged as ghosts (EnemyEntity.isGhost).")]
     public bool applyToAllGhosts = false;
 
     [Header("Values")]
@@ -73,8 +73,8 @@ public class ItemPickup : MonoBehaviour
         if (_consumed) return;
         if (other == null) return;
 
-        EntityBase picker = other.GetComponentInParent<EntityBase>();
-        if (picker == null) return;
+        EntityIdentity picker = EntityIdentityUtility.From(other);
+        if (!picker.IsValid) return;
 
         if (!CanBePickedUpBy(picker)) return;
 
@@ -87,19 +87,18 @@ public class ItemPickup : MonoBehaviour
             gameObject.SetActive(false);
     }
 
-    bool CanBePickedUpBy(EntityBase entity)
+    bool CanBePickedUpBy(EntityIdentity entity)
     {
-        if (entity == null) return false;
+        if (!entity.IsValid) return false;
 
-        bool isPlayer = entity.GetComponent<PlayerEntity>() != null;
-        bool isGhost = entity.isGhost;
+        bool isPlayer = entity.Kind == EntityKind.Player;
+        bool isGhost = entity.IsGhost;
 
         // If an entity qualifies for both categories, allow pickup if either is enabled.
         bool allowed = (isPlayer && PlayerPickup) || (isGhost && GhostPickup);
         return allowed;
     }
-
-    void Apply(EntityBase picker)
+    void Apply(EntityIdentity picker)
     {
         // These systems are global/static in this project, so apply them once per pickup.
         ApplyGlobalValues();
@@ -111,23 +110,31 @@ public class ItemPickup : MonoBehaviour
         }
 
         // Universal per-entity effects.
-        HashSet<EntityBase> targets = new();
+        var targets = new List<EntityIdentity>();
+        var seen = new HashSet<int>();
 
         if (applyToAllPlayers)
         {
             var players = FindObjectsOfType<PlayerEntity>();
             for (int i = 0; i < players.Length; i++)
-                targets.Add(players[i]);
+            {
+                var identity = new EntityIdentity(players[i]);
+                if (seen.Add(identity.InstanceId))
+                    targets.Add(identity);
+            }
         }
 
         if (applyToAllGhosts)
         {
-            var entities = FindObjectsOfType<EntityBase>();
-            for (int i = 0; i < entities.Length; i++)
+            var enemies = FindObjectsOfType<EnemyEntity>();
+            for (int i = 0; i < enemies.Length; i++)
             {
-                var e = entities[i];
-                if (e != null && e.isGhost)
-                    targets.Add(e);
+                var enemy = enemies[i];
+                if (enemy == null || !enemy.isGhost)
+                    continue;
+                var identity = new EntityIdentity(enemy);
+                if (seen.Add(identity.InstanceId))
+                    targets.Add(identity);
             }
         }
 
@@ -135,8 +142,8 @@ public class ItemPickup : MonoBehaviour
         if (targets.Count == 0)
             targets.Add(picker);
 
-        foreach (var t in targets)
-            ApplyPerEntityValues(t);
+        for (int i = 0; i < targets.Count; i++)
+            ApplyPerEntityValues(targets[i]);
     }
 
     void ApplyGlobalValues()
@@ -155,15 +162,14 @@ public class ItemPickup : MonoBehaviour
         }
     }
 
-    void ApplyPerEntityValues(EntityBase target)
+    void ApplyPerEntityValues(EntityIdentity target)
     {
-        if (target == null) return;
+        if (!target.IsValid) return;
 
         if (ammoValue != 0)
         {
-            var pe = target.GetComponent<PlayerEntity>();
-            if (pe != null)
-                pe.ammo = Mathf.Max(0, pe.ammo + ammoValue);
+            if (target.player != null)
+                target.player.ammo = Mathf.Max(0, target.player.ammo + ammoValue);
         }
 
         if (inventory != null)

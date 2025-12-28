@@ -7018,8 +7018,9 @@ GameObject:
   - component: {fileID: 943175501}
   - component: {fileID: 943175503}
   - component: {fileID: 943175502}
+  - component: {fileID: 943175504}
   m_Layer: 0
-  m_Name: Green
+  m_Name: icon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -7034,7 +7035,7 @@ Transform:
   m_GameObject: {fileID: 943175500}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -75, y: 0, z: 0}
+  m_LocalPosition: {x: -13.82, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -7219,7 +7220,7 @@ MonoBehaviour:
     ReceiveShadows: 1
   PreviewSize: {x: 1, y: 1, z: 0}
   visuals:
-    Color: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+    Color: {r: 1, g: 1, b: 1, a: 1}
     CornerRadius:
       Raw: 0
       Type: 0
@@ -7285,8 +7286,8 @@ MonoBehaviour:
       Mode: 1
     SoftenEdges: 1
     FillEnabled: 1
-  texture: {fileID: 2800000, guid: 3bfd3e142166e4247b18e71d5c3ebce0, type: 3}
-  sprite: {fileID: 0}
+  texture: {fileID: 0}
+  sprite: {fileID: 1884526633, guid: 4f65c2b20ce9fed4c9f37ab78af4b0df, type: 3}
 --- !u!114 &943175503
 MonoBehaviour:
   m_ObjectHideFlags: 10
@@ -7299,6 +7300,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c9117b6d975111c47b064a4373cc67ab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Nova::Nova.UIBlockActivator
+--- !u!95 &943175504
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 943175500}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 7d10d0478b2628e4ea2915047f34523b, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &996037123
 GameObject:
   m_ObjectHideFlags: 0
@@ -9859,8 +9882,9 @@ GameObject:
   - component: {fileID: 1367229485}
   - component: {fileID: 1367229484}
   - component: {fileID: 1367229483}
+  - component: {fileID: 1367229487}
   m_Layer: 0
-  m_Name: SCORE
+  m_Name: LIVES
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9882,7 +9906,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 37.85, y: 0}
+  m_AnchoredPosition: {x: 33.93, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1367229483
@@ -9971,7 +9995,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: -75, y: -36, z: -75, w: -36}
+  m_margin: {x: -13.82, y: -36, z: -13.82, w: -36}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   _SortingLayer: 0
@@ -9997,7 +10021,7 @@ MonoBehaviour:
   layout:
     Size:
       X:
-        Raw: 150
+        Raw: 27.64
         Type: 0
       Y:
         Raw: 1
@@ -10007,7 +10031,7 @@ MonoBehaviour:
         Type: 0
     Position:
       X:
-        Raw: 75.7
+        Raw: 67.86
         Type: 0
       Y:
         Raw: 0
@@ -10218,6 +10242,20 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &1367229487
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1367229481}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c60c54d8913077843a74e6990486f73c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  runtime: {fileID: 2102862980}
+  novaTextBlock: {fileID: 1367229483}
 --- !u!1 &1367575482
 GameObject:
   m_ObjectHideFlags: 0
@@ -11834,7 +11872,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PassiveBurn
   clock: {fileID: 1458636881}
-  tickHeat: 96
+  tickHeat: 15
 --- !u!1 &1495150276
 GameObject:
   m_ObjectHideFlags: 0
@@ -12642,7 +12680,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 268536791abc3764a832ce6e792f6f71, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Heat
-  currentHeat: 1000
+  currentHeat: 7500
   stageTargets:
   - {fileID: 68427304}
   - {fileID: 568592308}
@@ -12973,7 +13011,7 @@ Transform:
   m_GameObject: {fileID: 1973691819}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -251.65, y: -16, z: 0}
+  m_LocalPosition: {x: -309.35, y: -16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -12998,7 +13036,7 @@ MonoBehaviour:
   layout:
     Size:
       X:
-        Raw: 225.7
+        Raw: 95.5
         Type: 0
       Y:
         Raw: 72
@@ -13008,7 +13046,7 @@ MonoBehaviour:
         Type: 0
     Position:
       X:
-        Raw: 127.5
+        Raw: 134.9
         Type: 0
       Y:
         Raw: 0
@@ -14480,6 +14518,14 @@ MonoBehaviour:
   localPlayerRegistryKey: Player
   startingLives: 3
   enableRespawn: 1
+  spawnGhostEnemiesOnAwake: 1
+  ghostEnemyRegistryKeys:
+  - Ghost_Green
+  - Ghost_Yellow
+  - Ghost_Red
+  - Ghost_Purple
+  restrictGhostAutoSpawnsToGhostMarkers: 1
+  enforceUniqueGhostSpawnTiles: 1
   forceClientMode: 0
   isClient: 0
   localPlayerInstance: {fileID: 0}

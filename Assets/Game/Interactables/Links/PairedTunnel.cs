@@ -45,11 +45,11 @@ public class PairedTunnel : MonoBehaviour
             return;
         }
 
-        EntityBase entity = other.GetComponentInParent<EntityBase>();
-        if (entity != null && !gate.HasAccess(entity))
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        if (identity.IsValid && !gate.HasAccess(identity))
             return;
 
-        Transform root = other.transform.root;
+        Transform root = identity.IsValid && identity.Transform != null ? identity.Transform : other.transform.root;
         Vector3 rootPos = root.position;
         Vector2 rootXZ = new Vector2(rootPos.x, rootPos.z);
         Vector2 tunnelXZ = new Vector2(transform.position.x, transform.position.z);
@@ -154,8 +154,8 @@ public class PairedTunnel : MonoBehaviour
 
     int GetCooldownKey(Collider other)
     {
-        EntityBase entity = other.GetComponentInParent<EntityBase>();
-        if (entity != null) return entity.GetInstanceID();
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        if (identity.IsValid) return identity.InstanceId;
         return other.transform.root.GetInstanceID();
     }
 
@@ -175,8 +175,8 @@ public class PairedTunnel : MonoBehaviour
     static void TeleportOther(Collider other, Vector3 target)
     {
         Transform root = other.transform.root;
-        EntityBase entity = other.GetComponentInParent<EntityBase>();
-        if (entity != null) root = entity.transform;
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        if (identity.IsValid && identity.Transform != null) root = identity.Transform;
 
         GridMotor motor = root.GetComponent<GridMotor>();
         if (motor != null)

@@ -16,6 +16,19 @@ public class PathFinding : MonoBehaviour
     readonly List<Vector2Int> _cells = new();
     int _idx;
 
+    public bool HasActivePath => _cells.Count > 0 && _idx < _cells.Count;
+    public bool IsIdle => !HasActivePath;
+    public int RemainingWaypoints => Mathf.Max(0, _cells.Count - Mathf.Clamp(_idx, 0, _cells.Count));
+
+    public Vector2Int CurrentTargetCell
+    {
+        get
+        {
+            if (!HasActivePath) return default;
+            return _cells[Mathf.Clamp(_idx, 0, _cells.Count - 1)];
+        }
+    }
+
     void Reset()
     {
         motor = GetComponent<GridMotor>();
@@ -36,6 +49,46 @@ public class PathFinding : MonoBehaviour
                 _cells.Add(cells[i]);
         }
         _idx = 0;
+    }
+
+    public void ClearPath()
+    {
+        _cells.Clear();
+        _idx = 0;
+    }
+
+    public void SetPathFromWorldPoints(IList<Vector3> worldPoints)
+    {
+        if (worldPoints == null || worldPoints.Count == 0)
+        {
+            ClearPath();
+            return;
+        }
+
+        Vector3 origin = motor != null ? motor.EffectiveOrigin() : Vector3.zero;
+        float cellSize = motor != null ? Mathf.Max(0.01f, motor.cellSize) : 1f;
+
+        var buffer = new List<Vector2Int>(worldPoints.Count);
+        Vector2Int? last = null;
+        for (int i = 0; i < worldPoints.Count; i++)
+        {
+            Vector2Int cell = WorldToCell(worldPoints[i], origin, cellSize);
+            if (last.HasValue && last.Value == cell)
+                continue;
+
+            buffer.Add(cell);
+            last = cell;
+        }
+
+        SetPath(buffer);
+    }
+
+    static Vector2Int WorldToCell(Vector3 world, Vector3 origin, float cellSize)
+    {
+        float inv = 1f / Mathf.Max(0.0001f, cellSize);
+        int x = Mathf.RoundToInt((world.x - origin.x) * inv);
+        int z = Mathf.RoundToInt((world.z - origin.z) * inv);
+        return new Vector2Int(x, z);
     }
 
     void Update()

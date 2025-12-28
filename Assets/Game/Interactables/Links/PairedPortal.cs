@@ -45,12 +45,12 @@ public class PairedPortal : MonoBehaviour
             return;
         }
 
-        EntityBase entity = other.GetComponentInParent<EntityBase>();
-        if (entity != null && !gate.HasAccess(entity))
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        if (identity.IsValid && !gate.HasAccess(identity))
             return;
 
         // Only teleport when the entity root is close enough to the portal center on XZ.
-        Transform root = other.transform.root;
+        Transform root = identity.IsValid && identity.Transform != null ? identity.Transform : other.transform.root;
         Vector3 rootPos = root.position;
         Vector2 rootXZ = new Vector2(rootPos.x, rootPos.z);
         Vector2 portalXZ = new Vector2(transform.position.x, transform.position.z);
@@ -106,13 +106,17 @@ public class PairedPortal : MonoBehaviour
             }
         }
 
+        if (identity.IsValid)
+        {
+            DoorOverrideRegistry.Consume(identity, gate);
+        }
         SetCooldown(key);
     }
 
     int GetCooldownKey(Collider other)
     {
-        EntityBase entity = other.GetComponentInParent<EntityBase>();
-        if (entity != null) return entity.GetInstanceID();
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        if (identity.IsValid) return identity.InstanceId;
         return other.transform.root.GetInstanceID();
     }
 
@@ -133,8 +137,8 @@ public class PairedPortal : MonoBehaviour
     {
         // Prefer entity root.
         Transform root = other.transform.root;
-        EntityBase entity = other.GetComponentInParent<EntityBase>();
-        if (entity != null) root = entity.transform;
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        if (identity.IsValid && identity.Transform != null) root = identity.Transform;
 
         GridMotor motor = root.GetComponent<GridMotor>();
         if (motor != null)
