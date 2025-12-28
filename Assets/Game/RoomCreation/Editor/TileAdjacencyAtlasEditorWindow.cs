@@ -866,69 +866,49 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             AssetDatabase.CreateAsset(atlas, atlasPath);
         }
 
-        // Sanitize placeables: remove any explicit None entries before saving (None is used as a transient 'clear' value).
+        // Sanitize placeables: build a new list to fully overwrite any previous serialized data.
         if (atlas.placeables != null)
         {
-            // Normalize legacy numeric kinds into current keys and clear invalid references.
-            for (int i = atlas.placeables.Count - 1; i >= 0; i--)
+            var cleaned = new List<TileAdjacencyAtlas.PlaceableCell>(atlas.placeables.Count);
+            for (int i = 0; i < atlas.placeables.Count; i++)
             {
                 var p = atlas.placeables[i];
 
-                // If prefab reference no longer points to an asset, clear it.
+                // Clear invalid prefab references (scene-only objects, missing assets)
                 if (p.prefab != null)
                 {
                     string prefabPath = AssetDatabase.GetAssetPath(p.prefab);
                     if (string.IsNullOrEmpty(prefabPath))
-                    {
                         p.prefab = null;
-                    }
                 }
 
-                // Normalize numeric legacy kinds ("1", "2", etc.) to the string constants.
-                if (!string.IsNullOrEmpty(p.kind) && int.TryParse(p.kind, out int num))
-                {
-                    switch (num)
-                    {
-                        case 0: p.kind = TileAdjacencyAtlas.PlaceableKind.None; break;
-                        case 1: p.kind = TileAdjacencyAtlas.PlaceableKind.SpawnPlayer; break;
-                        case 2: p.kind = TileAdjacencyAtlas.PlaceableKind.Enemy; break;
-                        case 3: p.kind = TileAdjacencyAtlas.PlaceableKind.Loot; break;
-                        case 4: p.kind = TileAdjacencyAtlas.PlaceableKind.Coin; break;
-                        case 5: p.kind = TileAdjacencyAtlas.PlaceableKind.Ammo; break;
-                        default:
-                            // Unknown legacy value: clear this placeable entry (treat as blank)
-                            atlas.placeables.RemoveAt(i);
-                            continue;
-                    }
-                }
-
-                // If after normalization the kind is explicit None and there is no prefab/marker, remove the entry.
-                bool isEmpty = string.IsNullOrEmpty(p.marker) && p.prefab == null && string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase);
-                if (isEmpty)
-                {
-                    atlas.placeables.RemoveAt(i);
+                // Drop numeric/legacy kinds entirely (we only persist string kinds now).
+                if (string.IsNullOrWhiteSpace(p.kind) || int.TryParse(p.kind, out _))
                     continue;
-                }
 
-                // If marker is '*' (legacy), clear it.
-                if (!string.IsNullOrEmpty(p.marker) && p.marker.Trim() == "*")
-                {
-                    p.marker = null;
-                }
+                // Persist ONLY the kind + rotation + coordinates.
+                // Prefab, marker, and markerColor are editor-only and recomputed on load.
+                p.prefab = null;
+                p.marker = null;
+                p.markerColor = Color.clear;
 
-                // Ensure markerColor has a sensible default.
-                if (p.markerColor.a <= 0f)
-                    p.markerColor = Color.white;
-
-                atlas.placeables[i] = p;
+                // Only keep entries that have meaningful data after normalization
+                bool keep = !string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase);
+                if (keep)
+                    cleaned.Add(p);
             }
 
-            // Finally, remove any remaining explicit None entries as a safeguard.
-            atlas.placeables.RemoveAll(p => string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase) && p.prefab == null && string.IsNullOrEmpty(p.marker));
+            // Replace the list entirely to force serialization of the cleaned state.
+            atlas.placeables = cleaned;
         }
 
         EditorUtility.SetDirty(atlas);
         AssetDatabase.SaveAssets();
+        // Force reimport/reserialize so older serialized values are discarded by Unity's asset database.
+        if (!string.IsNullOrEmpty(atlasPath))
+        {
+            AssetDatabase.ImportAsset(atlasPath, ImportAssetOptions.ForceUpdate);
+        }
         AssetDatabase.Refresh();
     }
 

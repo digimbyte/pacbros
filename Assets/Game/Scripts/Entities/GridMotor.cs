@@ -69,7 +69,13 @@ public class GridMotor : MonoBehaviour
     [Tooltip("Scales collision probe radius to let the capsule slip past corners (0.5..1).")]
     [Range(0.5f, 1f)] public float cornerRadiusScale = 0.85f;
 
+    [Header("Debug")]
+    [Tooltip("If true, logs why movement is blocked (out-of-bounds vs collider hit). Throttled.")]
+    public bool debugBlockers = false;
+    public float debugBlockerLogInterval = 0.25f;
+
     Vector2 _desiredInput;
+    float _nextBlockerLogTime;
 
     // Current and queued directions in grid-space.
     Vector2Int _moveDir;
@@ -372,12 +378,33 @@ public class GridMotor : MonoBehaviour
         if (dirWorld.sqrMagnitude < 0.5f) return false;
 
         if (IsOutOfBounds(dirWorld))
+        {
+            if (debugBlockers && Time.unscaledTime >= _nextBlockerLogTime)
+            {
+                _nextBlockerLogTime = Time.unscaledTime + Mathf.Max(0.05f, debugBlockerLogInterval);
+                if (LevelRuntime.Active != null)
+                {
+                    var lr = LevelRuntime.Active;
+                    var b = lr.levelBoundsXZ;
+                    float step = Mathf.Max(cellSize, forwardProbeDistance);
+                    Vector3 target = transform.position + dirWorld.normalized * step;
+                    string atlasName = (lr.levelAtlas != null) ? lr.levelAtlas.name : "<null>";
+                    int atlasW = (lr.levelAtlas != null) ? lr.levelAtlas.width : -1;
+                    int atlasH = (lr.levelAtlas != null) ? lr.levelAtlas.height : -1;
+                    Debug.Log($"GridMotor: BLOCKED (OOB) pos={transform.position} target={target} boundsMin={b.min} boundsMax={b.max} atlas={atlasName}({atlasW}x{atlasH}) floorMask={lr.floorLayers.value} wallMask={lr.wallLayers.value}", this);
+                }
+                else
+                {
+                    Debug.Log($"GridMotor: BLOCKED (OOB) pos={transform.position} (no LevelRuntime.Active)", this);
+                }
+            }
             return true;
+        }
 
         float radius, height;
         GetCapsuleDims(out radius, out height);
 
-        Vector3 center = transform.position;
+        Vector3 center = GetCapsuleCenterWorld();
         float half = Mathf.Max(0f, (height * 0.5f) - radius);
 
         Vector3 p1 = center + Vector3.up * half;
@@ -385,7 +412,29 @@ public class GridMotor : MonoBehaviour
 
         float dist = Mathf.Max(0f, forwardProbeDistance);
         float probeRadius = Mathf.Max(0.001f, radius * cornerRadiusScale - skin);
-        return Physics.CapsuleCast(p1, p2, probeRadius, dirWorld.normalized, dist, solidMask, QueryTriggerInteraction.Ignore);
+
+        bool hit = Physics.CapsuleCast(p1, p2, probeRadius, dirWorld.normalized, out RaycastHit hitInfo, dist, solidMask, QueryTriggerInteraction.Ignore);
+        if (hit && debugBlockers && Time.unscaledTime >= _nextBlockerLogTime)
+        {
+            _nextBlockerLogTime = Time.unscaledTime + Mathf.Max(0.05f, debugBlockerLogInterval);
+            var go = hitInfo.collider != null ? hitInfo.collider.gameObject : null;
+            string hitName = go != null ? go.name : "<null>";
+            int hitLayer = go != null ? go.layer : -1;
+            Debug.Log($"GridMotor: BLOCKED (HIT) dir={dir} hit={hitName} layer={hitLayer} dist={hitInfo.distance} mask={solidMask.value}", this);
+        }
+        return hit;
+    }
+
+    Vector3 GetCapsuleCenterWorld()
+    {
+        // IMPORTANT: CharacterController's collision capsule is centered at transform.position + center.
+        // Using transform.position directly can cause false overlaps (e.g. with floor/walls) and freeze motion.
+        if (characterController != null)
+        {
+            // center is in local-space; TransformPoint accounts for local transforms.
+            return transform.TransformPoint(characterController.center);
+        }
+        return transform.position;
     }
 
     void GetCapsuleDims(out float radius, out float height)
@@ -420,7 +469,7 @@ public class GridMotor : MonoBehaviour
         float radius, height;
         GetCapsuleDims(out radius, out height);
 
-        Vector3 center = transform.position;
+        Vector3 center = GetCapsuleCenterWorld();
         float half = Mathf.Max(0f, (height * 0.5f) - radius);
         Vector3 p1 = center + Vector3.up * half;
         Vector3 p2 = center - Vector3.up * half;
@@ -451,7 +500,7 @@ public class GridMotor : MonoBehaviour
     {
         float radius, height;
         GetCapsuleDims(out radius, out height);
-        Vector3 center = transform.position;
+        Vector3 center = GetCapsuleCenterWorld();
         float half = Mathf.Max(0f, (height * 0.5f) - radius);
         Vector3 p1 = center + Vector3.up * half;
         Vector3 p2 = center - Vector3.up * half;

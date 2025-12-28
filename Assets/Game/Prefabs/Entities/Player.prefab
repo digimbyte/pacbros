@@ -9,12 +9,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7018057839761460336}
-  - component: {fileID: 6231003033362147239}
   - component: {fileID: 1580952793944945138}
   - component: {fileID: 619055779628719833}
   - component: {fileID: 3489647428217073734}
   - component: {fileID: 7242115553091643686}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -37,20 +36,6 @@ Transform:
   - {fileID: 2108824726392390845}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6231003033362147239
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2584990566347290654}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1d5ea5d5108dc2a4398a14221f25c741, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EntityBase
-  isGhost: 0
-  inventory: 
 --- !u!114 &1580952793944945138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -87,7 +72,7 @@ MonoBehaviour:
   laneSnapMaxSpeed: 8
   solidMask:
     serializedVersion: 2
-    m_Bits: 4294967295
+    m_Bits: 1217
   forwardProbeDistance: 0.2
   skin: 0.02
   cornerRadiusScale: 0.85
@@ -168,7 +153,7 @@ GameObject:
   - component: {fileID: 2108824726392390845}
   - component: {fileID: 3846949516043537774}
   - component: {fileID: 5852181343223175095}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}

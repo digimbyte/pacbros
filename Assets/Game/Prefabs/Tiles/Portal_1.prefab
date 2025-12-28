@@ -20,7 +20,7 @@ GameObject:
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
+  m_StaticEditorFlags: 2147483647
   m_IsActive: 1
 --- !u!4 &3658040675317190118
 Transform:
@@ -963,11 +963,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PairedPortal
   paired: {fileID: 0}
-  requiresKey: 0
-  requiredKey: 1
-  allowHigherKeys: 1
-  allowGhosts: 1
-  ghostsBypassKeyRequirement: 0
   exitWorldOffset: {x: 0, y: 0, z: 0}
   cooldownSeconds: 0.2
   activationRadius: 0.25

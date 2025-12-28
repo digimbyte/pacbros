@@ -377,11 +377,11 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 9
     y: 21
-    tile: {fileID: 6435338811587375429, guid: bb287cfbdad284e4d92a687711e0d655, type: 3}
+    tile: {fileID: 4054986085679452633, guid: 63566cd420333e2438350105df04a892, type: 3}
     rotationIndex: 0
   - x: 9
     y: 19
-    tile: {fileID: -8898120891871626909, guid: 2910d5696d3d5164e8f4865e534513b6, type: 3}
+    tile: {fileID: 4054986085679452633, guid: f4342e3035d82cf4a84796cd6645521b, type: 3}
     rotationIndex: 0
   - x: 9
     y: 18
@@ -441,7 +441,7 @@ MonoBehaviour:
     rotationIndex: 3
   - x: 12
     y: 12
-    tile: {fileID: -2766634091346958623, guid: 5434f1a2e0645e743a76dc1ad4417575, type: 3}
+    tile: {fileID: 4054986085679452633, guid: 30c4be6f6885c454aab6f299544b5596, type: 3}
     rotationIndex: 0
   - x: 11
     y: 12
@@ -577,7 +577,7 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 15
     y: 21
-    tile: {fileID: 6435338811587375429, guid: bb287cfbdad284e4d92a687711e0d655, type: 3}
+    tile: {fileID: 4054986085679452633, guid: 63566cd420333e2438350105df04a892, type: 3}
     rotationIndex: 0
   - x: 15
     y: 20
@@ -589,7 +589,7 @@ MonoBehaviour:
     rotationIndex: 3
   - x: 15
     y: 19
-    tile: {fileID: -8898120891871626909, guid: 2910d5696d3d5164e8f4865e534513b6, type: 3}
+    tile: {fileID: 4054986085679452633, guid: f4342e3035d82cf4a84796cd6645521b, type: 3}
     rotationIndex: 0
   - x: 15
     y: 17
@@ -1899,1012 +1899,1037 @@ MonoBehaviour:
     y: 20
     tile: {fileID: -3285165343615480943, guid: a5557b15f8cd94b42be922e58fd103af, type: 3}
     rotationIndex: 1
+  - x: 5
+    y: 14
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 5
+    y: 13
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 6
+    y: 13
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 6
+    y: 14
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 19
+    y: 14
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 19
+    y: 13
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 18
+    y: 14
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
+  - x: 18
+    y: 13
+    tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
+    rotationIndex: 0
   placeables:
   - x: 3
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: EnemySpawn
-    marker: SP
-    markerColor: {r: 0.15, g: 0.85, b: 0.15, a: 1}
+    kind: SpawnPoint
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 11
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: Loot
-    marker: E
-    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    kind: EnemySpawn
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 13
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: Loot
-    marker: E
-    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    kind: EnemySpawn
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 12
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: Loot
-    marker: E
-    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+    kind: EnemySpawn
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    kind: Coin
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: gun
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
-  - x: 9
-    y: 0
-    prefab: {fileID: 0}
-    rotationIndex: 0
-    kind: SpawnPoint
+    kind: Coin
     marker: 
-    markerColor: {r: 1, g: 1, b: 1, a: 1}
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 4
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 5
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 6
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 12
     y: 13
     prefab: {fileID: 0}
     rotationIndex: 0
-    kind: gun
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    kind: Ammo
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 10
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 9
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 8
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 2
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 6
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 2
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 4
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 2
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 4
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 5
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 5
     y: 6
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 5
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 4
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 2
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 2
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 11
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 10
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 9
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 9
     y: 2
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 9
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 10
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 11
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 13
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 14
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 15
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 15
     y: 2
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 15
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 14
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 13
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 19
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 19
     y: 6
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 19
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 20
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 22
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 5
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 4
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 2
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 22
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 1
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 22
     y: 3
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 6
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 22
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 20
     y: 7
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 8
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 9
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 10
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 19
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 18
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 20
     y: 11
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 12
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 13
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 14
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 15
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: SpawnPoint
-    marker: SP
-    markerColor: {r: 0.15, g: 0.85, b: 0.15, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 20
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 19
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 18
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 17
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 16
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 15
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 14
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 13
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 12
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 11
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 10
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 9
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 8
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 7
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 6
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 5
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 4
     y: 16
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 15
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 14
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 13
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 12
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 5
     y: 21
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 5
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 4
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 21
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 3
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 4
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 2
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 21
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 1
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 2
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 9
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 10
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 11
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 12
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 13
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 14
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 15
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 15
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 14
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 13
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 11
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 10
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 9
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 9
     y: 18
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 10
     y: 18
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 11
     y: 18
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 13
     y: 18
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 14
     y: 18
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 15
     y: 18
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 19
     y: 21
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 19
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 20
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 22
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 22
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 21
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 23
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 22
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 20
     y: 20
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
-    marker: c
-    markerColor: {r: 1, g: 0.86, b: 0.25, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 21
     y: 21
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Ammo
-    marker: G
-    markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
   - x: 12
     y: 9
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Loot
-    marker: I
-    markerColor: {r: 0, g: 1, b: 1, a: 1}
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}

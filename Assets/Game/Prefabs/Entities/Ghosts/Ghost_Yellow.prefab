@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2527624984478347847}
   - component: {fileID: 7766518045613671595}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,7 +104,7 @@ GameObject:
   - component: {fileID: 2153044852385526397}
   - component: {fileID: 3908160944877652555}
   - component: {fileID: 6358558277448211888}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Ghost_Yellow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -181,6 +181,8 @@ MonoBehaviour:
   forwardProbeDistance: 0.2
   skin: 0.02
   cornerRadiusScale: 0.85
+  debugBlockers: 0
+  debugBlockerLogInterval: 0.25
 --- !u!143 &2153044852385526397
 CharacterController:
   m_ObjectHideFlags: 0

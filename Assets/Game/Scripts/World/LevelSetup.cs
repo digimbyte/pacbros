@@ -44,59 +44,129 @@ public class LevelSetup : MonoBehaviour
     }
 
     /// <summary>
-    /// Find a SpawnPlayer anchor (PlayerSpawnPoint) and move the player entity and camera to it.
+    /// Choose a PlayerSpawnPoint for a player.
+    /// MVP rule: ANY spawn point is valid; we do not reserve specific spawns per player.
+    /// When multiple spawns exist, pick one at random using the spawn's weight.
+    /// </summary>
+    PlayerSpawnPoint ChoosePlayerSpawn(int playerIndex)
+    {
+        // NOTE: playerIndex is currently ignored by design (no per-player reservation).
+
+        // Prefer using an explicit registry if present so we avoid repeated FindObjects calls.
+        var registry = Object.FindObjectOfType<SpawnPointsRegistry>(includeInactive: true);
+        List<PlayerSpawnPoint> allSpawns = null;
+
+        if (registry != null && registry.PlayerSpawns != null && registry.PlayerSpawns.Count > 0)
+        {
+            allSpawns = new List<PlayerSpawnPoint>(registry.PlayerSpawns);
+        }
+        else
+        {
+            var spawnsArr = GameObject.FindObjectsOfType<PlayerSpawnPoint>(includeInactive: true);
+            if (spawnsArr != null && spawnsArr.Length > 0)
+                allSpawns = new List<PlayerSpawnPoint>(spawnsArr);
+        }
+
+        if (allSpawns == null || allSpawns.Count == 0)
+            return null;
+
+        // MVP: just choose a random spawn (weighted) from the full set.
+        return ChooseWeightedRandom(allSpawns);
+    }
+
+    /// <summary>
+    /// Choose a random spawn from the list using its weight; if all weights are non-positive,
+    /// select uniformly.
+    /// </summary>
+    PlayerSpawnPoint ChooseWeightedRandom(List<PlayerSpawnPoint> spawns)
+    {
+        if (spawns == null || spawns.Count == 0)
+            return null;
+
+        float totalWeight = 0f;
+        for (int i = 0; i < spawns.Count; i++)
+        {
+            var s = spawns[i];
+            if (s == null) continue;
+            float w = Mathf.Max(0f, s.weight);
+            totalWeight += w;
+        }
+
+        if (totalWeight <= 0f)
+        {
+            // All weights are zero or negative; choose uniformly.
+            int idx = Random.Range(0, spawns.Count);
+            return spawns[idx];
+        }
+
+        float r = Random.Range(0f, totalWeight);
+        float accum = 0f;
+        for (int i = 0; i < spawns.Count; i++)
+        {
+            var s = spawns[i];
+            if (s == null) continue;
+            float w = Mathf.Max(0f, s.weight);
+            if (w <= 0f) continue;
+            accum += w;
+            if (r <= accum)
+                return s;
+        }
+
+        // Numerical edge case; just return the last valid.
+        for (int i = spawns.Count - 1; i >= 0; i--)
+        {
+            if (spawns[i] != null)
+                return spawns[i];
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Find a SpawnPlayer anchor (PlayerSpawnPoint), spawn the local Player prefab there via LevelRuntime,
+    /// and wire the camera to follow it. Falls back to repositioning an existing PlayerEntity if no runtime is present.
+    /// Also positions enemies from EnemySpawnPoints.
     /// </summary>
     public void PositionPlayersAndCamera(int playerIndex = 0)
     {
-        // Find all spawn markers in the active level.
-        var spawns = GameObject.FindObjectsOfType<PlayerSpawnPoint>(includeInactive: true);
-        if (spawns == null || spawns.Length == 0)
+        var chosen = ChoosePlayerSpawn(playerIndex);
+        if (chosen == null)
             return;
 
-        PlayerSpawnPoint chosen = null;
+        // Prefer letting the LevelRuntime own instantiation, lives and camera wiring.
+        var runtime = LevelRuntime.Active != null ? LevelRuntime.Active : GetComponentInParent<LevelRuntime>();
+        PlayerEntity pEntity = null;
 
-        // Prefer exact index match.
-        for (int i = 0; i < spawns.Length; i++)
+        if (runtime != null && runtime.spawnLocalPlayer)
         {
-            var s = spawns[i];
-            if (s != null && s.playerIndex == playerIndex)
+            pEntity = runtime.SpawnLocalPlayerAt(chosen, playerIndex, isRespawn: false);
+            if (pEntity != null)
             {
-                chosen = s;
-                break;
+                // Keep the reference field in sync for consumers of LevelSetup.player.
+                player = pEntity;
             }
         }
 
-        // Fallback: any spawn with playerIndex < 0.
-        if (chosen == null)
+        // Fallback: move an already-placed PlayerEntity and manually retarget the camera.
+        if (pEntity == null)
         {
-            for (int i = 0; i < spawns.Length; i++)
+            pEntity = player != null ? player : Object.FindObjectOfType<PlayerEntity>(includeInactive: true);
+            if (pEntity != null)
             {
-                var s = spawns[i];
-                if (s != null && s.playerIndex < 0)
+                var t = pEntity.transform;
+                var pos = chosen.transform.position;
+                t.position = new Vector3(pos.x, t.position.y, pos.z);
+            }
+
+            var cam = cameraControl != null ? cameraControl : Object.FindObjectOfType<CameraControl>(includeInactive: true);
+            if (cam != null && pEntity != null)
+            {
+                cam.target = pEntity.transform;
+                if (cam.pivot != null)
                 {
-                    chosen = s;
-                    break;
+                    var pos = pEntity.transform.position;
+                    cam.pivot.position = new Vector3(pos.x, cam.pivot.position.y, pos.z);
                 }
             }
-        }
-
-        if (chosen == null)
-            return;
-
-        // Move the primary player entity.
-        var pEntity = player != null ? player : GameObject.FindObjectOfType<PlayerEntity>(includeInactive: true);
-        if (pEntity != null)
-        {
-            var t = pEntity.transform;
-            var pos = chosen.transform.position;
-            t.position = new Vector3(pos.x, t.position.y, pos.z);
-        }
-
-        // Retarget the camera control if present.
-        var cam = cameraControl != null ? cameraControl : GameObject.FindObjectOfType<CameraControl>(includeInactive: true);
-        if (cam != null && pEntity != null)
-        {
-            cam.target = pEntity.transform;
         }
 
         // Position enemies from EnemySpawnPoints.

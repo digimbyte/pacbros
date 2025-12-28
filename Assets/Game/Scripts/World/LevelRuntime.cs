@@ -56,9 +56,23 @@ public class LevelRuntime : MonoBehaviour
     public Camera playerCamera;
     [Tooltip("If true, LevelRuntime will spawn the local Player prefab at the atlas 'player' spawn and assign the camera to follow it.")]
     public bool spawnLocalPlayer = true;
+    [Tooltip("Registry key used when spawning the local player prefab from entityRegistry (e.g. 'Player').")]
+    public string localPlayerRegistryKey = "Player";
+    [Tooltip("Number of lives the local player starts with (each spawn/respawn consumes one).")]
+    public int startingLives = 3;
+    [Tooltip("If true, LevelRuntime will respawn the local player at the last chosen spawn point until lives are exhausted.")]
+    public bool enableRespawn = true;
+
+    [Header("Multiplayer Role")]
+    [Tooltip("If true, force this runtime to behave as a CLIENT even when no ClientSessionMarker is present in the scene.")]
+    public bool forceClientMode = false;
+    [Tooltip("Computed on Awake: true if this runtime is acting as a client (joined/guest session). If false, treated as host.")]
+    [HideInInspector] public bool isClient = false;
 
     // Runtime instance for the local player (if spawned by this runtime).
     [HideInInspector] public GameObject localPlayerInstance;
+    [HideInInspector] public int currentLives;
+    [HideInInspector] public PlayerSpawnPoint lastPlayerSpawnPoint;
 
     readonly List<GridMotor> _motors = new();
 
@@ -81,6 +95,38 @@ public class LevelRuntime : MonoBehaviour
     void Awake()
     {
         Active = this;
+
+        // Determine host vs client role.
+        // If a ClientSessionMarker singleton exists, consult its SessionMode.
+        // If not, assume a purely local hosted game unless forceClientMode overrides.
+        var session = ClientSessionMarker.Instance;
+        if (session != null)
+        {
+            isClient = session.IsClient;
+        }
+        else
+        {
+            // No session object in play: treat as local host by default.
+            isClient = false;
+        }
+
+        if (forceClientMode)
+        {
+            isClient = true;
+        }
+
+        if (isClient)
+        {
+            // In client mode we do not spawn the authoritative local player here;
+            // that should be controlled by the netcode / host.
+            spawnLocalPlayer = false;
+            enableRespawn = false;
+        }
+
+        // Initialize lives for the local player (host-side only, but harmless if disabled above).
+        if (startingLives < 0)
+            startingLives = 0;
+        currentLives = startingLives;
 
         // Instantiate the level geometry/placeables from atlas before scanning grid/collision.
         if (levelAtlas != null)
@@ -111,24 +157,11 @@ public class LevelRuntime : MonoBehaviour
         // Enforce 1m grid cells.
         cellSize = 1f;
 
-        // Navmesh: grab or find AstarPath and ensure a 1m GridGraph centered on this level.
+        // Navmesh: grab or find AstarPath and configure after one frame (colliders ready).
         if (astar == null)
             astar = FindObjectOfType<AstarPath>();
-
-        if (astar != null)
-        {
-            ConfigureGridGraph(astar);
-
-            if (buildNavmeshOnAwake)
-            {
-                astar.Scan();
-                // After scan, register graph edges for portals/tunnels.
-                if (setup != null)
-                {
-                    setup.RegisterAstarPortalEdges();
-                }
-            }
-        }
+        if (astar != null && buildNavmeshOnAwake)
+            StartCoroutine(ConfigureAndScanNextFrame(astar, setup));
 
         // Drain any motors that awoke before this level (race-safe).
         GridMotor.FlushPendingMotorsTo(this);
@@ -153,48 +186,19 @@ public class LevelRuntime : MonoBehaviour
 
     Transform ResolveEntitiesRoot()
     {
-        if (entitiesRoot != null) return entitiesRoot;
-
-        Transform candidate = null;
-
-        if (transform.parent != null)
-            candidate = transform.parent.Find("Entities");
-
-        if (candidate == null)
-            candidate = transform.Find("Entities");
-
-        if (candidate == null)
+        if (entitiesRoot == null)
         {
-            var go = new GameObject("Entities");
-            if (transform.parent != null)
-                go.transform.SetParent(transform.parent, false);
-            else
-                go.transform.SetParent(transform, false);
-            candidate = go.transform;
+            Debug.LogError("LevelRuntime: entitiesRoot is not assigned. Please assign the root that holds all entities.", this);
         }
-
-        entitiesRoot = candidate;
         return entitiesRoot;
     }
 
     Transform ResolveLevelContainer(string nameHint = null)
     {
-        if (levelContainer != null) return levelContainer;
-
-        // Try to find an existing child that matches the atlas name.
-        if (!string.IsNullOrEmpty(nameHint))
+        if (levelContainer == null)
         {
-            var existing = transform.Find(nameHint);
-            if (existing != null)
-            {
-                levelContainer = existing;
-                return levelContainer;
-            }
+            Debug.LogError("LevelRuntime: levelContainer is not assigned. Please assign the root that will hold spawned level geometry.", this);
         }
-
-        var go = new GameObject(string.IsNullOrEmpty(nameHint) ? "Level" : nameHint);
-        go.transform.SetParent(transform, false);
-        levelContainer = go.transform;
         return levelContainer;
     }
 
@@ -204,8 +208,8 @@ public class LevelRuntime : MonoBehaviour
 
         var levelRoot = ResolveLevelContainer();
         // Create/ensure a child named after the atlas to hold all spawned tiles/placeables
-        Transform atlasRoot = levelRoot.Find(atlas.name);
-        if (atlasRoot == null)
+        Transform atlasRoot = levelRoot != null ? levelRoot.Find(atlas.name) : null;
+        if (atlasRoot == null && levelRoot != null)
         {
             var go = new GameObject(atlas.name);
             go.transform.SetParent(levelRoot, false);
@@ -215,13 +219,16 @@ public class LevelRuntime : MonoBehaviour
         var entities = ResolveEntitiesRoot();
 
         // Clear previous children to avoid duplicates on reload.
-        for (int i = atlasRoot.childCount - 1; i >= 0; i--)
+        if (atlasRoot != null)
+        {
+            for (int i = atlasRoot.childCount - 1; i >= 0; i--)
         {
             Destroy(atlasRoot.GetChild(i).gameObject);
         }
+        }
 
         // Tiles (world geometry)
-        if (atlas.cells != null)
+        if (atlas.cells != null && atlasRoot != null)
         {
             for (int i = 0; i < atlas.cells.Count; i++)
             {
@@ -250,43 +257,31 @@ public class LevelRuntime : MonoBehaviour
                 if (string.IsNullOrEmpty(p.kind))
                     continue;
 
-                // Normalize legacy numeric kinds (e.g. "1") into current string keys before use.
-                string kindKey = NormalizePlaceableKind(p.kind);
-
-                // Special-case the local player spawn so we can wire the camera to it.
-                if (spawnLocalPlayer && kindKey == TileAdjacencyAtlas.PlaceableKind.SpawnPlayer)
-                {
-                    if (localPlayerInstance == null)
-                    {
-                        GameObject prefab = GetRegistryPrefab(kindKey);
-                        if (prefab != null)
-                        {
-                            var pos = new Vector3(p.x, 0f, p.y) + prefab.transform.localPosition;
-                            var rot = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(p.rotationIndex) * 90f, 0f) * prefab.transform.localRotation;
-                            localPlayerInstance = Instantiate(prefab, pos, rot, entities);
-                            // Include registry key in spawned instance name for easier debugging.
-                            if (localPlayerInstance != null)
-                                localPlayerInstance.name = $"{prefab.name}<{kindKey}>";
-                            localPlayerInstance.transform.localScale = prefab.transform.localScale;
-                            AssignCameraToPlayer(localPlayerInstance.transform);
-                        }
-                    }
-                    // Do not also create a second generic instance for the player spawn.
-                    continue;
-                }
-
-                // Generic placeable instantiation (non-player)
-                GameObject genericPrefab = GetRegistryPrefab(kindKey);
-                if (genericPrefab == null)
+                GameObject prefab = GetRegistryPrefab(p.kind);
+                if (prefab == null)
                     continue;
 
-                var inst = Instantiate(genericPrefab, entities);
+                var inst = Instantiate(prefab, entities);
                 if (inst != null)
-                    inst.name = $"{genericPrefab.name}<{kindKey}>";
-                Transform prefabT = genericPrefab.transform;
+                    inst.name = $"{prefab.name}<{p.kind}>";
+                Transform prefabT = prefab.transform;
                 inst.transform.localPosition = new Vector3(p.x, 0f, p.y) + prefabT.localPosition;
                 inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(p.rotationIndex) * 90f, 0f) * prefabT.localRotation;
                 inst.transform.localScale = prefabT.localScale;
+
+                // If this is a player spawn marker kind, ensure it carries a PlayerSpawnPoint component
+                // so LevelSetup can discover it and choose a spawn for the local player.
+                if (string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.SpawnPlayer, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(p.kind, "SpawnPoint", StringComparison.OrdinalIgnoreCase))
+                {
+                    var marker = inst.GetComponent<PlayerSpawnPoint>();
+                    if (marker == null)
+                    {
+                        marker = inst.AddComponent<PlayerSpawnPoint>();
+                        marker.playerIndex = -1;   // default: any player
+                        marker.weight = 1f;
+                    }
+                }
             }
         }
     }
@@ -324,30 +319,89 @@ public class LevelRuntime : MonoBehaviour
         return go != null ? go.GetComponent<T>() : null;
     }
 
-    // Convert legacy numeric placeable kinds into the current string keys.
-    // If the incoming `raw` looks like an integer, map it to known keys here.
-    string NormalizePlaceableKind(string raw)
+    /// <summary>
+    /// Spawn (or respawn) the local player at the given spawn point, consuming one life.
+    /// Stores the spawn as the current respawn point and wires the camera rig to the new instance.
+    /// </summary>
+    public PlayerEntity SpawnLocalPlayerAt(PlayerSpawnPoint spawnPoint, int playerIndex = 0, bool isRespawn = false)
     {
-        if (string.IsNullOrEmpty(raw)) return raw;
+        if (!spawnLocalPlayer || spawnPoint == null)
+            return null;
 
-        // If already a non-numeric key, return as-is (case preserved).
-        if (!int.TryParse(raw, out int numeric))
-            return raw;
+        if (!enableRespawn && isRespawn)
+            return null;
 
-        // Legacy numeric mapping (edit these if your legacy enum differed).
-        // 0 = none, 1 = player, 2 = enemy, 3 = loot, 4 = coin, 5 = ammo
-        switch (numeric)
+        // Initialise lives on first use if something else has not already.
+        if (currentLives <= 0 && startingLives > 0 && !isRespawn && localPlayerInstance == null)
         {
-            case 0: return TileAdjacencyAtlas.PlaceableKind.None;
-            case 1: return TileAdjacencyAtlas.PlaceableKind.SpawnPlayer;
-            case 2: return TileAdjacencyAtlas.PlaceableKind.Enemy;
-            case 3: return TileAdjacencyAtlas.PlaceableKind.Loot;
-            case 4: return TileAdjacencyAtlas.PlaceableKind.Coin;
-            case 5: return TileAdjacencyAtlas.PlaceableKind.Ammo;
-            default:
-                Debug.LogWarning($"LevelRuntime: unknown legacy numeric placeable kind '{raw}' — passing through as string.");
-                return raw;
+            currentLives = startingLives;
         }
+
+        if (currentLives <= 0)
+        {
+            Debug.Log("LevelRuntime: Cannot spawn local player; no lives remaining.", this);
+            return null;
+        }
+
+        currentLives--;
+
+        // Clean up any previous instance.
+        if (localPlayerInstance != null)
+        {
+            Destroy(localPlayerInstance);
+            localPlayerInstance = null;
+        }
+
+        Vector3 spawnPos = spawnPoint.transform.position;
+        Quaternion spawnRot = Quaternion.identity;
+
+        var playerEntity = InstantiateRegistryPrefab<PlayerEntity>(localPlayerRegistryKey, spawnPos, spawnRot);
+        if (playerEntity == null)
+            return null;
+
+        localPlayerInstance = playerEntity.gameObject;
+        playerEntity.playerIndex = playerIndex;
+        playerEntity.isLocal = true;
+
+        // Ensure PlayerController (if present) is wired to this motor.
+        var motor = localPlayerInstance.GetComponent<GridMotor>();
+        var controller = localPlayerInstance.GetComponent<PlayerController>();
+        if (controller != null && controller.motor == null)
+        {
+            controller.motor = motor;
+        }
+
+        // Align the grid motor precisely with the spawn to avoid half-cell offsets.
+        if (motor != null)
+        {
+            motor.HardTeleport(spawnPos);
+        }
+        else
+        {
+            localPlayerInstance.transform.position = spawnPos;
+        }
+
+        lastPlayerSpawnPoint = spawnPoint;
+
+        AssignCameraToPlayer(localPlayerInstance.transform);
+
+        return playerEntity;
+    }
+
+    /// <summary>
+    /// Attempt to respawn the local player at the last stored respawn point, if any lives remain.
+    /// </summary>
+    public bool TryRespawnLocalPlayer(int playerIndex = 0)
+    {
+        if (!enableRespawn)
+            return false;
+        if (lastPlayerSpawnPoint == null)
+            return false;
+        if (currentLives <= 0)
+            return false;
+
+        var player = SpawnLocalPlayerAt(lastPlayerSpawnPoint, playerIndex, isRespawn: true);
+        return player != null;
     }
 
     void AssignCameraToPlayer(Transform playerTransform)
@@ -383,10 +437,29 @@ public class LevelRuntime : MonoBehaviour
     // No reflection into fields: registry must implement a direct API.
     void AutoConfigureFromChildren()
     {
-        // Use child colliders; rely on explicit wall/floor layers you set in the scene.
-        var cols = GetComponentsInChildren<Collider>(includeInactive: true);
+        // Use colliders from the levelContainer only (entities are dynamic/non-world and excluded).
+        var cols = levelContainer != null
+            ? levelContainer.GetComponentsInChildren<Collider>(includeInactive: true)
+            : Array.Empty<Collider>();
+
         if (cols == null || cols.Length == 0)
+        {
+            // Fallback: derive grid origin/bounds from atlas dimensions.
+            if (levelAtlas != null)
+            {
+                cellSize = 1f;
+                float fOriginX = 0.5f;
+                float fOriginZ = 0.5f;
+                gridOrigin = new Vector3(fOriginX, transform.position.y, fOriginZ);
+
+                float fSizeX = Mathf.Max(1f, levelAtlas.width);
+                float fSizeZ = Mathf.Max(1f, levelAtlas.height);
+                levelBoundsXZ = new Bounds(
+                    new Vector3((fSizeX) * 0.5f, transform.position.y, (fSizeZ) * 0.5f),
+                    new Vector3(fSizeX, 0f, fSizeZ));
+            }
             return;
+        }
 
         bool anyFloor = false;
         float minX = float.PositiveInfinity;
@@ -425,7 +498,12 @@ public class LevelRuntime : MonoBehaviour
         }
 
         if (!anyFloor)
+        {
+            // No floor/portal/door colliders detected on the configured layers.
+            // Treat the atlas as the source of truth for bounds so GridMotor's OOB logic matches the level data.
+            EnsureBoundsCoverAtlas();
             return;
+        }
 
         // 1m grid, floor cubes are 1m and centered at integer+0.5.
         cellSize = 1f;
@@ -442,36 +520,78 @@ public class LevelRuntime : MonoBehaviour
         Vector3 size = new Vector3(sizeX, 0f, sizeZ);
         levelBoundsXZ.center = center;
         levelBoundsXZ.size = size;
+
+        // Always ensure runtime bounds cover the atlas extents (atlas is the authoritative layout).
+        // This prevents tiny bounds (e.g. 1x1) when layers are misconfigured or colliders are missing.
+        EnsureBoundsCoverAtlas();
+    }
+
+    void EnsureBoundsCoverAtlas()
+    {
+        if (levelAtlas == null)
+            return;
+
+        // Atlas cell coordinates map directly to world XZ (1 unit per cell).
+        // Bounds should include centers at x/z = 0..width-1 and 0..height-1.
+        // That yields min=-0.5, max=width-0.5 (and same for Z).
+        float w = Mathf.Max(1f, levelAtlas.width);
+        float h = Mathf.Max(1f, levelAtlas.height);
+
+        float y = transform.position.y;
+        Vector3 atlasMin = new Vector3(-0.5f, y, -0.5f);
+        Vector3 atlasMax = new Vector3(w - 0.5f, y, h - 0.5f);
+
+        // If bounds are unset, set them directly.
+        if (levelBoundsXZ.size == Vector3.zero)
+        {
+            levelBoundsXZ = new Bounds(
+                new Vector3((atlasMin.x + atlasMax.x) * 0.5f, y, (atlasMin.z + atlasMax.z) * 0.5f),
+                new Vector3(w, 0f, h));
+            return;
+        }
+
+        // Expand existing bounds to include atlas bounds (never shrink).
+        Vector3 min = levelBoundsXZ.min;
+        Vector3 max = levelBoundsXZ.max;
+        if (atlasMin.x < min.x) min.x = atlasMin.x;
+        if (atlasMin.z < min.z) min.z = atlasMin.z;
+        if (atlasMax.x > max.x) max.x = atlasMax.x;
+        if (atlasMax.z > max.z) max.z = atlasMax.z;
+
+        levelBoundsXZ.SetMinMax(min, max);
     }
 
     void ConfigureGridGraph(AstarPath path)
     {
         if (path == null) return;
+    }
 
-        // Ensure we have at least one GridGraph.
-        var data = path.data;
-        GridGraph graph = null;
+    System.Collections.IEnumerator ConfigureAndScanNextFrame(AstarPath path, LevelSetup setup)
+    {
+        // wait one frame so Unity creates colliders on spawned tiles
+        yield return null;
 
-        // Try to reuse an existing GridGraph.
-        for (int i = 0; i < data.graphs.Length; i++)
+        ConfigureGridGraphFromAtlas(path);
+
+        if (path != null)
         {
-            graph = data.graphs[i] as GridGraph;
-            if (graph != null)
-                break;
+            path.Scan();
+            if (setup != null)
+            {
+                setup.RegisterAstarPortalEdges();
+                // Let LevelSetup choose a spawn and ask this runtime to spawn the local player there.
+                setup.PositionPlayersAndCamera();
+            }
         }
+    }
 
-        if (graph == null)
-        {
-            graph = data.AddGraph(typeof(GridGraph)) as GridGraph;
-        }
-
-        if (graph == null)
-            return;
+    void ConfigureGridGraphFromAtlas(AstarPath path)
+    {
+        if (path == null || levelAtlas == null) return;
 
         // All grid cells are exactly 1m apart.
-        graph.isometricAngle = 0f;
-        graph.uniformEdgeCosts = true;
-        graph.nodeSize = 1f;
+        GridGraph graph = EnsureGridGraph(path);
+        if (graph == null) return;
 
         // Use walls as unwalkable obstacles, with a reduced sampling footprint so 1-wide corridors stay open.
         graph.collision.use2D = false;
@@ -481,67 +601,68 @@ public class LevelRuntime : MonoBehaviour
         graph.collision.diameter = 0.5f;      // default is 1; smaller keeps nodes off wall corners
         graph.collision.collisionOffset = -0.45f; // inset more aggressively
 
-        // Use floors only for height/grounding, not for blocking.
         graph.collision.heightCheck = true;
-        // Floors + portals + doors are considered ground; they do NOT block.
         graph.collision.heightMask = floorLayers | portalLayers | doorLayers;
         graph.collision.fromHeight = 5f;
         graph.collision.height = 10f;
-
-        // No extra erosion by default; corridors are already tight.
         graph.erodeIterations = 0;
 
-        // Compute bounds in XZ from level children.
-        var cols = GetComponentsInChildren<Collider>(includeInactive: true);
-        if (cols == null || cols.Length == 0)
+        // Size from atlas first.
+        float fSizeX = Mathf.Max(1f, levelAtlas.width);
+        float fSizeZ = Mathf.Max(1f, levelAtlas.height);
+        int gWidth = Mathf.CeilToInt(fSizeX / 1f);
+        int gDepth = Mathf.CeilToInt(fSizeZ / 1f);
+        float gCenterX = fSizeX * 0.5f + 0.5f;
+        float gCenterZ = fSizeZ * 0.5f + 0.5f;
+
+        // If colliders exist, expand (never shrink) to cover them.
+        var cols = levelContainer != null
+            ? levelContainer.GetComponentsInChildren<Collider>(includeInactive: true)
+            : Array.Empty<Collider>();
+        if (cols != null && cols.Length > 0)
         {
-            // Fallback: small graph around level root.
-            graph.center = transform.position;
-            graph.SetDimensions(32, 32, 1f);
-            return;
+            float minX = float.PositiveInfinity, maxX = float.NegativeInfinity;
+            float minZ = float.PositiveInfinity, maxZ = float.NegativeInfinity;
+            for (int i = 0; i < cols.Length; i++)
+            {
+                var c = cols[i];
+                if (c == null) continue;
+                var b = c.bounds;
+                if (b.min.x < minX) minX = b.min.x;
+                if (b.max.x > maxX) maxX = b.max.x;
+                if (b.min.z < minZ) minZ = b.min.z;
+                if (b.max.z > maxZ) maxZ = b.max.z;
+            }
+            float cSizeX = Mathf.Max(fSizeX, maxX - minX);
+            float cSizeZ = Mathf.Max(fSizeZ, maxZ - minZ);
+            gWidth = Mathf.CeilToInt(cSizeX / 1f);
+            gDepth = Mathf.CeilToInt(cSizeZ / 1f);
+            gCenterX = Mathf.Max(gCenterX, minX + cSizeX * 0.5f + 0.5f);
+            gCenterZ = Mathf.Max(gCenterZ, minZ + cSizeZ * 0.5f + 0.5f);
         }
 
-        float minX = float.PositiveInfinity;
-        float maxX = float.NegativeInfinity;
-        float minZ = float.PositiveInfinity;
-        float maxZ = float.NegativeInfinity;
+        graph.center = new Vector3(gCenterX, -0.5f, gCenterZ);
+        graph.SetDimensions(gWidth, gDepth, 1f);
+    }
 
-        for (int i = 0; i < cols.Length; i++)
+    GridGraph EnsureGridGraph(AstarPath path)
+    {
+        if (path == null) return null;
+        var data = path.data;
+        GridGraph graph = null;
+        for (int i = 0; i < data.graphs.Length; i++)
         {
-            var c = cols[i];
-            if (c == null) continue;
-            var b = c.bounds;
-            if (b.min.x < minX) minX = b.min.x;
-            if (b.max.x > maxX) maxX = b.max.x;
-            if (b.min.z < minZ) minZ = b.min.z;
-            if (b.max.z > maxZ) maxZ = b.max.z;
+            graph = data.graphs[i] as GridGraph;
+            if (graph != null)
+                break;
         }
+        if (graph == null)
+            graph = data.AddGraph(typeof(GridGraph)) as GridGraph;
+        if (graph == null) return null;
 
-        // Snap bounds to 1m grid.
-        minX = Mathf.Floor(minX);
-        minZ = Mathf.Floor(minZ);
-        maxX = Mathf.Ceil(maxX);
-        maxZ = Mathf.Ceil(maxZ);
-
-        float sizeX = Mathf.Max(1f, maxX - minX);
-        float sizeZ = Mathf.Max(1f, maxZ - minZ);
-
-        int width  = Mathf.CeilToInt(sizeX / 1f);
-        int depth  = Mathf.CeilToInt(sizeZ / 1f);
-
-        // Center of the graph in world space.
-        float centerX = minX + sizeX * 0.5f;
-        float centerZ = minZ + sizeZ * 0.5f;
-
-        // Offset so nodes are at floor centers, not at integer corners:
-        //  - floor tiles are 1m cubes centered at x/z + 0.5
-        //  - floor Y is -1, so put nodes around -0.5 in Y.
-        centerX += 0.5f;
-        centerZ += 0.5f;
-
-        graph.center = new Vector3(centerX, -0.5f, centerZ);
-        graph.SetDimensions(width, depth, 1f);
-
-        // Optionally, you could set collision/height testing here to match your tiles.
+        graph.isometricAngle = 0f;
+        graph.uniformEdgeCosts = true;
+        graph.nodeSize = 1f;
+        return graph;
     }
 }

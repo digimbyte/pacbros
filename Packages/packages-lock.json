@@ -28,7 +28,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "6e6ed6eb0ef17fa66456a006d89b7f7fd3b6ae1a"
+      "hash": "106f4fc0e5c8292eadc5f0d33686ec350a12f7ae"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -327,7 +327,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.services.multiplayer": {
-      "version": "1.2.0",
+      "version": "1.2.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
