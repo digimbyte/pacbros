@@ -11,4 +11,8 @@ public class PlayerEntity : EntityBase
 
     [Tooltip("Optional: can be used to tag local-player controlled entities.")]
     public bool isLocal;
+
+    [Header("Resources")]
+    [Min(0)]
+    public int ammo;
 }

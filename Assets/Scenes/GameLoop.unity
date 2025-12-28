@@ -3620,8 +3620,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9192b169d23b9dc4ea5c6bf98a71e5f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  novaTextBlock: {fileID: 0}
-  uiTextFallback: {fileID: 0}
+  novaTextBlock: {fileID: 378978376}
   padding: 6
   maxScore: 999999
 --- !u!1 &437007082
