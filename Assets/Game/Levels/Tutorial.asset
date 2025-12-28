@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9d54270cf41d34e49b0da28687974db3, type: 3}
   m_Name: Tutorial
   m_EditorClassIdentifier: Assembly-CSharp::TileAdjacencyAtlas
-  width: 22
+  width: 21
   height: 22
   cells:
   - x: 5
@@ -1788,27 +1788,6 @@ MonoBehaviour:
     tile: {fileID: -7910015379338343097, guid: 84c728611eb6ddc48a4aba359143063f, type: 3}
     rotationIndex: 0
   placeables:
-  - x: 10
-    y: 10
-    prefab: {fileID: 0}
-    rotationIndex: 0
-    kind: enemy
-    marker: E
-    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - x: 9
-    y: 10
-    prefab: {fileID: 0}
-    rotationIndex: 0
-    kind: enemy
-    marker: E
-    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
-  - x: 11
-    y: 10
-    prefab: {fileID: 0}
-    rotationIndex: 0
-    kind: enemy
-    marker: E
-    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
   - x: 1
     y: 16
     prefab: {fileID: 0}
@@ -3062,3 +3041,24 @@ MonoBehaviour:
     kind: gun
     marker: G
     markerColor: {r: 0.6, g: 0.8, b: 1, a: 1}
+  - x: 10
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: EnemySpawn
+    marker: E
+    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - x: 9
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: EnemySpawn
+    marker: E
+    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
+  - x: 11
+    y: 10
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: EnemySpawn
+    marker: E
+    markerColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}

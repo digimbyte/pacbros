@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 4694529873367521260}
   - component: {fileID: 511541837041713926}
   m_Layer: 0
-  m_Name: SpawnPoint
+  m_Name: EnemySpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -67,7 +67,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: e96a85f4d326bb149a8f1047f95154d0, type: 2}
+  - {fileID: 2100000, guid: e35de030879aade42bc73dcab8ec13da, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0

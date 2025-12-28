@@ -288,11 +288,11 @@ public class TileAdjacencyAtlas : ScriptableObject
     public static class PlaceableKind
     {
         public const string None = "none";
-        public const string SpawnPlayer = "player";
-        public const string Enemy = "enemy";
-        public const string Loot = "loot";
-        public const string Coin = "coin";
-        public const string Gun = "gun";
+        public const string SpawnPlayer = "SpawnPoint";
+        public const string Enemy = "EnemySpawn";
+        public const string Loot = "Loot";
+        public const string Coin = "Coin";
+        public const string Ammo = "Ammo";
     }
 
     [Serializable]

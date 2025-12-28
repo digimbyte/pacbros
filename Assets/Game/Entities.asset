@@ -13,52 +13,59 @@ MonoBehaviour:
   m_Name: Entities
   m_EditorClassIdentifier: Core.Registry::Core.Registry.Registry
   assetType: 0
-  defaultAsset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+  defaultAsset: {fileID: 5899738003039467554, guid: 509a5ae5ca92ad146a3ee1fa4725f56c, type: 3}
   description: Registry for managing asset references.
   itemEntries:
   - uid: SpawnPlayer
-    asset: {fileID: 2584990566347290654, guid: 9ef0cc05eeed81a4a889bdcf08d41489, type: 3}
+    asset: {fileID: 5899738003039467554, guid: 742d1f87a5d5c0841ad5444154f0fdd4, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: EnemySpawn
+    asset: {fileID: 5899738003039467554, guid: b8885f3c26a64ff48b895af3b8a68a07, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Ghost_Green
-    asset: {fileID: 8400212119263442475, guid: 92020d6e24480954ea121fc85ddd36d0, type: 3}
+    asset: {fileID: 6081089341591554248, guid: d9a32d9dffffde84982b2b2d4aa0091a, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Ghost_Yellow
-    asset: {fileID: 8400212119263442475, guid: 92020d6e24480954ea121fc85ddd36d0, type: 3}
+    asset: {fileID: 6081089341591554248, guid: 2ab992e81f42f5f43b52a155ec0c9502, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Ghost_Red
-    asset: {fileID: 8400212119263442475, guid: 92020d6e24480954ea121fc85ddd36d0, type: 3}
+    asset: {fileID: 6081089341591554248, guid: 86ce10c3838994c4191fdde3e4abfbf8, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Ghost_Purple
-    asset: {fileID: 8400212119263442475, guid: 92020d6e24480954ea121fc85ddd36d0, type: 3}
+    asset: {fileID: 6081089341591554248, guid: 24876eb81f47e4346937c6e7300282ac, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
   - uid: Coin
-    asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    asset: {fileID: 5899738003039467554, guid: 97efee9bbd031984d806aa2fe9c31a1a, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
-  - uid: Gun
+  - uid: Ammo
     asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
     tags: []
     description: 
@@ -109,6 +116,13 @@ MonoBehaviour:
       values: []
   - uid: Gunshot
     asset: {fileID: 5899738003039467554, guid: 9af77afee6ac6a34eb3bd3bc38fa9124, type: 3}
+    tags: []
+    description: 
+    metadata:
+      keys: []
+      values: []
+  - uid: Player
+    asset: {fileID: 2584990566347290654, guid: ee80c801fff38a8448be82cac500680d, type: 3}
     tags: []
     description: 
     metadata:

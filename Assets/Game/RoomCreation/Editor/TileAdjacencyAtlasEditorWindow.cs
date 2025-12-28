@@ -75,7 +75,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Enemy, label = "E", color = Color.yellow },                         // Yellow
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Loot, label = "I", color = Color.cyan },
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Coin, label = "c", color = new Color(1f, 0.86f, 0.25f) },
-        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Gun, label = "G", color = new Color(0.6f, 0.8f, 1f) }
+        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Ammo, label = "G", color = new Color(0.6f, 0.8f, 1f) }
     };
 
         private static readonly string[] PlaceableKindOptions = new[]
@@ -84,7 +84,7 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             TileAdjacencyAtlas.PlaceableKind.Enemy,
             TileAdjacencyAtlas.PlaceableKind.Loot,
             TileAdjacencyAtlas.PlaceableKind.Coin,
-            TileAdjacencyAtlas.PlaceableKind.Gun
+            TileAdjacencyAtlas.PlaceableKind.Ammo
         };
 
     private static MarkerDef ResolveMarkerDef(string kind)
@@ -869,7 +869,62 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         // Sanitize placeables: remove any explicit None entries before saving (None is used as a transient 'clear' value).
         if (atlas.placeables != null)
         {
-                atlas.placeables.RemoveAll(p => string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase));
+            // Normalize legacy numeric kinds into current keys and clear invalid references.
+            for (int i = atlas.placeables.Count - 1; i >= 0; i--)
+            {
+                var p = atlas.placeables[i];
+
+                // If prefab reference no longer points to an asset, clear it.
+                if (p.prefab != null)
+                {
+                    string prefabPath = AssetDatabase.GetAssetPath(p.prefab);
+                    if (string.IsNullOrEmpty(prefabPath))
+                    {
+                        p.prefab = null;
+                    }
+                }
+
+                // Normalize numeric legacy kinds ("1", "2", etc.) to the string constants.
+                if (!string.IsNullOrEmpty(p.kind) && int.TryParse(p.kind, out int num))
+                {
+                    switch (num)
+                    {
+                        case 0: p.kind = TileAdjacencyAtlas.PlaceableKind.None; break;
+                        case 1: p.kind = TileAdjacencyAtlas.PlaceableKind.SpawnPlayer; break;
+                        case 2: p.kind = TileAdjacencyAtlas.PlaceableKind.Enemy; break;
+                        case 3: p.kind = TileAdjacencyAtlas.PlaceableKind.Loot; break;
+                        case 4: p.kind = TileAdjacencyAtlas.PlaceableKind.Coin; break;
+                        case 5: p.kind = TileAdjacencyAtlas.PlaceableKind.Ammo; break;
+                        default:
+                            // Unknown legacy value: clear this placeable entry (treat as blank)
+                            atlas.placeables.RemoveAt(i);
+                            continue;
+                    }
+                }
+
+                // If after normalization the kind is explicit None and there is no prefab/marker, remove the entry.
+                bool isEmpty = string.IsNullOrEmpty(p.marker) && p.prefab == null && string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase);
+                if (isEmpty)
+                {
+                    atlas.placeables.RemoveAt(i);
+                    continue;
+                }
+
+                // If marker is '*' (legacy), clear it.
+                if (!string.IsNullOrEmpty(p.marker) && p.marker.Trim() == "*")
+                {
+                    p.marker = null;
+                }
+
+                // Ensure markerColor has a sensible default.
+                if (p.markerColor.a <= 0f)
+                    p.markerColor = Color.white;
+
+                atlas.placeables[i] = p;
+            }
+
+            // Finally, remove any remaining explicit None entries as a safeguard.
+            atlas.placeables.RemoveAll(p => string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.None, StringComparison.OrdinalIgnoreCase) && p.prefab == null && string.IsNullOrEmpty(p.marker));
         }
 
         EditorUtility.SetDirty(atlas);

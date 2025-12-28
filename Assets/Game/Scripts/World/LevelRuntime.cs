@@ -51,6 +51,15 @@ public class LevelRuntime : MonoBehaviour
     [Tooltip("True once the level has finished its Awake/initialisation and all registered motors have been notified.")]
     public bool isReady;
 
+    [Header("Local Player")]
+    [Tooltip("Camera used for the local player. If assigned, LevelRuntime will attach a CameraFollow to it and set the spawned player as the follow target.")]
+    public Camera playerCamera;
+    [Tooltip("If true, LevelRuntime will spawn the local Player prefab at the atlas 'player' spawn and assign the camera to follow it.")]
+    public bool spawnLocalPlayer = true;
+
+    // Runtime instance for the local player (if spawned by this runtime).
+    [HideInInspector] public GameObject localPlayerInstance;
+
     readonly List<GridMotor> _motors = new();
 
     public void RegisterMotor(GridMotor motor)
@@ -113,11 +122,10 @@ public class LevelRuntime : MonoBehaviour
             if (buildNavmeshOnAwake)
             {
                 astar.Scan();
-                // After scan, register graph edges for portals/tunnels and snap player to spawn.
+                // After scan, register graph edges for portals/tunnels.
                 if (setup != null)
                 {
                     setup.RegisterAstarPortalEdges();
-                    setup.PositionPlayersAndCamera();
                 }
             }
         }
@@ -239,17 +247,44 @@ public class LevelRuntime : MonoBehaviour
             for (int i = 0; i < atlas.placeables.Count; i++)
             {
                 var p = atlas.placeables[i];
+                if (string.IsNullOrEmpty(p.kind))
+                    continue;
 
-                // Registry is responsible for providing a valid prefab or its own fallback.
-                // We always call by kind and instantiate blindly.
-                GameObject prefab = GetRegistryPrefab(p.kind);
-                var target = entities; // all placeables go under Entities
+                // Normalize legacy numeric kinds (e.g. "1") into current string keys before use.
+                string kindKey = NormalizePlaceableKind(p.kind);
 
-                var inst = Instantiate(prefab, target);
-                Transform prefabT = prefab.transform;
-                // Preserve prefab local position additively (grid + prefab local offset).
+                // Special-case the local player spawn so we can wire the camera to it.
+                if (spawnLocalPlayer && kindKey == TileAdjacencyAtlas.PlaceableKind.SpawnPlayer)
+                {
+                    if (localPlayerInstance == null)
+                    {
+                        GameObject prefab = GetRegistryPrefab(kindKey);
+                        if (prefab != null)
+                        {
+                            var pos = new Vector3(p.x, 0f, p.y) + prefab.transform.localPosition;
+                            var rot = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(p.rotationIndex) * 90f, 0f) * prefab.transform.localRotation;
+                            localPlayerInstance = Instantiate(prefab, pos, rot, entities);
+                            // Include registry key in spawned instance name for easier debugging.
+                            if (localPlayerInstance != null)
+                                localPlayerInstance.name = $"{prefab.name}<{kindKey}>";
+                            localPlayerInstance.transform.localScale = prefab.transform.localScale;
+                            AssignCameraToPlayer(localPlayerInstance.transform);
+                        }
+                    }
+                    // Do not also create a second generic instance for the player spawn.
+                    continue;
+                }
+
+                // Generic placeable instantiation (non-player)
+                GameObject genericPrefab = GetRegistryPrefab(kindKey);
+                if (genericPrefab == null)
+                    continue;
+
+                var inst = Instantiate(genericPrefab, entities);
+                if (inst != null)
+                    inst.name = $"{genericPrefab.name}<{kindKey}>";
+                Transform prefabT = genericPrefab.transform;
                 inst.transform.localPosition = new Vector3(p.x, 0f, p.y) + prefabT.localPosition;
-                // preserve prefab local position additively
                 inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(p.rotationIndex) * 90f, 0f) * prefabT.localRotation;
                 inst.transform.localScale = prefabT.localScale;
             }
@@ -277,13 +312,71 @@ public class LevelRuntime : MonoBehaviour
         if (prefab == null) return null;
 
         var targetParent = parent ?? ResolveEntitiesRoot();
-        return Instantiate(prefab, position, rotation, targetParent);
+        var go = Instantiate(prefab, position, rotation, targetParent);
+        if (go != null)
+            go.name = $"{prefab.name}<{key}>";
+        return go;
     }
 
     public T InstantiateRegistryPrefab<T>(string key, Vector3 position, Quaternion rotation, Transform parent = null) where T : Component
     {
         var go = InstantiateRegistryPrefab(key, position, rotation, parent);
         return go != null ? go.GetComponent<T>() : null;
+    }
+
+    // Convert legacy numeric placeable kinds into the current string keys.
+    // If the incoming `raw` looks like an integer, map it to known keys here.
+    string NormalizePlaceableKind(string raw)
+    {
+        if (string.IsNullOrEmpty(raw)) return raw;
+
+        // If already a non-numeric key, return as-is (case preserved).
+        if (!int.TryParse(raw, out int numeric))
+            return raw;
+
+        // Legacy numeric mapping (edit these if your legacy enum differed).
+        // 0 = none, 1 = player, 2 = enemy, 3 = loot, 4 = coin, 5 = ammo
+        switch (numeric)
+        {
+            case 0: return TileAdjacencyAtlas.PlaceableKind.None;
+            case 1: return TileAdjacencyAtlas.PlaceableKind.SpawnPlayer;
+            case 2: return TileAdjacencyAtlas.PlaceableKind.Enemy;
+            case 3: return TileAdjacencyAtlas.PlaceableKind.Loot;
+            case 4: return TileAdjacencyAtlas.PlaceableKind.Coin;
+            case 5: return TileAdjacencyAtlas.PlaceableKind.Ammo;
+            default:
+                Debug.LogWarning($"LevelRuntime: unknown legacy numeric placeable kind '{raw}' — passing through as string.");
+                return raw;
+        }
+    }
+
+    void AssignCameraToPlayer(Transform playerTransform)
+    {
+        if (playerTransform == null)
+            return;
+
+        // Prefer the project's CameraControl rig when present.
+        var cc = FindObjectOfType<CameraControl>();
+        if (cc != null)
+        {
+            cc.target = playerTransform;
+            // If the rig exposes a pivot, snap it to the player's position so the camera starts aligned.
+            if (cc.pivot != null)
+            {
+                cc.pivot.position = playerTransform.position;
+            }
+            return;
+        }
+
+        // No CameraControl found — if a `playerCamera` is assigned, log guidance.
+        if (playerCamera != null)
+        {
+            Debug.LogWarning("LevelRuntime: No CameraControl found in scene; assign the camera rig to set follow target. `playerCamera` is present but LevelRuntime will not auto-wire it.", this);
+        }
+        else
+        {
+            Debug.LogWarning("LevelRuntime: No CameraControl found in scene and no `playerCamera` is assigned. Camera will not follow the spawned player.", this);
+        }
     }
 
 
