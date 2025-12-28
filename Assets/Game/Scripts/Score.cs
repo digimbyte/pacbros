@@ -118,13 +118,12 @@ public class Score : MonoBehaviour
     private string FormatScore(int value, int pad)
     {
         int p = Mathf.Clamp(pad, 0, 6);
-        // Ensure value does not exceed 6 digits
-        int max = 999999;
-        int v = Mathf.Clamp(value, 0, max);
+        // Ensure value does not exceed configured max
+        int v = Mathf.Clamp(value, 0, s_maxScore);
         return v.ToString().PadLeft(p, '0');
     }
 
-    private bool TrySetTextOnNovaBlock(Nova.UIBlock2D block, string text)
+    private bool TrySetTextOnNovaBlock(Component block, string text)
     {
         try
         {
