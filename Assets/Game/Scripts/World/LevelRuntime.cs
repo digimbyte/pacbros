@@ -142,7 +142,8 @@ public class LevelRuntime : MonoBehaviour
     /// </summary>
     public void NotifyLocalPlayerOutOfLives(GameObject localPlayer)
     {
-        if (localPlayer == null) return;
+        if (localPlayer == null || _outOfLivesTriggered) return;
+        _outOfLivesTriggered = true;
         try
         {
             onLocalPlayerOutOfLives?.Invoke(localPlayer);
@@ -790,6 +791,7 @@ public class LevelRuntime : MonoBehaviour
 
     bool _gameOverTriggered = false;
     bool _winTriggered = false;
+    bool _outOfLivesTriggered = false;
 
     void EvaluateGameState()
     {

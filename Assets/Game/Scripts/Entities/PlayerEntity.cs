@@ -114,6 +114,7 @@ public class PlayerEntity : MonoBehaviour
         
     // Track last dead state for change detection
     bool _lastDeadState = false;
+    bool _killedEventTriggered = false;
 
     void Start()
     {
@@ -125,6 +126,7 @@ public class PlayerEntity : MonoBehaviour
         // Invoke event based on initial state
         if (isDead)
         {
+            _killedEventTriggered = true;
             onKilled?.Invoke();
         }
         else
@@ -140,10 +142,15 @@ public class PlayerEntity : MonoBehaviour
             _lastDeadState = isDead;
             if (isDead)
             {
-                onKilled?.Invoke();
+                if (!_killedEventTriggered)
+                {
+                    _killedEventTriggered = true;
+                    onKilled?.Invoke();
+                }
             }
             else
             {
+                _killedEventTriggered = false;
                 onRespawn?.Invoke();
             }
         }
