@@ -31,11 +31,19 @@ public class GridMotor : MonoBehaviour
     public float laneSnapMaxSpeed = 1000f;
 
     [Header("Collision")]
-    public LayerMask solidMask = ~0;
     public float cornerRadiusScale = 0.5f;
     public float skin = 0.02f;
 
-    private LayerMask enemyMask;
+    // Hard-coded layer IDs for collision detection
+    const int WALL_LAYER = 6;  // Assuming wall layer is 8
+    const int DOOR_LAYER = 10;  // Assuming door layer is 9
+    const int PLAYER_LAYER = 8; // Assuming player layer is 10
+    const int ENEMY_LAYER = 13; // Assuming enemy layer is 11
+
+    private LayerMask wallMask;
+
+    public delegate void TeleportDelegate(Vector3 fromPosition, Vector3 toPosition);
+    public event TeleportDelegate OnTeleport;
 
     Vector2 _desiredInput;
     Vector2Int _moveDir;
@@ -44,13 +52,20 @@ public class GridMotor : MonoBehaviour
     float _moveProgress = 0f;
     Vector3 _startPos;
 
+    /// <summary>
+    /// Public access to current movement direction for door collision detection
+    /// </summary>
+    public Vector2Int MoveDirection => _moveDir;
+
     void Awake()
     {
         if (!characterController)
             characterController = GetComponent<CharacterController>();
 
+        // Set up hard-coded layer masks
+        wallMask = 1 << WALL_LAYER;
+
         TryRegisterWithLevel();
-        enemyMask = LayerMask.GetMask("Enemy", "Ghost", "Enemies");
     }
 
     void OnEnable() => TryRegisterWithLevel();
@@ -77,7 +92,7 @@ public class GridMotor : MonoBehaviour
     {
         cellSize = level.cellSize;
         gridOrigin = level.gridOrigin;
-        solidMask = level.wallLayers != 0 ? level.wallLayers : ~0;
+        // No longer using level's layer masks - using hard-coded layers
     }
 
     public static void FlushPendingMotorsTo(LevelRuntime level)
@@ -213,32 +228,15 @@ public class GridMotor : MonoBehaviour
             lr.gridOrigin +
             new Vector3((x + 0.5f) * lr.cellSize, transform.position.y, (z + 0.5f) * lr.cellSize);
 
-        Collider[] hits = Physics.OverlapBox(
-            center,
-            new Vector3(lr.cellSize * 0.3f, 1f, lr.cellSize * 0.3f),
-            Quaternion.identity,
-            solidMask
-        );
-
-        foreach (var h in hits)
-            if (h.gameObject != gameObject)
-                return true;
-
-        // For enemies, also check enemy layers to prevent getting stuck on each other
-        if (GetComponent<EnemyEntity>() != null)
+        // Use sphere cast for wall collision detection only
+        float radius = lr.cellSize * 0.3f;
+        if (Physics.SphereCast(center + Vector3.up * 2f, radius, Vector3.down, out RaycastHit hit, 4f, wallMask))
         {
-            Collider[] enemyHits = Physics.OverlapBox(
-                center,
-                new Vector3(lr.cellSize * 0.3f, 1f, lr.cellSize * 0.3f),
-                Quaternion.identity,
-                enemyMask
-            );
-
-            foreach (var h in enemyHits)
-                if (h.gameObject != gameObject)
-                    return true;
+            if (hit.collider.gameObject != gameObject)
+                return true;
         }
 
+        // Entities NEVER block each other - only walls block movement
         return false;
     }
 
@@ -273,6 +271,8 @@ public class GridMotor : MonoBehaviour
 
     public void Teleport(Vector3 position)
     {
+        Vector3 fromPosition = transform.position;
+
         // Temporarily disable trails and controller to avoid spawning effects or collisions during teleport
         var trails = GetComponent<Trails>();
         if (trails != null)
@@ -287,6 +287,9 @@ public class GridMotor : MonoBehaviour
         _moveDir = Vector2Int.zero;
         _queuedDir = Vector2Int.zero;
         _velocity = Vector3.zero;
+
+        // Notify listeners of teleport
+        OnTeleport?.Invoke(fromPosition, position);
 
         // Re-enable after a frame
         StartCoroutine(ReEnableAfterTeleport(trails));

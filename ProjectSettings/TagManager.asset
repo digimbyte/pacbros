@@ -13,12 +13,12 @@ TagManager:
   - UI
   - wall
   - floor
-  - entity
+  - player
   - item
   - door
   - portal
   - info
-  - 
+  - enemy
   - 
   - 
   - 

@@ -162,7 +162,7 @@ MonoBehaviour:
   effectIsUniversal: 0
   applyToAllPlayers: 0
   applyToAllGhosts: 0
-  heatValue: -500
+  heatValue: 0
   scoreValue: 100
   livesValue: 0
   ammoValue: 0

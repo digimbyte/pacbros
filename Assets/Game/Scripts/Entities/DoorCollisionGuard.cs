@@ -5,6 +5,8 @@ using UnityEngine;
 [DisallowMultipleComponent]
 public class DoorCollisionGuard : MonoBehaviour
 {
+    const int DOOR_LAYER = 9; // Hard-coded door layer ID
+
     [Tooltip("Radius (meters) used when probing for blocking doors around the player.")]
     public float probeRadius = 0.5f;
 
@@ -51,27 +53,24 @@ public class DoorCollisionGuard : MonoBehaviour
             Debug.LogWarning($"DoorCollisionGuard[{name}] blocked by '{doorName}'", this);
     }
 
-    bool TryFindBlockingDoor(out AccessGate blockingGate)
+    bool TryFindBlockingDoor(out AccessGate gate)
     {
-        blockingGate = null;
+        gate = null;
 
-        LayerMask mask = doorLayers;
-        if (mask == 0 && LevelRuntime.Active != null)
-            mask = LevelRuntime.Active.doorLayers;
-        if (mask == 0)
-            mask = ~0; // fallback: search everything
+        // Use sphere cast to detect doors in movement direction
+        LayerMask doorMask = 1 << DOOR_LAYER; // Use hard-coded door layer
+        if (doorLayers != 0) doorMask = doorLayers; // Fallback to configured mask
 
-        Collider[] hits = Physics.OverlapSphere(transform.position, Mathf.Max(0.1f, probeRadius), mask, QueryTriggerInteraction.Collide);
-        for (int i = 0; i < hits.Length; i++)
+        Vector3 castOrigin = transform.position + Vector3.up * 0.5f;
+        Vector3 castDirection = _motor != null ? new Vector3(_motor.MoveDirection.x, 0, _motor.MoveDirection.y) : transform.forward;
+        float castDistance = Mathf.Max(0.5f, probeRadius);
+
+        if (Physics.SphereCast(castOrigin, 0.1f, castDirection, out RaycastHit hit, castDistance, doorMask))
         {
-            var col = hits[i];
-            if (col == null) continue;
-            var gate = col.GetComponentInParent<AccessGate>();
-            if (gate == null) continue;
-
-            if (gate.ShouldBlock(new EntityIdentity(_player)))
+            var doorGate = hit.collider.GetComponentInParent<AccessGate>();
+            if (doorGate != null && doorGate.ShouldBlock(new EntityIdentity(_player)))
             {
-                blockingGate = gate;
+                gate = doorGate;
                 return true;
             }
         }

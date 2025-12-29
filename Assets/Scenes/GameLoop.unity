@@ -1219,6 +1219,10 @@ PrefabInstance:
       propertyPath: playAllOnStart
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2173989403736820698, guid: 872e99b16353f7f459ba1cef7322d49a, type: 3}
+      propertyPath: configuredTweens.Array.data[0].fromVec3.y
+      value: 120
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -15605,16 +15609,108 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].type
+      value: 9
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
       propertyPath: configuredTweens.Array.data[0].local
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].local
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].toBool
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].toFloat
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
       propertyPath: configuredTweens.Array.data[0].toVec3.y
-      value: -120
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].duration
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].toColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].toColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].toColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].toColor.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
       propertyPath: configuredTweens.Array.data[0].fromVec3.y
       value: 120
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].fromColor.a
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].fromColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].fromColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].fromColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].targetObject
+      value: 
+      objectReference: {fileID: 2022617464}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].materialProperty
+      value: _Glossiness
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].useCurrentAsFrom
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].curve.m_PreInfinity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].curve.m_PostInfinity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].curve.m_RotationOrder
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].curve.m_Curve.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].curve.m_Curve.Array.data[1].time
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2780637240553353877, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
+      propertyPath: configuredTweens.Array.data[2].curve.m_Curve.Array.data[1].value
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8523798318266223512, guid: 9a4136bc23097e045a662db4c3493c2e, type: 3}
       propertyPath: targetCamera

@@ -152,6 +152,11 @@ public class LevelRuntime : MonoBehaviour
         {
             Debug.LogException(ex);
         }
+        // Trigger game over
+        _gameOverTriggered = true;
+        if (gameOverHUD != null) gameOverHUD.SetActive(true);
+        // Destroy player and clean up to stop game activity
+        DestroyPlayerAndEntities();
     }
 
     public void RegisterMotor(GridMotor motor)
@@ -811,16 +816,11 @@ public class LevelRuntime : MonoBehaviour
             {
                 Debug.LogException(ex);
             }
+            // Destroy player and clean up to stop game activity
+            DestroyPlayerAndEntities();
             return;
         }
 
-        // Game over condition: all players dead AND no lives remaining.
-        bool allPlayersDead = AreAllPlayersDead();
-        if (allPlayersDead && currentLives <= 0)
-        {
-            _gameOverTriggered = true;
-            if (gameOverHUD != null) gameOverHUD.SetActive(true);
-        }
     }
 
     public int CountRemainingCoins()
@@ -836,6 +836,36 @@ public class LevelRuntime : MonoBehaviour
             count++;
         }
         return count;
+    }
+
+    void DestroyPlayerAndEntities()
+    {
+        // Destroy the local player
+        if (localPlayerInstance != null)
+        {
+            Destroy(localPlayerInstance);
+            localPlayerInstance = null;
+        }
+
+        // Destroy all enemies to stop attacks
+        var enemies = FindObjectsOfType<EnemyEntity>();
+        foreach (var enemy in enemies)
+        {
+            if (enemy != null && enemy.gameObject != null)
+            {
+                Destroy(enemy.gameObject);
+            }
+        }
+
+        // Destroy all item pickups to stop collecting
+        var items = FindObjectsOfType<ItemPickup>();
+        foreach (var item in items)
+        {
+            if (item != null && item.gameObject != null)
+            {
+                Destroy(item.gameObject);
+            }
+        }
     }
 
     bool AreAllPlayersDead()
