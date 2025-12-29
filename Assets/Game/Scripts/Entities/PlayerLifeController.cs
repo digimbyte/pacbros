@@ -79,6 +79,13 @@ public class PlayerLifeController : MonoBehaviour
 
         PlayerEventStack.Push(new PlayerEvent(PlayerEventType.Death, _player, transform.position));
 
+        // Notify LevelRuntime only for the local player so external hooks (audio/UI)
+        // can respond to the local player's death.
+        if (_player != null && _player.isLocal && LevelRuntime.Active != null)
+        {
+            LevelRuntime.Active.NotifyLocalPlayerDeath(_player.gameObject);
+        }
+
         if (deathFreezeSeconds > 0f)
             yield return new WaitForSeconds(deathFreezeSeconds);
 
@@ -92,6 +99,11 @@ public class PlayerLifeController : MonoBehaviour
         else
         {
             PlayerEventStack.Push(new PlayerEvent(PlayerEventType.OutOfLives, _player, transform.position));
+            // Notify LevelRuntime only for the local player so external hooks can respond.
+            if (_player != null && _player.isLocal && LevelRuntime.Active != null)
+            {
+                LevelRuntime.Active.NotifyLocalPlayerOutOfLives(_player.gameObject);
+            }
             if (verboseLogging)
                 Debug.LogWarning($"PlayerLifeController[{name}] out of lives. Player remains disabled.", this);
         }

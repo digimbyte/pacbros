@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(PlayerEntity))]
 public class PlayerAttackController : MonoBehaviour
@@ -23,40 +24,60 @@ public class PlayerAttackController : MonoBehaviour
         _player = GetComponent<PlayerEntity>();
     }
 
-    bool TryAcquireTarget(out Vector3 direction, out EnemyEntity enemy)
+    bool TryAcquireTargets(out Vector3 shootDirection, out List<EntityIdentity> targets)
     {
-        direction = Vector3.zero;
-        float bestDistance = float.MaxValue;
-        enemy = null;
+        shootDirection = Vector3.zero;
+        targets = new List<EntityIdentity>();
+
+        var runtime = LevelRuntime.Active;
+        if (runtime == null) return false;
+
+        float cellSize = runtime.cellSize;
+        Vector3 gridOrigin = runtime.gridOrigin;
+        LayerMask wallMask = runtime.wallLayers;
 
         Vector3 origin = transform.position;
-        Vector3[] dirs =
-        {
-            Vector3.right,   // east
-            Vector3.left,    // west
-            Vector3.forward, // north
-            Vector3.back     // south
-        };
+        Vector3[] dirs = { Vector3.right, Vector3.left, Vector3.forward, Vector3.back };
 
-        for (int i = 0; i < dirs.Length; i++)
+        foreach (Vector3 dir in dirs)
         {
-            Vector3 dir = dirs[i];
-            if (Physics.Raycast(origin, dir, out RaycastHit hit, attackRange, enemyLayers, QueryTriggerInteraction.Ignore))
+            // Scan along the axis
+            for (float dist = cellSize; dist <= attackRange; dist += cellSize)
             {
-                var hitEnemy = hit.collider != null ? hit.collider.GetComponentInParent<EnemyEntity>() : null;
-                if (hitEnemy == null || hitEnemy.isDead)
-                    continue;
+                Vector3 checkPos = origin + dir * dist;
+                // Snap to grid center
+                Vector3 gridPos = new Vector3(
+                    Mathf.Floor((checkPos.x - gridOrigin.x) / cellSize) * cellSize + gridOrigin.x + cellSize * 0.5f,
+                    gridOrigin.y, // ground level
+                    Mathf.Floor((checkPos.z - gridOrigin.z) / cellSize) * cellSize + gridOrigin.z + cellSize * 0.5f
+                );
 
-                if (hit.distance < bestDistance)
+                // Check for wall at this position
+                Vector3 halfExtents = new Vector3(cellSize * 0.4f, 1f, cellSize * 0.4f);
+                Collider[] colliders = Physics.OverlapBox(gridPos, halfExtents, Quaternion.identity, wallMask, QueryTriggerInteraction.Ignore);
+                if (colliders.Length > 0)
                 {
-                    direction = dir;
-                    bestDistance = hit.distance;
-                    enemy = hitEnemy;
+                    // Wall found, stop scanning this axis
+                    break;
+                }
+
+                // Check for entities at this position
+                Collider[] entityColliders = Physics.OverlapSphere(gridPos, cellSize * 0.5f, ~0, QueryTriggerInteraction.Ignore);
+                foreach (Collider col in entityColliders)
+                {
+                    if (col == null) continue;
+                    var identity = EntityIdentityUtility.From(col.gameObject);
+                    if (identity.IsValid && !identity.IsDead && identity.Transform != transform) // don't shoot self
+                    {
+                        targets.Add(identity);
+                        if (shootDirection == Vector3.zero)
+                            shootDirection = dir;
+                    }
                 }
             }
         }
 
-        return direction != Vector3.zero;
+        return targets.Count > 0;
     }
 
     void SpawnProjectile(Vector3 direction)
@@ -107,8 +128,13 @@ public class PlayerAttackController : MonoBehaviour
         if (_player.ammo < ammoPerShot || ammoPerShot <= 0)
             return;
 
-        if (!TryAcquireTarget(out Vector3 direction, out EnemyEntity enemy))
-            return;
+        Vector3 direction = Vector3.forward; // default direction
+        List<EntityIdentity> targets = new List<EntityIdentity>();
+
+        if (TryAcquireTargets(out Vector3 shootDir, out targets))
+        {
+            direction = shootDir;
+        }
 
         _player.ammo = Mathf.Max(0, _player.ammo - ammoPerShot);
 
@@ -116,8 +142,17 @@ public class PlayerAttackController : MonoBehaviour
 
         PlayerEventStack.Push(new PlayerEvent(PlayerEventType.Attack, _player, transform.position));
 
-        if (logHits && enemy != null)
-            Debug.Log($"PlayerAttackController[{name}] fired at '{enemy.name}' ({direction})", enemy);
+        // Kill all detected targets
+        foreach (var target in targets)
+        {
+            if (target.player != null)
+                target.player.isDead = true;
+            else if (target.enemy != null)
+                target.enemy.isDead = true;
+
+            if (logHits)
+                Debug.Log($"PlayerAttackController[{name}] killed '{target.Name}'", target.Transform);
+        }
     }
 
     void OnDrawGizmosSelected()

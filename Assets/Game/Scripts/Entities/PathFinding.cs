@@ -111,8 +111,8 @@ public class PathFinding : MonoBehaviour
     static Vector2Int WorldToCell(Vector3 world, Vector3 origin, float cellSize)
     {
         float inv = 1f / Mathf.Max(0.0001f, cellSize);
-        int x = Mathf.RoundToInt((world.x - origin.x) * inv);
-        int z = Mathf.RoundToInt((world.z - origin.z) * inv);
+        int x = Mathf.FloorToInt((world.x - origin.x) * inv);
+        int z = Mathf.FloorToInt((world.z - origin.z) * inv);
         return new Vector2Int(x, z);
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Pathfinding; // A* Project
+using UnityEngine.Events;
 using Core.Registry; // for Registry (Entities.asset)
 
 /// <summary>
@@ -51,6 +52,8 @@ public class LevelRuntime : MonoBehaviour
     public bool buildNavmeshOnAwake = true;
     [Tooltip("Optional explicit AstarPath reference; if null, will FindObjectOfType.")]
     public AstarPath astar;
+    [Tooltip("If true, use A* pathfinding for enemies. If false, use simple marching algorithm.")]
+    public bool useAStar = false;
 
     [Header("State")] 
     [Tooltip("True once the level has finished its Awake/initialisation and all registered motors have been notified.")]
@@ -107,6 +110,48 @@ public class LevelRuntime : MonoBehaviour
 
     readonly List<GridMotor> _motors = new();
     bool _ghostEnemiesSpawned;
+
+    [Header("Events")]
+    [Tooltip("Invoked when the local player dies. Parameter: the local player GameObject.")]
+    public UnityEvent<GameObject> onLocalPlayerDeath;
+
+    /// <summary>
+    /// Notify the runtime that the local player has died. Invokes `onLocalPlayerDeath`.
+    /// </summary>
+    public void NotifyLocalPlayerDeath(GameObject localPlayer)
+    {
+        if (localPlayer == null) return;
+        try
+        {
+            onLocalPlayerDeath?.Invoke(localPlayer);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+    }
+
+    [Tooltip("Invoked when the local player has no lives remaining. Parameter: the local player GameObject.")]
+    public UnityEvent<GameObject> onLocalPlayerOutOfLives;
+
+    [Tooltip("Invoked when the level is won (all coins collected). No parameters.")]
+    public UnityEvent onLevelWon;
+
+    /// <summary>
+    /// Notify the runtime that the local player has run out of lives. Invokes `onLocalPlayerOutOfLives`.
+    /// </summary>
+    public void NotifyLocalPlayerOutOfLives(GameObject localPlayer)
+    {
+        if (localPlayer == null) return;
+        try
+        {
+            onLocalPlayerOutOfLives?.Invoke(localPlayer);
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
+    }
 
     public void RegisterMotor(GridMotor motor)
     {
@@ -424,7 +469,11 @@ public class LevelRuntime : MonoBehaviour
             return null;
         }
 
-        currentLives--;
+        // Consume a life only when this is an explicit respawn. Initial level
+        // spawns should not decrement the player's lives so the HUD shows the
+        // configured startingLives value.
+        if (isRespawn)
+            currentLives--;
 
         // Clean up any previous instance.
         if (localPlayerInstance != null)
@@ -752,6 +801,14 @@ public class LevelRuntime : MonoBehaviour
         {
             _winTriggered = true;
             if (winHUD != null) winHUD.SetActive(true);
+            try
+            {
+                onLevelWon?.Invoke();
+            }
+            catch (Exception ex)
+            {
+                Debug.LogException(ex);
+            }
             return;
         }
 
@@ -764,7 +821,7 @@ public class LevelRuntime : MonoBehaviour
         }
     }
 
-    int CountRemainingCoins()
+    public int CountRemainingCoins()
     {
         // Consider ItemPickup instances that are active in the scene and not consumed.
         var pickups = FindObjectsOfType<ItemPickup>();

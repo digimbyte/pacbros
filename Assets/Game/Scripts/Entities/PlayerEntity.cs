@@ -111,6 +111,9 @@ public class PlayerEntity : MonoBehaviour
     {
         var tracker = PlayerTracker.EnsureInstance();
         tracker?.Register(this);
+
+        // Give starting ammo
+        ammo = 10;
     }
 
     void OnDisable()

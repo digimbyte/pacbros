@@ -1,5 +1,6 @@
 using UnityEngine;
 using Pathfinding;
+using System.Collections.Generic;
 
 public enum EnemyBrainType
 {
@@ -345,6 +346,13 @@ public class EnemyBrainController : MonoBehaviour
 
     void TickPathing()
     {
+        var runtime = LevelRuntime.Active;
+        if (runtime == null || !runtime.useAStar)
+        {
+            TickSimple();
+            return;
+        }
+
         if (!_hasDestination || _pathPending)
             return;
         if (Time.time < _nextPathTime)
@@ -358,6 +366,80 @@ public class EnemyBrainController : MonoBehaviour
         DoorDelegate.FindPathForEntity(start, goal, _enemy, OnPathReady, overrideAllowance, ticketLifetime);
         _nextPathTime = Time.time + repathInterval;
     }
+
+    void TickSimple()
+    {
+        if (Time.time < _nextPathTime)
+            return;
+
+        GridMotor motor = _motor;
+        if (motor == null) return;
+
+        if (_pathFollower != null)
+        {
+            _pathFollower.ClearPath();
+            _pathPending = false;
+        }
+
+        Vector2Int currentDir = motor.GetCurrentDirection();
+        bool blocked = currentDir != Vector2Int.zero && motor.IsDirectionBlocked(currentDir);
+
+        if (currentDir == Vector2Int.zero || blocked)
+        {
+            // Choose new direction
+            List<Vector2Int> candidates = new List<Vector2Int> { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
+
+            // Prefer direction towards goal if available
+            if (_hasDestination)
+            {
+                Vector3 toGoal = _desiredDestination - transform.position;
+                toGoal.y = 0;
+                if (toGoal.sqrMagnitude > 0.1f)
+                {
+                    Vector2Int preferred = new Vector2Int(
+                        Mathf.RoundToInt(Mathf.Sign(toGoal.x)),
+                        Mathf.RoundToInt(Mathf.Sign(toGoal.z))
+                    );
+                    if (!motor.IsDirectionBlocked(preferred))
+                    {
+                        motor.SetDesiredDirection(preferred);
+                        _nextPathTime = Time.time + repathInterval;
+                        return;
+                    }
+                }
+            }
+
+            // Shuffle candidates for randomness
+            for (int i = candidates.Count - 1; i > 0; i--)
+            {
+                int j = Random.Range(0, i + 1);
+                var temp = candidates[i];
+                candidates[i] = candidates[j];
+                candidates[j] = temp;
+            }
+
+            foreach (var dir in candidates)
+            {
+                if (!motor.IsDirectionBlocked(dir))
+                {
+                    motor.SetDesiredDirection(dir);
+                    _nextPathTime = Time.time + repathInterval;
+                    return;
+                }
+            }
+
+            // All blocked, stop
+            motor.SetDesiredDirection(Vector2Int.zero);
+        }
+        else
+        {
+            // Continue in current direction
+            motor.SetDesiredDirection(currentDir);
+        }
+
+        _nextPathTime = Time.time + repathInterval;
+    }
+
     void UpdateDoorOverrideTracker()
     {
         if (_currentTarget == null)

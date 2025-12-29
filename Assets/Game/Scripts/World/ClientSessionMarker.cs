@@ -33,9 +33,12 @@ public class ClientSessionMarker : MonoBehaviour
     [Tooltip("Name of the gameplay scene to load once a session has been prepared.")]
     public string gameSceneName = "GameLoop";
 
-    [Header("Connection Meta")] 
-    [Tooltip("Friend code / join code or any other identifier used to connect to a host.")]
-    public string friendCode;
+    [Header("Network Scripts")]
+    [Tooltip("Reference to the UnityNetworkHost script in the menu scene.")]
+    public UnityNetworkHost hostScript;
+
+    [Tooltip("Reference to the UnityNetworkClient script in the menu scene.")]
+    public UnityNetworkClient clientScript;
 
     [Tooltip("Local player index for this process (0 = first player). LevelRuntime may use this for spawn index.")]
     public int localPlayerIndex = 0;
@@ -56,12 +59,10 @@ public class ClientSessionMarker : MonoBehaviour
     }
 
     /// <summary>
-    /// Start a purely local (no networking) game.
-    /// Scene load is performed immediately.
+    /// Load the gameplay scene. Call this after network setup is complete.
     /// </summary>
-    public void StartLocalGame()
+    public void LoadGameScene()
     {
-        mode = SessionMode.LocalHost;
         SceneManager.LoadScene(gameSceneName);
     }
 
@@ -69,25 +70,35 @@ public class ClientSessionMarker : MonoBehaviour
     /// Prepare to host a networked game using the given friend/join code.
     /// Insert your actual Unity networking host/bootstrap here before the scene load.
     /// </summary>
-    public void StartHostGame(string joinCode)
+    public async Task<string> StartHostGame()
     {
         mode = SessionMode.NetHost;
-        friendCode = joinCode;
 
-        // TODO: spin up Unity networking host/server here, then load the gameplay scene
-        SceneManager.LoadScene(gameSceneName);
+        if (hostScript != null)
+        {
+            hostScript.enabled = true;
+            if (clientScript != null) clientScript.enabled = false;
+            string actualCode = await hostScript.StartHosting();
+            friendCode = actualCode;
+            return actualCode;
+        }
+        return "";
     }
 
     /// <summary>
     /// Prepare to join a remote host using the given friend/join code.
     /// Insert your actual Unity networking client-connect flow here before the scene load.
     /// </summary>
-    public void JoinGame(string joinCode)
+    public async Task JoinGame(string joinCode)
     {
         mode = SessionMode.NetClient;
         friendCode = joinCode;
 
-        // TODO: kick off Unity networking client connect here, then load the gameplay scene
-        SceneManager.LoadScene(gameSceneName);
+        if (clientScript != null)
+        {
+            clientScript.enabled = true;
+            if (hostScript != null) hostScript.enabled = false;
+            await clientScript.StartJoining(joinCode);
+        }
     }
 }

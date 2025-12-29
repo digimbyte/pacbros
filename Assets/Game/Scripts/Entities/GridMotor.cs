@@ -98,23 +98,12 @@ public class GridMotor : MonoBehaviour
         _moveDir = Vector2Int.zero;
         _queuedDir = Vector2Int.zero;
 
-        // If a CharacterController is present, compute the transform position such that
-        // the capsule's bottom (feet) sits at worldPosition.y. This compensates for
-        // CharacterController.center and height so entities land exactly on the grid.
+        // Force final world Y to 0 (top-down game ground plane).
+        Vector3 target = worldPosition;
+        target.y = 0f;
+
         if (characterController != null)
         {
-            float radius, height;
-            GetCapsuleDims(out radius, out height);
-
-            // center is in local-space; we only need its Y component for vertical math.
-            float centerLocalY = characterController.center.y;
-
-            // Desired bottom Y is the provided worldPosition.y. Solve for transform.position.y
-            // bottomY = (transformY + centerLocalY) - height/2
-            // => transformY = bottomY - centerLocalY + height/2
-            Vector3 target = worldPosition;
-            target.y = worldPosition.y - centerLocalY + (height * 0.5f);
-
             bool wasEnabled = characterController.enabled;
             characterController.enabled = false;
             transform.position = target;
@@ -122,7 +111,7 @@ public class GridMotor : MonoBehaviour
         }
         else
         {
-            transform.position = worldPosition;
+            transform.position = target;
         }
     }
 
@@ -136,6 +125,10 @@ public class GridMotor : MonoBehaviour
         if (characterController == null)
             characterController = GetComponent<CharacterController>();
 
+        // Ensure consistent grid offsets for all entities
+        gridOffsetX = 0.5f;
+        gridOffsetZ = 0.5f;
+
         TryRegisterWithLevel();
     }
 
@@ -143,6 +136,16 @@ public class GridMotor : MonoBehaviour
     {
         cornerRadiusScale = Mathf.Clamp(cornerRadiusScale, 0.5f, 1f);
     }
+
+    /// <summary>
+    /// Get the current movement direction in grid space.
+    /// </summary>
+    public Vector2Int GetCurrentDirection() => _moveDir;
+
+    /// <summary>
+    /// Check if the given direction is blocked by walls or out of bounds.
+    /// </summary>
+    public bool IsDirectionBlocked(Vector2Int dir) => IsBlocked(dir);
 
     void OnEnable()
     {
@@ -312,9 +315,19 @@ public class GridMotor : MonoBehaviour
         {
             _velocity = Vector3.MoveTowards(_velocity, desiredVel, accel * dt);
         }
+
+        // Snap to grid center when stopped
+        if (_velocity == Vector3.zero && _moveDir == Vector2Int.zero)
+        {
+            Vector3 pos = transform.position;
+            pos.x = SnapToLane(pos.x, EffectiveOrigin().x, cellSize);
+            pos.z = SnapToLane(pos.z, EffectiveOrigin().z, cellSize);
+            transform.position = pos;
+        }
+
         // 6) Clamp displacement against walls as a fallback to avoid sticking/penetration.
         Vector3 displacement = _velocity * dt;
-        displacement = ClampDisplacement(displacement);
+        // displacement = ClampDisplacement(displacement);
 
         // 7) Move via CharacterController (preferred) or fallback to transform
         if (characterController != null && characterController.enabled)
@@ -328,18 +341,18 @@ public class GridMotor : MonoBehaviour
 
         // 8) If we ended up inside a wall, attempt a gentle penetration-resolve nudge
         // before resorting to a hard teleport back to the last safe position.
-        if (IsInsideWall())
-        {
-            bool resolved = TryResolvePenetration();
-            if (!resolved)
-            {
-                HardTeleport(_lastSafePos);
-            }
-            _velocity = Vector3.zero;
-            _moveDir = Vector2Int.zero;
-            _queuedDir = Vector2Int.zero;
-        }
-        else
+        // if (IsInsideWall())
+        // {
+        //     bool resolved = TryResolvePenetration();
+        //     if (!resolved)
+        //     {
+        //         HardTeleport(_lastSafePos);
+        //     }
+        //     _velocity = Vector3.zero;
+        //     _moveDir = Vector2Int.zero;
+        //     _queuedDir = Vector2Int.zero;
+        // }
+        // else
         {
             _lastSafePos = transform.position;
             _lastSafeCell = CurrentCell();
@@ -418,29 +431,29 @@ public class GridMotor : MonoBehaviour
         Vector3 dirWorld = new Vector3(dir.x, 0f, dir.y);
         if (dirWorld.sqrMagnitude < 0.5f) return false;
 
-        if (IsOutOfBounds(dirWorld))
-        {
-            if (debugBlockers && Time.unscaledTime >= _nextBlockerLogTime)
-            {
-                _nextBlockerLogTime = Time.unscaledTime + Mathf.Max(0.05f, debugBlockerLogInterval);
-                if (LevelRuntime.Active != null)
-                {
-                    var lr = LevelRuntime.Active;
-                    var b = lr.levelBoundsXZ;
-                    float step = Mathf.Max(cellSize, forwardProbeDistance);
-                    Vector3 target = transform.position + dirWorld.normalized * step;
-                    string atlasName = (lr.levelAtlas != null) ? lr.levelAtlas.name : "<null>";
-                    int atlasW = (lr.levelAtlas != null) ? lr.levelAtlas.width : -1;
-                    int atlasH = (lr.levelAtlas != null) ? lr.levelAtlas.height : -1;
-                    Debug.Log($"GridMotor: BLOCKED (OOB) pos={transform.position} target={target} boundsMin={b.min} boundsMax={b.max} atlas={atlasName}({atlasW}x{atlasH}) floorMask={lr.floorLayers.value} wallMask={lr.wallLayers.value}", this);
-                }
-                else
-                {
-                    Debug.Log($"GridMotor: BLOCKED (OOB) pos={transform.position} (no LevelRuntime.Active)", this);
-                }
-            }
-            return true;
-        }
+        // if (IsOutOfBounds(dirWorld))
+        // {
+        //     if (debugBlockers && Time.unscaledTime >= _nextBlockerLogTime)
+        //     {
+        //         _nextBlockerLogTime = Time.unscaledTime + Mathf.Max(0.05f, debugBlockerLogInterval);
+        //         if (LevelRuntime.Active != null)
+        //         {
+        //             var lr = LevelRuntime.Active;
+        //             var b = lr.levelBoundsXZ;
+        //             float step = Mathf.Max(cellSize, forwardProbeDistance);
+        //             Vector3 target = transform.position + dirWorld.normalized * step;
+        //             string atlasName = (lr.levelAtlas != null) ? lr.levelAtlas.name : "<null>";
+        //             int atlasW = (lr.levelAtlas != null) ? lr.levelAtlas.width : -1;
+        //             int atlasH = (lr.levelAtlas != null) ? lr.levelAtlas.height : -1;
+        //             Debug.Log($"GridMotor: BLOCKED (OOB) pos={transform.position} target={target} boundsMin={b.min} boundsMax={b.max} atlas={atlasName}({atlasW}x{atlasH}) floorMask={lr.floorLayers.value} wallMask={lr.wallLayers.value}", this);
+        //         }
+        //         else
+        //         {
+        //             Debug.Log($"GridMotor: BLOCKED (OOB) pos={transform.position} (no LevelRuntime.Active)", this);
+        //         }
+        //     }
+        //     return true;
+        // }
 
         float radius, height;
         GetCapsuleDims(out radius, out height);
@@ -657,7 +670,7 @@ public class GridMotor : MonoBehaviour
     {
         if (size <= 0f) return v;
         float t = (v - origin) / size;
-        float snapped = Mathf.Round(t) * size + origin;
+        float snapped = Mathf.Floor(t) * size + origin;
         return snapped;
     }
 
@@ -684,17 +697,14 @@ public class GridMotor : MonoBehaviour
         {
             bool wasEnabled = characterController.enabled;
             characterController.enabled = false;
-            // Also snap Y to grid origin to ensure entity sits on the ground level.
-            float radius, height;
-            GetCapsuleDims(out radius, out height);
-            float centerLocalY = characterController.center.y;
-            pos.y = origin.y - centerLocalY + (height * 0.5f);
+            // Force Y to zero (top-down game ground plane)
+            pos.y = 0f;
             transform.position = pos;
             characterController.enabled = wasEnabled;
         }
         else
         {
-            pos.y = origin.y;
+            pos.y = 0f;
             transform.position = pos;
         }
     }

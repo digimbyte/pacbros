@@ -1,41 +1,49 @@
+using System;
+using System.Threading.Tasks;
 using UnityEngine;
+
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
+
 using Unity.Services.Core;
 using Unity.Services.Authentication;
 using Unity.Services.Relay;
 using Unity.Services.Relay.Models;
-using System.Threading.Tasks;
 
-public class UnityNetworkHost : MonoBehaviour
+public class RelayBootstrap : MonoBehaviour
 {
     public NetworkManager networkManager;
     public int maxPlayers = 4;
-    private string joinCode;
 
-    void Awake()
+    private bool servicesReady;
+
+    async void Awake()
     {
         if (networkManager == null)
             networkManager = FindFirstObjectByType<NetworkManager>();
-    }
 
-    public async Task<string> StartHosting()
-    {
         await InitServices();
-        return await HostGame();
     }
 
     async Task InitServices()
     {
+        if (servicesReady) return;
+
         await UnityServices.InitializeAsync();
+
         if (!AuthenticationService.Instance.IsSignedIn)
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
+
+        servicesReady = true;
     }
 
-    async Task<string> HostGame()
+    // =======================
+    // HOST
+    // =======================
+    public async void Host()
     {
         Allocation alloc = await RelayService.Instance.CreateAllocationAsync(maxPlayers);
-        joinCode = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId);
+        string joinCode = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId);
 
         Debug.Log($"JOIN CODE: {joinCode}");
 
@@ -43,7 +51,18 @@ public class UnityNetworkHost : MonoBehaviour
         transport.SetRelayServerData(new RelayServerData(alloc, "dtls"));
 
         networkManager.StartHost();
+    }
 
-        return joinCode;
+    // =======================
+    // CLIENT
+    // =======================
+    public async void Join(string joinCode)
+    {
+        JoinAllocation joinAlloc = await RelayService.Instance.JoinAllocationAsync(joinCode);
+
+        var transport = networkManager.GetComponent<UnityTransport>();
+        transport.SetRelayServerData(new RelayServerData(joinAlloc, "dtls"));
+
+        networkManager.StartClient();
     }
 }
