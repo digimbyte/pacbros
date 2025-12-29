@@ -131,7 +131,7 @@ public class PathFinding : MonoBehaviour
         Vector3 origin = motor.EffectiveOrigin();
         Vector3 targetPos = new Vector3(
             origin.x + targetCell.x * motor.cellSize,
-            pos.y,
+            origin.y,
             origin.z + targetCell.y * motor.cellSize);
 
         Vector3 delta = targetPos - pos;
@@ -144,7 +144,7 @@ public class PathFinding : MonoBehaviour
                 return;
 
             targetCell = _cells[_idx];
-            targetPos = new Vector3(origin.x + targetCell.x * motor.cellSize, pos.y, origin.z + targetCell.y * motor.cellSize);
+            targetPos = new Vector3(origin.x + targetCell.x * motor.cellSize, origin.y, origin.z + targetCell.y * motor.cellSize);
             delta = targetPos - pos;
             delta.y = 0f;
         }

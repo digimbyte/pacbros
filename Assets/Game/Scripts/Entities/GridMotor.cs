@@ -68,6 +68,10 @@ public class GridMotor : MonoBehaviour
     public float skin = 0.02f;
     [Tooltip("Scales collision probe radius to let the capsule slip past corners (0.5..1).")]
     [Range(0.5f, 1f)] public float cornerRadiusScale = 0.85f;
+    [Tooltip("If true, ignore colliders that belong to PlayerEntity or EnemyEntity so entities phase through each other.")]
+    public bool ignoreEntityColliders = true;
+    [Tooltip("If true, snap to the grid lane immediately when `SetDesiredDirection` is called.")]
+    public bool snapToGridOnSetDirection = true;
 
     [Header("Debug")]
     [Tooltip("If true, logs why movement is blocked (out-of-bounds vs collider hit). Throttled.")]
@@ -76,6 +80,8 @@ public class GridMotor : MonoBehaviour
 
     Vector2 _desiredInput;
     float _nextBlockerLogTime;
+
+    float _lastNudgeTime = 0f;
 
     // Current and queued directions in grid-space.
     Vector2Int _moveDir;
@@ -92,11 +98,26 @@ public class GridMotor : MonoBehaviour
         _moveDir = Vector2Int.zero;
         _queuedDir = Vector2Int.zero;
 
-        if (characterController != null && characterController.enabled)
+        // If a CharacterController is present, compute the transform position such that
+        // the capsule's bottom (feet) sits at worldPosition.y. This compensates for
+        // CharacterController.center and height so entities land exactly on the grid.
+        if (characterController != null)
         {
+            float radius, height;
+            GetCapsuleDims(out radius, out height);
+
+            // center is in local-space; we only need its Y component for vertical math.
+            float centerLocalY = characterController.center.y;
+
+            // Desired bottom Y is the provided worldPosition.y. Solve for transform.position.y
+            // bottomY = (transformY + centerLocalY) - height/2
+            // => transformY = bottomY - centerLocalY + height/2
+            Vector3 target = worldPosition;
+            target.y = worldPosition.y - centerLocalY + (height * 0.5f);
+
             bool wasEnabled = characterController.enabled;
             characterController.enabled = false;
-            transform.position = worldPosition;
+            transform.position = target;
             characterController.enabled = wasEnabled;
         }
         else
@@ -186,6 +207,13 @@ public class GridMotor : MonoBehaviour
         _queuedDir = ClampDir(dir);
         if (_moveDir == Vector2Int.zero)
             _moveDir = _queuedDir;
+        // Optionally snap to grid axis immediately when direction is set (helps AI align to lanes)
+        // Always attempt to snap when the caller requests it; snapping only when move==queued
+        // could leave AI slightly off-lane (e.g. half-cell offsets) and prevent turns.
+        if (snapToGridOnSetDirection)
+        {
+            SnapToIntersectionForTurn(_queuedDir);
+        }
     }
 
     void Update()
@@ -298,10 +326,15 @@ public class GridMotor : MonoBehaviour
             transform.position += displacement;
         }
 
-        // 8) If we ended up inside a wall, snap back to last safe position.
+        // 8) If we ended up inside a wall, attempt a gentle penetration-resolve nudge
+        // before resorting to a hard teleport back to the last safe position.
         if (IsInsideWall())
         {
-            HardTeleport(_lastSafePos);
+            bool resolved = TryResolvePenetration();
+            if (!resolved)
+            {
+                HardTeleport(_lastSafePos);
+            }
             _velocity = Vector3.zero;
             _moveDir = Vector2Int.zero;
             _queuedDir = Vector2Int.zero;
@@ -343,6 +376,14 @@ public class GridMotor : MonoBehaviour
         {
             transform.position = pos;
         }
+    }
+
+    bool IsEntityCollider(Collider col)
+    {
+        if (!ignoreEntityColliders || col == null) return false;
+        if (col.GetComponentInParent<PlayerEntity>() != null) return true;
+        if (col.GetComponentInParent<EnemyEntity>() != null) return true;
+        return false;
     }
 
     /// <summary>
@@ -413,7 +454,17 @@ public class GridMotor : MonoBehaviour
         float dist = Mathf.Max(0f, forwardProbeDistance);
         float probeRadius = Mathf.Max(0.001f, radius * cornerRadiusScale - skin);
 
-        bool hit = Physics.CapsuleCast(p1, p2, probeRadius, dirWorld.normalized, out RaycastHit hitInfo, dist, solidMask, QueryTriggerInteraction.Ignore);
+        RaycastHit[] hits = Physics.CapsuleCastAll(p1, p2, probeRadius, dirWorld.normalized, dist, solidMask, QueryTriggerInteraction.Ignore);
+        RaycastHit hitInfo = default;
+        bool hit = false;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (IsEntityCollider(hits[i].collider))
+                continue;
+            hitInfo = hits[i];
+            hit = true;
+            break;
+        }
         if (hit && debugBlockers && Time.unscaledTime >= _nextBlockerLogTime)
         {
             _nextBlockerLogTime = Time.unscaledTime + Mathf.Max(0.05f, debugBlockerLogInterval);
@@ -478,7 +529,18 @@ public class GridMotor : MonoBehaviour
         Vector3 dir = displacement / dist;
 
         float probeRadius = Mathf.Max(0.001f, radius * cornerRadiusScale - skin);
-        if (Physics.CapsuleCast(p1, p2, probeRadius, dir, out RaycastHit hit, dist + skin, solidMask, QueryTriggerInteraction.Ignore))
+        RaycastHit[] hits = Physics.CapsuleCastAll(p1, p2, probeRadius, dir, dist + skin, solidMask, QueryTriggerInteraction.Ignore);
+        RaycastHit hit = default;
+        bool found = false;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (IsEntityCollider(hits[i].collider))
+                continue;
+            hit = hits[i];
+            found = true;
+            break;
+        }
+        if (found)
         {
             // Clamp to just before contact and zero velocity along blocked axis.
             float allowed = Mathf.Max(0f, hit.distance - skin);
@@ -505,7 +567,64 @@ public class GridMotor : MonoBehaviour
         Vector3 p1 = center + Vector3.up * half;
         Vector3 p2 = center - Vector3.up * half;
         float probeRadius = Mathf.Max(0.001f, radius * cornerRadiusScale - skin * 0.5f);
-        return Physics.CheckCapsule(p1, p2, probeRadius, solidMask, QueryTriggerInteraction.Ignore);
+        // Use OverlapCapsule so we can ignore entity colliders when desired.
+        var hits = Physics.OverlapCapsule(p1, p2, probeRadius, solidMask, QueryTriggerInteraction.Ignore);
+        if (hits == null || hits.Length == 0) return false;
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (IsEntityCollider(hits[i])) continue;
+            return true;
+        }
+        return false;
+    }
+
+    bool TryResolvePenetration()
+    {
+        float radius, height;
+        GetCapsuleDims(out radius, out height);
+        Vector3 center = GetCapsuleCenterWorld();
+        float probeRadius = Mathf.Max(0.001f, radius * cornerRadiusScale - skin * 0.5f);
+
+        var overlaps = Physics.OverlapSphere(center, probeRadius, solidMask, QueryTriggerInteraction.Ignore);
+        if (overlaps == null || overlaps.Length == 0)
+            return false;
+        Vector3 totalPush = Vector3.zero;
+        foreach (var col in overlaps)
+        {
+            if (col == null) continue;
+            if (IsEntityCollider(col))
+                continue;
+            Vector3 closest = col.ClosestPoint(center);
+            Vector3 diff = center - closest;
+            float dist = diff.magnitude;
+            float penetration = probeRadius - dist;
+            if (penetration > 0.0001f)
+            {
+                if (dist > 0.0001f)
+                    totalPush += diff.normalized * penetration;
+                else
+                    totalPush += Vector3.up * penetration; // fallback direction
+            }
+        }
+
+        if (totalPush.sqrMagnitude < 1e-8f)
+            return false;
+
+        // Apply a conservative push to escape geometry.
+        Vector3 push = totalPush.normalized * Mathf.Min(totalPush.magnitude, 0.5f);
+        if (characterController != null && characterController.enabled)
+        {
+            bool wasEnabled = characterController.enabled;
+            characterController.enabled = false;
+            transform.position += push;
+            characterController.enabled = wasEnabled;
+        }
+        else
+        {
+            transform.position += push;
+        }
+
+        return true;
     }
 
     Vector2Int CurrentCell()
@@ -565,11 +684,17 @@ public class GridMotor : MonoBehaviour
         {
             bool wasEnabled = characterController.enabled;
             characterController.enabled = false;
+            // Also snap Y to grid origin to ensure entity sits on the ground level.
+            float radius, height;
+            GetCapsuleDims(out radius, out height);
+            float centerLocalY = characterController.center.y;
+            pos.y = origin.y - centerLocalY + (height * 0.5f);
             transform.position = pos;
             characterController.enabled = wasEnabled;
         }
         else
         {
+            pos.y = origin.y;
             transform.position = pos;
         }
     }

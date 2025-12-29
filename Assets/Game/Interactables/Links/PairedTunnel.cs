@@ -8,7 +8,12 @@ public class PairedTunnel : MonoBehaviour
 {
     public PairedTunnel paired;
 
-    // Access/security is handled by a required `AccessGate` component on this GameObject.
+    [Header("Debug")]
+    public bool verboseDebug = false;
+
+    [Header("Activation")]
+    [Tooltip("Optional: assign a separate trigger collider (child) to use for activation. If null, the collider on this GameObject is used.")]
+    public Collider activationCollider;
 
     [Header("Teleport")]
     public Vector3 exitWorldOffset = Vector3.zero;
@@ -27,11 +32,45 @@ public class PairedTunnel : MonoBehaviour
     void Awake()
     {
         var c = GetComponent<Collider>();
-        if (c != null && !c.isTrigger)
+        if (c != null)
+        {
             c.isTrigger = true;
+            if (activationCollider == null)
+                activationCollider = c;
+        }
+
+        if (activationCollider != null && activationCollider != c)
+        {
+            activationCollider.isTrigger = true;
+
+            var fwd = activationCollider.GetComponent<TunnelTriggerForwarder>();
+            if (fwd == null)
+                fwd = activationCollider.gameObject.AddComponent<TunnelTriggerForwarder>();
+
+            fwd.parentTunnel = this;
+        }
     }
 
     void OnTriggerEnter(Collider other)
+    {
+        ProcessTrigger(other);
+    }
+
+    public void ExternalTriggerEnter(Collider other)
+    {
+        ProcessTrigger(other);
+    }
+
+    public void ExternalTriggerExit(Collider other)
+    {
+        EntityIdentity id = EntityIdentityUtility.From(other);
+        Transform root = id.IsValid && id.Transform != null ? id.Transform : other.transform.root;
+        var tl = root.GetComponent<TeleportLethargy>();
+        if (tl != null)
+            tl.ClearIgnoredPortal(this.GetInstanceID());
+    }
+
+    void ProcessTrigger(Collider other)
     {
         if (paired == null) return;
 
@@ -39,171 +78,140 @@ public class PairedTunnel : MonoBehaviour
         if (IsCoolingDown(key)) return;
 
         var gate = GetComponent<AccessGate>();
-        if (gate == null)
+        if (gate == null) return;
+
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        if (identity.IsValid && !gate.HasAccess(identity)) return;
+
+        Transform root =
+            identity.IsValid && identity.Transform != null
+                ? identity.Transform
+                : other.transform.root;
+
+        TeleportLethargy tl = root.GetComponent<TeleportLethargy>();
+        if (tl == null) tl = root.gameObject.AddComponent<TeleportLethargy>();
+        // Respect per-portal ignore as well as the generic recent-teleport timer.
+        if (tl.IsIgnoredByPortal(this.GetInstanceID()) || tl.IsRecentlyTeleported())
         {
-            Debug.LogError("PairedTunnel requires an AccessGate component to decide access.");
+            if (verboseDebug) Debug.Log($"{name}: Ignored — entity recently teleported into this tunnel.", this);
             return;
         }
 
-        EntityIdentity identity = EntityIdentityUtility.From(other);
-        if (identity.IsValid && !gate.HasAccess(identity))
-            return;
-
-        Transform root = identity.IsValid && identity.Transform != null ? identity.Transform : other.transform.root;
-        Vector3 rootPos = root.position;
-        Vector2 rootXZ = new Vector2(rootPos.x, rootPos.z);
-        Vector2 tunnelXZ = new Vector2(transform.position.x, transform.position.z);
+        Vector2 rootXZ = new(root.position.x, root.position.z);
+        Vector2 tunnelXZ = new(transform.position.x, transform.position.z);
         if (Vector2.Distance(rootXZ, tunnelXZ) > activationRadius) return;
 
-        // Capture last movement direction and invert it for tunnels (opposite-way teleport)
         Vector3 lastMove = Vector3.zero;
         GridMotor motor = root.GetComponent<GridMotor>();
         if (motor != null) lastMove = motor.GetVelocity();
-        else
-        {
-            var rb = root.GetComponent<Rigidbody>();
-            if (rb != null) lastMove = rb.linearVelocity;
-        }
+        else if (root.TryGetComponent(out Rigidbody rb0)) lastMove = rb0.linearVelocity;
 
-        Vector3 target = paired.transform.position + paired.exitWorldOffset;
+        // compute target after exitDir is known so we can optionally offset out of collider
 
-        // Determine inbound direction relative to this tunnel's rotation and compute corresponding exit direction
-        Vector3 inbound = (root.position - transform.position);
+        Vector3 inbound = root.position - transform.position;
         inbound.y = 0f;
-        Vector2 inboundXZ = new Vector2(inbound.x, inbound.z);
-
-        // If we couldn't determine a meaningful inbound vector, fall back to simple inversion
+        Vector2 inboundXZ = new(inbound.x, inbound.z);
         bool hasInbound = inboundXZ.sqrMagnitude > 0.0001f;
 
-        // Source and destination yaw (degrees)
         float srcYaw = transform.eulerAngles.y;
         float dstYaw = paired.transform.eulerAngles.y;
 
-        Vector2Int exitDirCardinal = Vector2Int.zero;
+        Vector2Int exitDir = Vector2Int.zero;
 
         if (hasInbound)
         {
-            float inboundAngle = Mathf.Atan2(inboundXZ.y, inboundXZ.x) * Mathf.Rad2Deg; // 0 = +X (east), 90 = +Z (north)
-            float relative = Mathf.DeltaAngle(srcYaw, inboundAngle); // angle from source forward to inbound
+            float inboundAngle = Mathf.Atan2(inboundXZ.y, inboundXZ.x) * Mathf.Rad2Deg;
+            float relative = Mathf.DeltaAngle(srcYaw, inboundAngle);
             float exitAngle = dstYaw + relative;
-            // Snap to nearest cardinal (90-degree) direction
             float snapped = Mathf.Round(exitAngle / 90f) * 90f;
-            float ang = Mathf.DeltaAngle(0f, snapped); // normalize
-            if (Mathf.Abs(Mathf.DeltaAngle(ang, 0f)) < 1f)
-                exitDirCardinal = new Vector2Int(1, 0); // east
-            else if (Mathf.Abs(Mathf.DeltaAngle(ang, 90f)) < 1f)
-                exitDirCardinal = new Vector2Int(0, 1); // north
-            else if (Mathf.Abs(Mathf.DeltaAngle(ang, 180f)) < 1f || Mathf.Abs(Mathf.DeltaAngle(ang, -180f)) < 1f)
-                exitDirCardinal = new Vector2Int(-1, 0); // west
-            else
-                exitDirCardinal = new Vector2Int(0, -1); // south
+            float ang = Mathf.DeltaAngle(0f, snapped);
+
+            if (Mathf.Abs(ang) < 1f) exitDir = new Vector2Int(1, 0);
+            else if (Mathf.Abs(ang - 90f) < 1f) exitDir = new Vector2Int(0, 1);
+            else if (Mathf.Abs(Mathf.Abs(ang) - 180f) < 1f) exitDir = new Vector2Int(-1, 0);
+            else exitDir = new Vector2Int(0, -1);
         }
+
+        Vector3 target = paired.transform.position + paired.exitWorldOffset;
+        // Ensure teleport places entity at ground Y = 0
+        target.y = 0f;
+
+        // small outward nudge to avoid overlapping the destination trigger
+        Vector3 outward = Vector3.zero;
+        if (exitDir != Vector2Int.zero) outward = new Vector3(exitDir.x, 0f, exitDir.y).normalized;
+        if (outward.sqrMagnitude < 0.0001f) outward = paired.transform.forward;
+        const float exitOffset = 0.20f;
+        target += outward * exitOffset;
 
         if (motor != null)
         {
             motor.HardTeleport(target);
-            if (exitDirCardinal != Vector2Int.zero)
+
+            if (exitDir != Vector2Int.zero)
             {
-                motor.SetDesiredDirection(exitDirCardinal);
+                motor.SetDesiredDirection(exitDir);
             }
             else if (lastMove.sqrMagnitude > 0.0001f)
             {
-                // fallback: invert
                 Vector3 inv = -lastMove;
-                Vector2Int dir = (Mathf.Abs(inv.x) >= Mathf.Abs(inv.z)) ? new Vector2Int(inv.x > 0f ? 1 : -1, 0) : new Vector2Int(0, inv.z > 0f ? 1 : -1);
+                Vector2Int dir =
+                    Mathf.Abs(inv.x) >= Mathf.Abs(inv.z)
+                        ? new Vector2Int(inv.x > 0 ? 1 : -1, 0)
+                        : new Vector2Int(0, inv.z > 0 ? 1 : -1);
+
                 motor.SetDesiredDirection(dir);
             }
         }
-        else
-        {
-            CharacterController cc = root.GetComponent<CharacterController>();
-            if (cc != null)
-            {
-                bool wasEnabled = cc.enabled;
-                cc.enabled = false;
-                root.position = target;
-                cc.enabled = wasEnabled;
-            }
-            else
-            {
-                Rigidbody rb = root.GetComponent<Rigidbody>();
-                if (rb != null)
-                {
-                    rb.position = target;
-                    if (exitDirCardinal != Vector2Int.zero && lastMove.sqrMagnitude > 0.0001f)
-                    {
-                        // preserve speed, assign direction according to exitDirCardinal
-                        float speed = lastMove.magnitude;
-                        Vector3 outDir = new Vector3(exitDirCardinal.x, 0f, exitDirCardinal.y);
-                        rb.linearVelocity = outDir.normalized * speed;
-                    }
-                    else
-                    {
-                        rb.linearVelocity = -lastMove;
-                    }
-                }
-                else
-                {
-                    root.position = target;
-                }
-            }
-        }
-
-        SetCooldown(key);
-    }
-
-    int GetCooldownKey(Collider other)
-    {
-        EntityIdentity identity = EntityIdentityUtility.From(other);
-        if (identity.IsValid) return identity.InstanceId;
-        return other.transform.root.GetInstanceID();
-    }
-
-    bool IsCoolingDown(int key)
-    {
-        if (cooldownSeconds <= 0f) return false;
-        if (!_cooldowns.TryGetValue(key, out float until)) return false;
-        return Time.time < until;
-    }
-
-    void SetCooldown(int key)
-    {
-        if (cooldownSeconds <= 0f) return;
-        _cooldowns[key] = Time.time + cooldownSeconds;
-    }
-
-    static void TeleportOther(Collider other, Vector3 target)
-    {
-        Transform root = other.transform.root;
-        EntityIdentity identity = EntityIdentityUtility.From(other);
-        if (identity.IsValid && identity.Transform != null) root = identity.Transform;
-
-        GridMotor motor = root.GetComponent<GridMotor>();
-        if (motor != null)
-        {
-            motor.HardTeleport(target);
-            return;
-        }
-
-        CharacterController cc = root.GetComponent<CharacterController>();
-        if (cc != null)
+        else if (root.TryGetComponent(out CharacterController cc))
         {
             bool wasEnabled = cc.enabled;
             cc.enabled = false;
             root.position = target;
             cc.enabled = wasEnabled;
-            return;
         }
-
-        Rigidbody rb = root.GetComponent<Rigidbody>();
-        if (rb != null)
+        else if (root.TryGetComponent(out Rigidbody rb))
         {
             rb.position = target;
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            return;
+
+            if (exitDir != Vector2Int.zero && lastMove.sqrMagnitude > 0.0001f)
+            {
+                float speed = lastMove.magnitude;
+                Vector3 outDir = new(exitDir.x, 0f, exitDir.y);
+                rb.linearVelocity = outDir.normalized * speed;
+            }
+            else
+            {
+                rb.linearVelocity = -lastMove;
+            }
+        }
+        else
+        {
+            root.position = target;
         }
 
-        root.position = target;
+        tl.MarkTeleportedNow();
+
+        SetCooldown(key);
+        if (paired != null)
+            paired.SetCooldown(key);
+    }
+
+    int GetCooldownKey(Collider other)
+    {
+        EntityIdentity identity = EntityIdentityUtility.From(other);
+        return identity.IsValid ? identity.InstanceId : other.transform.root.GetInstanceID();
+    }
+
+    bool IsCoolingDown(int key)
+    {
+        return cooldownSeconds > 0f
+            && _cooldowns.TryGetValue(key, out float until)
+            && Time.time < until;
+    }
+
+    public void SetCooldown(int key)
+    {
+        if (cooldownSeconds > 0f)
+            _cooldowns[key] = Time.time + cooldownSeconds;
     }
 }

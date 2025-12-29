@@ -25,6 +25,11 @@ public class LevelSetup : MonoBehaviour
     [Tooltip("If true, add graph connections between nearest A* nodes at portal endpoints after scan.")]
     public bool registerAstarPortalEdges = true;
 
+    [Header("Themes")]
+    [Tooltip("Optional list of material themes. If non-empty, a random theme will be chosen at Initialize and applied by material name.")]
+    public MaterialTheme[] themes = new MaterialTheme[0];
+
+
     /// <summary>
     /// Initialize pairings and (optionally) register graph edges. Call after A* scan.
     /// </summary>
@@ -32,6 +37,10 @@ public class LevelSetup : MonoBehaviour
     {
         PairPortals();
         PairTunnels();
+
+        // Optionally apply a random material theme before registering graph edges so
+        // any material-dependent queries/visuals pick up the theme.
+        ApplyRandomTheme();
 
         if (registerAstarPortalEdges)
         {
@@ -41,6 +50,42 @@ public class LevelSetup : MonoBehaviour
         // After level geometry + entities are spawned and portals linked,
         // snap the player (and camera) to a SpawnPlayer anchor.
         PositionPlayersAndCamera();
+    }
+
+    void ApplyRandomTheme()
+    {
+        if (themes == null || themes.Length == 0) return;
+        // Choose a random theme
+        var theme = themes[Random.Range(0, themes.Length)];
+        if (theme == null || theme.materials == null || theme.materials.Length == 0) return;
+
+        // Build lookup by material name
+        var map = new System.Collections.Generic.Dictionary<string, Material>();
+        foreach (var m in theme.materials)
+        {
+            if (m == null) continue;
+            if (!map.ContainsKey(m.name)) map[m.name] = m;
+        }
+
+        // Find all renderers in the scene and swap sharedMaterials by name when present in map.
+        var renderers = Object.FindObjectsOfType<Renderer>(includeInactive: true);
+        foreach (var r in renderers)
+        {
+            var mats = r.sharedMaterials;
+            bool changed = false;
+            for (int i = 0; i < mats.Length; i++)
+            {
+                var mat = mats[i];
+                if (mat == null) continue;
+                if (map.TryGetValue(mat.name, out var repl) && repl != null)
+                {
+                    mats[i] = repl;
+                    changed = true;
+                }
+            }
+            if (changed)
+                r.sharedMaterials = mats;
+        }
     }
 
     /// <summary>
@@ -222,7 +267,17 @@ public class LevelSetup : MonoBehaviour
 
             var t = enemy.transform;
             var pos = chosen.transform.position;
-            t.position = new Vector3(pos.x, t.position.y, pos.z);
+            // Prefer to use the enemy's GridMotor HardTeleport so CharacterController
+            // offsets are accounted for and the capsule bottom sits on the spawn Y.
+            var motor = enemy.GetComponent<GridMotor>();
+            if (motor != null)
+            {
+                motor.HardTeleport(pos);
+            }
+            else
+            {
+                t.position = new Vector3(pos.x, t.position.y, pos.z);
+            }
         }
     }
 

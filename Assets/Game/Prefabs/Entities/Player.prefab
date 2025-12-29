@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 7686317791198650605}
   - component: {fileID: 1161058637082010665}
   - component: {fileID: 5171025004939381343}
+  - component: {fileID: -2248593157744303844}
   m_Layer: 8
   m_Name: Player
   m_TagString: Untagged
@@ -82,6 +83,8 @@ MonoBehaviour:
   forwardProbeDistance: 0.2
   skin: 0.02
   cornerRadiusScale: 0.85
+  ignoreEntityColliders: 1
+  snapToGridOnSetDirection: 1
   debugBlockers: 0
   debugBlockerLogInterval: 0.25
 --- !u!143 &619055779628719833
@@ -184,6 +187,8 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8183
   logHits: 0
+  gunshotRegistryKey: Gunshot
+  projectileSpawnOffset: 0.5
 --- !u!114 &679993214253418569
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -199,7 +204,7 @@ MonoBehaviour:
   probeRadius: 0.5
   doorLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 1024
   logBlocks: 0
 --- !u!114 &7686317791198650605
 MonoBehaviour:
@@ -5026,6 +5031,20 @@ ParticleSystemRenderer:
   m_MeshWeighting2: 1
   m_MeshWeighting3: 1
   m_MaskInteraction: 0
+--- !u!114 &-2248593157744303844
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2584990566347290654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd2a2e1a2f60ea489514379261030b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeleportLethargy
+  lethargySeconds: 2
+  lastTeleportTime: -10000
 --- !u!1 &8742992118628560814
 GameObject:
   m_ObjectHideFlags: 0

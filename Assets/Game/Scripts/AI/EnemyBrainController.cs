@@ -416,8 +416,11 @@ public class EnemyBrainController : MonoBehaviour
 
         if (overridesUsed)
             _doorOverrideArmed = false;
-
         _pathFollower.SetPathFromWorldPoints(path.vectorPath);
+        if (_pathFollower != null && _pathFollower.verboseDebug)
+        {
+            Debug.Log($"{name}: OnPathReady -> path received ({path.vectorPath.Count} points).", this);
+        }
         ResetDoorOverrideTracker();
     }
 }

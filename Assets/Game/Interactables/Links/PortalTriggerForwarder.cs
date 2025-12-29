@@ -25,5 +25,11 @@ public class PortalTriggerForwarder : MonoBehaviour
         parentPortal.ExternalTriggerEnter(other);
     }
 
+    void OnTriggerExit(Collider other)
+    {
+        if (parentPortal == null) return;
+        parentPortal.ExternalTriggerExit(other);
+    }
+
     // Optional: forward other trigger events if you need them in future.
 }

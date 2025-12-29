@@ -106,6 +106,7 @@ GameObject:
   - component: {fileID: 6358558277448211888}
   - component: {fileID: 5567828356497252029}
   - component: {fileID: -1681690423172737310}
+  - component: {fileID: 4142228567250319636}
   m_Layer: 8
   m_Name: Ghost_Yellow
   m_TagString: Untagged
@@ -169,6 +170,8 @@ MonoBehaviour:
   forwardProbeDistance: 0.2
   skin: 0.02
   cornerRadiusScale: 0.85
+  ignoreEntityColliders: 1
+  snapToGridOnSetDirection: 1
   debugBlockers: 0
   debugBlockerLogInterval: 0.25
 --- !u!143 &2153044852385526397
@@ -258,6 +261,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PathFinding
   motor: {fileID: 6900743032598973765}
+  verboseDebug: 0
   waypointReachRadius: 0.15
 --- !u!114 &5567828356497252029
 MonoBehaviour:
@@ -296,3 +300,17 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4142228567250319636
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6081089341591554248}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9cd2a2e1a2f60ea489514379261030b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TeleportLethargy
+  lethargySeconds: 1
+  lastTeleportTime: -10000
