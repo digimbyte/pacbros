@@ -396,10 +396,11 @@ public class EnemyBrainController : MonoBehaviour
                 toGoal.y = 0;
                 if (toGoal.sqrMagnitude > 0.1f)
                 {
-                    Vector2Int preferred = new Vector2Int(
-                        Mathf.RoundToInt(Mathf.Sign(toGoal.x)),
-                        Mathf.RoundToInt(Mathf.Sign(toGoal.z))
-                    );
+                    Vector2Int preferred;
+                    if (Mathf.Abs(toGoal.x) >= Mathf.Abs(toGoal.z))
+                        preferred = new Vector2Int(toGoal.x >= 0f ? 1 : -1, 0);
+                    else
+                        preferred = new Vector2Int(0, toGoal.z >= 0f ? 1 : -1);
                     if (!motor.IsDirectionBlocked(preferred))
                     {
                         motor.SetDesiredDirection(preferred);

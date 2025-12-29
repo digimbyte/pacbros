@@ -40,7 +40,7 @@ public class DoorCollisionGuard : MonoBehaviour
         }
 
         if (_motor != null)
-            _motor.HardTeleport(_lastFreePosition);
+            _motor.Teleport(_lastFreePosition);
         else
             transform.position = _lastFreePosition;
 

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Level _1
   m_EditorClassIdentifier: Assembly-CSharp::TileAdjacencyAtlas
   width: 30
-  height: 18
+  height: 19
   cells:
   - x: 0
     y: 17
@@ -464,10 +464,6 @@ MonoBehaviour:
     tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
     rotationIndex: 0
   - x: 14
-    y: 14
-    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
-    rotationIndex: 0
-  - x: 15
     y: 14
     tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
     rotationIndex: 0
@@ -1309,7 +1305,7 @@ MonoBehaviour:
     rotationIndex: 0
   - x: 24
     y: 13
-    tile: {fileID: -3285165343615480943, guid: c8a189bfac66a5346ad5dc90e453f722, type: 3}
+    tile: {fileID: -1430062691609882094, guid: 4537b06a9f21a1a4587a382eb10a5d40, type: 3}
     rotationIndex: 2
   - x: 25
     y: 13
@@ -1493,24 +1489,24 @@ MonoBehaviour:
     rotationIndex: 1
   - x: 28
     y: 17
-    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
-    rotationIndex: 0
+    tile: {fileID: -1430062691609882094, guid: 4537b06a9f21a1a4587a382eb10a5d40, type: 3}
+    rotationIndex: 2
   - x: 27
     y: 17
-    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
-    rotationIndex: 0
+    tile: {fileID: -1430062691609882094, guid: 4537b06a9f21a1a4587a382eb10a5d40, type: 3}
+    rotationIndex: 2
   - x: 26
     y: 17
-    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
-    rotationIndex: 0
+    tile: {fileID: -1430062691609882094, guid: 4537b06a9f21a1a4587a382eb10a5d40, type: 3}
+    rotationIndex: 2
   - x: 25
     y: 17
-    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
-    rotationIndex: 0
+    tile: {fileID: -1430062691609882094, guid: 4537b06a9f21a1a4587a382eb10a5d40, type: 3}
+    rotationIndex: 2
   - x: 29
     y: 17
     tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
-    rotationIndex: 0
+    rotationIndex: 1
   - x: 26
     y: 6
     tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
@@ -1667,6 +1663,54 @@ MonoBehaviour:
     y: 1
     tile: {fileID: -1430062691609882094, guid: 4537b06a9f21a1a4587a382eb10a5d40, type: 3}
     rotationIndex: 2
+  - x: 24
+    y: 4
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 1
+  - x: 24
+    y: 3
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 1
+  - x: 24
+    y: 2
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 1
+  - x: 24
+    y: 1
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 1
+  - x: 24
+    y: 0
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 1
+  - x: 29
+    y: 16
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 1
+  - x: 25
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 0
+  - x: 26
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 0
+  - x: 27
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 0
+  - x: 28
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 0
+  - x: 29
+    y: 18
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 0
+  - x: 15
+    y: 14
+    tile: {fileID: -7910015379338343097, guid: 7c5ef37856ac99b4f94554a69129671f, type: 3}
+    rotationIndex: 0
   placeables:
   - x: 23
     y: 11
@@ -2835,5 +2879,33 @@ MonoBehaviour:
     prefab: {fileID: 0}
     rotationIndex: 0
     kind: Coin
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
+  - x: 25
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: key_red
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
+  - x: 26
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: key_purple
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
+  - x: 27
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: key_green
+    marker: 
+    markerColor: {r: 0, g: 0, b: 0, a: 0}
+  - x: 28
+    y: 17
+    prefab: {fileID: 0}
+    rotationIndex: 0
+    kind: key_yellow
     marker: 
     markerColor: {r: 0, g: 0, b: 0, a: 0}

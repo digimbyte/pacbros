@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// Player-specific entity component.
@@ -12,6 +13,10 @@ public class PlayerEntity : MonoBehaviour
     public bool isGhost;
     [Tooltip("True when this player has been marked dead by game systems.")]
     public bool isDead;
+
+    [Header("Events")]
+    public UnityEvent onKilled;
+    public UnityEvent onRespawn;
 
     [Header("Inventory")]
     public ItemId[] inventory = Array.Empty<ItemId>();
@@ -105,6 +110,43 @@ public class PlayerEntity : MonoBehaviour
             KeycardColor.Purple => Has(ItemId.Key_Purple),
             _ => false,
         };
+    }
+        
+    // Track last dead state for change detection
+    bool _lastDeadState = false;
+
+    void Start()
+    {
+        _lastDeadState = isDead;
+
+        if (onKilled == null) onKilled = new UnityEvent();
+        if (onRespawn == null) onRespawn = new UnityEvent();
+
+        // Invoke event based on initial state
+        if (isDead)
+        {
+            onKilled?.Invoke();
+        }
+        else
+        {
+            onRespawn?.Invoke();
+        }
+    }
+
+    void Update()
+    {
+        if (isDead != _lastDeadState)
+        {
+            _lastDeadState = isDead;
+            if (isDead)
+            {
+                onKilled?.Invoke();
+            }
+            else
+            {
+                onRespawn?.Invoke();
+            }
+        }
     }
 
     void OnEnable()

@@ -26,6 +26,9 @@ public bool allowEnemiesToBypass = true;
     {
         if (!entity.IsValid) return false;
 
+        // Ghosts always bypass all requirements
+        if (entity.IsGhost) return true;
+
         if (allowEnemiesToBypass && entity.Kind == EntityKind.Enemy)
             return true;
 
@@ -33,7 +36,7 @@ public bool allowEnemiesToBypass = true;
             return true;
 
         if (requiredKey == KeycardColor.None) return true;
-        return entity.HasKeycard(requiredKey, allowHigherKeys: true);
+        return entity.HasKeycard(requiredKey, allowHigherKeys: false);
     }
 
     public bool HasAccess(PlayerEntity player) => HasAccess(new EntityIdentity(player));

@@ -75,7 +75,11 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Enemy, label = "E", color = Color.yellow },                         // Yellow
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Loot, label = "I", color = Color.cyan },
         new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Coin, label = "c", color = new Color(1f, 0.86f, 0.25f) },
-        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Ammo, label = "G", color = new Color(0.6f, 0.8f, 1f) }
+        new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.Ammo, label = "G", color = new Color(0.6f, 0.8f, 1f) },
+        new MarkerDef { kind = "key_green", label = "KG", color = new Color(0.5f, 1f, 0.5f) },
+        new MarkerDef { kind = "key_yellow", label = "KY", color = new Color(1f, 1f, 0.5f) },
+        new MarkerDef { kind = "key_red", label = "KR", color = new Color(1f, 0.5f, 0.5f) },
+        new MarkerDef { kind = "key_purple", label = "KP", color = new Color(0.8f, 0.5f, 1f) }
     };
 
         private static readonly string[] PlaceableKindOptions = new[]
@@ -84,16 +88,23 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
             TileAdjacencyAtlas.PlaceableKind.Enemy,
             TileAdjacencyAtlas.PlaceableKind.Loot,
             TileAdjacencyAtlas.PlaceableKind.Coin,
-            TileAdjacencyAtlas.PlaceableKind.Ammo
+            TileAdjacencyAtlas.PlaceableKind.Ammo,
+            "key_green",
+            "key_yellow",
+            "key_red",
+            "key_purple"
         };
 
     private static MarkerDef ResolveMarkerDef(string kind)
     {
+        if (string.IsNullOrEmpty(kind))
+            return new MarkerDef { kind = TileAdjacencyAtlas.PlaceableKind.None, label = "", color = Color.white };
+
         for (int i = 0; i < MarkerDefs.Length; i++)
         {
             if (MarkerDefs[i].kind == kind) return MarkerDefs[i];
         }
-        return new MarkerDef { kind = kind, label = "", color = Color.white };
+        return new MarkerDef { kind = kind, label = "!?", color = Color.red };
     }
 
 
@@ -635,8 +646,8 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
                 if (HasPlaceable(placeable))
                 {
                     var def = ResolveMarkerDef(placeable.kind);
-                    string markerLabel = !string.IsNullOrEmpty(placeable.marker) ? placeable.marker : def.label;
-                    Color col = placeable.markerColor.a > 0.001f ? placeable.markerColor : def.color;
+                    string markerLabel = def.label == "!?" ? "!?" : (!string.IsNullOrEmpty(placeable.marker) ? placeable.marker : def.label);
+                    Color col = def.label == "!?" ? Color.red : (placeable.markerColor.a > 0.001f ? placeable.markerColor : def.color);
 
                     var markerStyle = new GUIStyle(EditorStyles.boldLabel)
                     {

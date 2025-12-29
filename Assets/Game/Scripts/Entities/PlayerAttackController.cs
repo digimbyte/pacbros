@@ -10,6 +10,7 @@ public class PlayerAttackController : MonoBehaviour
     public int ammoPerShot = 1;
     public LayerMask enemyLayers = ~0;
     public bool logHits;
+    public float attackCooldown = 0.5f;
 
     [Header("Projectile")]
     public string gunshotRegistryKey = "Gunshot";
@@ -18,6 +19,8 @@ public class PlayerAttackController : MonoBehaviour
 
     PlayerEntity _player;
     bool _inputEnabled = true;
+    float _lastAttackTime = -1f;
+    bool _attackPressed = false;
 
     void Awake()
     {
@@ -35,6 +38,10 @@ public class PlayerAttackController : MonoBehaviour
         float cellSize = runtime.cellSize;
         Vector3 gridOrigin = runtime.gridOrigin;
         LayerMask wallMask = runtime.wallLayers;
+        if (wallMask == 0)
+            wallMask = LayerMask.GetMask("wall");
+        if (wallMask == 0)
+            wallMask = -1;
 
         Vector3 origin = transform.position;
         Vector3[] dirs = { Vector3.right, Vector3.left, Vector3.forward, Vector3.back };
@@ -58,6 +65,7 @@ public class PlayerAttackController : MonoBehaviour
                 if (colliders.Length > 0)
                 {
                     // Wall found, stop scanning this axis
+                    if (logHits) Debug.Log($"PlayerAttackController: Wall detected at {gridPos}, stopping scan for dir {dir}");
                     break;
                 }
 
@@ -87,18 +95,7 @@ public class PlayerAttackController : MonoBehaviour
             return;
 
         Vector3 spawnPos = transform.position + direction.normalized * Mathf.Max(0.1f, projectileSpawnOffset);
-        Quaternion rotation = Quaternion.identity;
-
-        if (direction == Vector3.right)
-            rotation = Quaternion.identity;
-        else if (direction == Vector3.left)
-            rotation = Quaternion.Euler(0f, 180f, 0f);
-        else if (direction == Vector3.forward)
-            rotation = Quaternion.Euler(0f, 90f, 0f);
-        else if (direction == Vector3.back)
-            rotation = Quaternion.Euler(0f, -90f, 0f);
-        else
-            rotation = Quaternion.LookRotation(direction, Vector3.up);
+        Quaternion rotation = Quaternion.LookRotation(direction, Vector3.up) * Quaternion.Euler(0f, -90f, 0f);
 
         var projectile = runtime.InstantiateRegistryPrefab(gunshotRegistryKey, spawnPos, rotation);
         if (projectile == null && logHits)
@@ -114,8 +111,15 @@ public class PlayerAttackController : MonoBehaviour
         if (keyboard == null)
             return;
 
-        if (keyboard.spaceKey.wasPressedThisFrame)
+        if (keyboard.spaceKey.isPressed && !_attackPressed && Time.time > _lastAttackTime + attackCooldown)
+        {
+            _attackPressed = true;
             TryAttack();
+        }
+        else if (!keyboard.spaceKey.isPressed)
+        {
+            _attackPressed = false;
+        }
     }
 
     public void SetInputEnabled(bool enabled)
@@ -128,13 +132,15 @@ public class PlayerAttackController : MonoBehaviour
         if (_player.ammo < ammoPerShot || ammoPerShot <= 0)
             return;
 
+        _lastAttackTime = Time.time;
+
         Vector3 direction = Vector3.forward; // default direction
         List<EntityIdentity> targets = new List<EntityIdentity>();
 
-        if (TryAcquireTargets(out Vector3 shootDir, out targets))
-        {
-            direction = shootDir;
-        }
+        if (!TryAcquireTargets(out Vector3 shootDir, out targets))
+            return;
+
+        direction = shootDir;
 
         _player.ammo = Mathf.Max(0, _player.ammo - ammoPerShot);
 

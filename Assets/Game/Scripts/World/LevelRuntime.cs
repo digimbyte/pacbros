@@ -507,7 +507,7 @@ public class LevelRuntime : MonoBehaviour
         // Align the grid motor precisely with the spawn to avoid half-cell offsets.
         if (motor != null)
         {
-            motor.HardTeleport(spawnPos);
+            motor.Teleport(spawnPos);
         }
         else
         {

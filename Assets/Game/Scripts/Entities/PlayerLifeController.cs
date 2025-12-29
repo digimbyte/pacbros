@@ -118,7 +118,7 @@ public class PlayerLifeController : MonoBehaviour
 
         if (_motor != null)
         {
-            _motor.HardTeleport(targetPos);
+            _motor.Teleport(targetPos);
         }
         else
         {

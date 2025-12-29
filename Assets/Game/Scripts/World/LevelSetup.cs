@@ -272,7 +272,7 @@ public class LevelSetup : MonoBehaviour
             var motor = enemy.GetComponent<GridMotor>();
             if (motor != null)
             {
-                motor.HardTeleport(pos);
+                motor.Teleport(pos);
             }
             else
             {

@@ -25,6 +25,9 @@ public class NetworkPlayerController : NetworkBehaviour
 
     void Update()
     {
+        // Only handle input in networked games
+        if (Unity.Netcode.NetworkManager.Singleton == null || !Unity.Netcode.NetworkManager.Singleton.IsListening) return;
+
         if (!IsOwner) return;
 
         float h = Input.GetAxis("Horizontal");

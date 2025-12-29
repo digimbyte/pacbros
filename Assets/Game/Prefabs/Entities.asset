@@ -79,28 +79,28 @@ MonoBehaviour:
     metadata:
       keys: []
       values: []
-  - uid: Key_Green
+  - uid: key_green
     asset: {fileID: 5899738003039467554, guid: 6cea3ecf161d96d449ea79870224bb9b, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
-  - uid: Key_Yellow
+  - uid: key_yellow
     asset: {fileID: 5899738003039467554, guid: c0f71c668b10a164dbfe0ba8ab87e900, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
-  - uid: Key_Red
+  - uid: key_red
     asset: {fileID: 5899738003039467554, guid: 9afc5525d59dde143891273624ae17e0, type: 3}
     tags: []
     description: 
     metadata:
       keys: []
       values: []
-  - uid: Key_Purple
+  - uid: key_purple
     asset: {fileID: 5899738003039467554, guid: 0928167c32f32094db16c50174c3db97, type: 3}
     tags: []
     description: 

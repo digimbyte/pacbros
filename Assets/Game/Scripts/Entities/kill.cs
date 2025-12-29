@@ -27,15 +27,16 @@ public class kill : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        TryHandleTouch(other.gameObject);
+        TryHandleTouch(other.gameObject, transform.position, other.transform.position);
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        TryHandleTouch(collision.gameObject);
+        Vector3 contactPoint = collision.contacts.Length > 0 ? collision.contacts[0].point : transform.position;
+        TryHandleTouch(collision.gameObject, contactPoint, contactPoint);
     }
 
-    void TryHandleTouch(GameObject other)
+    void TryHandleTouch(GameObject other, Vector3 killPosition, Vector3 contactPosition)
     {
         if (other == null) return;
 
@@ -43,21 +44,26 @@ public class kill : MonoBehaviour
         var pe = other.GetComponent<PlayerEntity>();
         if (pe != null && killPlayers)
         {
-            HandleKillTarget(other);
+            HandleKillTarget(other, killPosition, contactPosition);
             return;
         }
 
         var ee = other.GetComponent<EnemyEntity>();
         if (ee != null && killEnemies)
         {
-            HandleKillTarget(other);
+            HandleKillTarget(other, killPosition, contactPosition);
             return;
         }
     }
 
-    void HandleKillTarget(GameObject target)
+    void HandleKillTarget(GameObject target, Vector3 killPosition, Vector3 contactPosition)
     {
         if (target == null) return;
+
+        // Log the kill event
+        string killHierarchy = GetFullHierarchyPath(gameObject);
+        string targetHierarchy = GetFullHierarchyPath(target);
+        Debug.Log($"Kill Event: KillObject='{killHierarchy}' killed Target='{targetHierarchy}' at position {contactPosition} (KillPos: {killPosition})");
 
         // Prefer marking the entity dead on its concrete entity component rather than destroying the GameObject.
         var identity = EntityIdentityUtility.From(target);
@@ -77,5 +83,18 @@ public class kill : MonoBehaviour
         {
             Destroy(gameObject);
         }
+    }
+
+    string GetFullHierarchyPath(GameObject obj)
+    {
+        if (obj == null) return "null";
+        string path = obj.name;
+        Transform parent = obj.transform.parent;
+        while (parent != null)
+        {
+            path = parent.name + "/" + path;
+            parent = parent.parent;
+        }
+        return path;
     }
 }

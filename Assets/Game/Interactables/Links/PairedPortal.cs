@@ -125,7 +125,7 @@ public class PairedPortal : MonoBehaviour
         if (motor != null) lastMove = motor.GetVelocity();
         else if (root.TryGetComponent(out Rigidbody rb)) lastMove = rb.linearVelocity;
 
-        Vector3 target = paired.transform.position + paired.exitWorldOffset;
+        Vector3 target = paired.transform.position;
         // Force global ground Y to 0 so teleported objects don't end up underground.
         target.y = 0f;
 
@@ -157,7 +157,7 @@ public class PairedPortal : MonoBehaviour
 
         if (motor != null)
         {
-            motor.HardTeleport(target);
+            motor.Teleport(target);
 
             if (exitDirCardinal != Vector2Int.zero)
             {

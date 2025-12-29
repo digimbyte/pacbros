@@ -61,32 +61,20 @@ MonoBehaviour:
   gridOffsetX: 0.5
   gridOffsetZ: 0.5
   characterController: {fileID: 619055779628719833}
-  radiusOverride: 0
-  heightOverride: 0
   moveSpeed: 6
   acceleration: 60
+  speedMultiplier: 1
   instantAcceleration: 1
   stopOnBlocked: 1
   allowBufferedTurnOnBlock: 1
-  speedMultiplier: 1
-  accelerationMultiplier: 1
-  laneSnapMultiplier: 1
-  directionDeadzone: 0.15
   allowInstantReverse: 0
   turnAlignEpsilon: 0.2
-  laneSnapSpring: 55
-  laneSnapDamping: 14
   laneSnapMaxSpeed: 8
   solidMask:
     serializedVersion: 2
-    m_Bits: 1217
-  forwardProbeDistance: 0.2
-  skin: 0.02
+    m_Bits: 1089
   cornerRadiusScale: 0.85
-  ignoreEntityColliders: 1
-  snapToGridOnSetDirection: 1
-  debugBlockers: 0
-  debugBlockerLogInterval: 0.25
+  skin: 0.02
 --- !u!143 &619055779628719833
 CharacterController:
   m_ObjectHideFlags: 0
@@ -126,7 +114,61 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEntity
   isGhost: 0
   isDead: 0
-  inventory: 00000000
+  onKilled:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8742992118628560814}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 1580952793944945138}
+        m_TargetAssemblyTypeName: GridMotor, Assembly-CSharp
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  onRespawn:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 8742992118628560814}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1580952793944945138}
+        m_TargetAssemblyTypeName: GridMotor, Assembly-CSharp
+        m_MethodName: set_enabled
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+  inventory: 
   playerIndex: 0
   isLocal: 0
   ammo: 0
@@ -187,6 +229,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8183
   logHits: 0
+  attackCooldown: 0.5
   gunshotRegistryKey: Gunshot
   projectileSpawnOffset: 0.5
 --- !u!114 &679993214253418569
@@ -934,7 +977,7 @@ ParticleSystem:
     m_SpriteRenderer: {fileID: 0}
     m_UseMeshMaterialIndex: 0
     m_UseMeshColors: 1
-    alignToDirection: 1
+    alignToDirection: 0
     m_Texture: {fileID: 0}
     m_TextureClipChannel: 3
     m_TextureClipThreshold: 0
@@ -5045,6 +5088,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TeleportLethargy
   lethargySeconds: 2
   lastTeleportTime: -10000
+  ignoredPortalInstanceId: 0
 --- !u!1 &8742992118628560814
 GameObject:
   m_ObjectHideFlags: 0
@@ -5072,8 +5116,8 @@ Transform:
   m_GameObject: {fileID: 8742992118628560814}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: -0, z: -0, w: 0.8660254}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
+  m_LocalPosition: {x: 0, y: 0.79, z: -0.167}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 7018057839761460336}

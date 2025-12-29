@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5824198484573580564
+--- !u!1 &3609531284118062146
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,46 +8,68 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4151247843956430232}
-  - component: {fileID: 7753437246392000025}
-  m_Layer: 9
-  m_Name: Pivot
+  - component: {fileID: 499231696596112032}
+  - component: {fileID: 156502955203935980}
+  - component: {fileID: 9122114118313602914}
+  m_Layer: 0
+  m_Name: fireball_4 (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4151247843956430232
+--- !u!4 &499231696596112032
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5824198484573580564}
+  m_GameObject: {fileID: 3609531284118062146}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5, y: 0, z: 0, w: 0.8660254}
-  m_LocalPosition: {x: 0, y: 0.5, z: 0}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0.328, y: 0, z: 0}
+  m_LocalScale: {x: 0.38113472, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 2517743005989000836}
-  m_Father: {fileID: 6218394523208297512}
-  m_LocalEulerAnglesHint: {x: 60, y: 0, z: 0}
---- !u!114 &7753437246392000025
+  m_Children: []
+  m_Father: {fileID: 2517743005989000836}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
+--- !u!65 &156502955203935980
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3609531284118062146}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.54, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &9122114118313602914
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5824198484573580564}
+  m_GameObject: {fileID: 3609531284118062146}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9abf2a31f0281ee46b9a288ef572d699, type: 3}
+  m_Script: {fileID: 11500000, guid: 3aaa714f04caf424aa9665992823a1c7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: '::'
-  target: {fileID: 0}
-  zAngle: 0
-  localSpace: 1
+  m_EditorClassIdentifier: Assembly-CSharp::kill
+  killPlayers: 1
+  killEnemies: 0
+  destroySelfOnTouch: 0
+  selfDestructAfterSeconds: 0
 --- !u!1 &5899738003039467554
 GameObject:
   m_ObjectHideFlags: 0
@@ -58,7 +80,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6218394523208297512}
   - component: {fileID: 511541837041713926}
-  - component: {fileID: 6081174333098723068}
+  - component: {fileID: 2628885257939633712}
   m_Layer: 9
   m_Name: Gunshot
   m_TagString: Untagged
@@ -79,7 +101,7 @@ Transform:
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 4151247843956430232}
+  - {fileID: 2517743005989000836}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!65 &511541837041713926
@@ -101,9 +123,9 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 8, y: 1, z: 1}
-  m_Center: {x: 4, y: 0, z: 0}
---- !u!114 &6081174333098723068
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &2628885257939633712
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -112,12 +134,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 5899738003039467554}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9abf2a31f0281ee46b9a288ef572d699, type: 3}
+  m_Script: {fileID: 11500000, guid: 3aaa714f04caf424aa9665992823a1c7, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::GimbalDirection
-  target: {fileID: 0}
-  zAngle: 0
-  localSpace: 1
+  m_EditorClassIdentifier: Assembly-CSharp::kill
+  killPlayers: 0
+  killEnemies: 0
+  destroySelfOnTouch: 0
+  selfDestructAfterSeconds: 0.25
 --- !u!1 &7555645613206844307
 GameObject:
   m_ObjectHideFlags: 0
@@ -129,6 +152,8 @@ GameObject:
   - component: {fileID: 2517743005989000836}
   - component: {fileID: 1370351469572930750}
   - component: {fileID: 285255015879112183}
+  - component: {fileID: 8853934666179333925}
+  - component: {fileID: 88321014402988980}
   m_Layer: 0
   m_Name: fireball_4
   m_TagString: Untagged
@@ -144,13 +169,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7555645613206844307}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.75, y: 0, z: 0}
-  m_LocalScale: {x: 0.6, y: 0.59999996, z: 0.59999996}
+  m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 3.75, y: 0.5, z: 0}
+  m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 4151247843956430232}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_Children:
+  - {fileID: 499231696596112032}
+  m_Father: {fileID: 6218394523208297512}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 0}
 --- !u!212 &1370351469572930750
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -231,3 +257,40 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!65 &8853934666179333925
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7555645613206844307}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 2.54, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &88321014402988980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7555645613206844307}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aaa714f04caf424aa9665992823a1c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::kill
+  killPlayers: 0
+  killEnemies: 1
+  destroySelfOnTouch: 0
+  selfDestructAfterSeconds: 0

@@ -132,20 +132,20 @@ public class PairedTunnel : MonoBehaviour
             else exitDir = new Vector2Int(0, -1);
         }
 
-        Vector3 target = paired.transform.position + paired.exitWorldOffset;
+        Vector3 target = paired.transform.position;
         // Ensure teleport places entity at ground Y = 0
         target.y = 0f;
 
-        // small outward nudge to avoid overlapping the destination trigger
-        Vector3 outward = Vector3.zero;
-        if (exitDir != Vector2Int.zero) outward = new Vector3(exitDir.x, 0f, exitDir.y).normalized;
-        if (outward.sqrMagnitude < 0.0001f) outward = paired.transform.forward;
-        const float exitOffset = 0.20f;
-        target += outward * exitOffset;
+        // For tunnels, push the entity 1 tile in the exit direction to avoid getting stuck
+        float cellSize = LevelRuntime.Active?.cellSize ?? 1f;
+        if (exitDir != Vector2Int.zero)
+        {
+            target += new Vector3(exitDir.x, 0, exitDir.y) * cellSize;
+        }
 
         if (motor != null)
         {
-            motor.HardTeleport(target);
+            motor.Teleport(target);
 
             if (exitDir != Vector2Int.zero)
             {

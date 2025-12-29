@@ -1,10 +1,12 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// Enemy-specific entity component.
 /// AI / archetype info can live here.
 /// </summary>
+[RequireComponent(typeof(AudioSource))]
 public class EnemyEntity : MonoBehaviour
 {
     [Header("State")]
@@ -12,8 +14,15 @@ public class EnemyEntity : MonoBehaviour
     [Tooltip("True when this enemy has been marked dead by game systems.")]
     public bool isDead;
 
-    [Header("Inventory")]
+    [Header("Events")]
+    public UnityEvent onKilled;
+    public UnityEvent onRespawn;
+
+    [Header("Audio")]
+    public AudioClip deathAudio;
+    public AudioClip respawnAudio;
     public ItemId[] inventory = Array.Empty<ItemId>();
+    public bool dropInventoryOnDeath = true;
     [Header("Enemy")]
     [Tooltip("Optional: enemy type id (e.g. different ghosts, bosses, etc).")]
     public int enemyTypeId;
@@ -104,13 +113,28 @@ public class EnemyEntity : MonoBehaviour
     // Optional reference to a local `kill` component which should be disabled when this entity is dead.
     kill _killComponent;
     bool _lastDeadState = false;
+    AudioSource _audioSource;
 
     void Start()
     {
         _killComponent = GetComponent<kill>();
+        _audioSource = GetComponent<AudioSource>();
         _lastDeadState = isDead;
         if (_killComponent != null)
             _killComponent.enabled = !_lastDeadState;
+
+        if (onKilled == null) onKilled = new UnityEvent();
+        if (onRespawn == null) onRespawn = new UnityEvent();
+
+        // Invoke event based on initial state
+        if (isDead)
+        {
+            onKilled?.Invoke();
+        }
+        else
+        {
+            onRespawn?.Invoke();
+        }
     }
 
     void Update()
@@ -120,6 +144,40 @@ public class EnemyEntity : MonoBehaviour
             _lastDeadState = isDead;
             if (_killComponent != null)
                 _killComponent.enabled = !_lastDeadState;
+
+            if (isDead)
+            {
+                onKilled?.Invoke();
+                if (deathAudio != null && _audioSource != null)
+                    _audioSource.PlayOneShot(deathAudio);
+                if (dropInventoryOnDeath)
+                {
+                    DropInventory();
+                }
+            }
+            else
+            {
+                onRespawn?.Invoke();
+                if (respawnAudio != null && _audioSource != null)
+                    _audioSource.PlayOneShot(respawnAudio);
+            }
+        }
+    }
+
+    void DropInventory()
+    {
+        var runtime = LevelRuntime.Active;
+        if (runtime == null) return;
+
+        Vector3 pos = transform.position;
+        Quaternion rot = Quaternion.identity;
+
+        foreach (var item in inventory)
+        {
+            if (ItemRegistryMapping.TryGetRegistryKey(item, out string key))
+            {
+                runtime.InstantiateRegistryPrefab(key, pos, rot);
+            }
         }
     }
 }
