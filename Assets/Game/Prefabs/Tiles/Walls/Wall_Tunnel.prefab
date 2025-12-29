@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -6240180108987185802}
   - component: {fileID: 2762224662898303185}
   m_Layer: 11
-  m_Name: Border_Tunnel
+  m_Name: Wall_Tunnel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

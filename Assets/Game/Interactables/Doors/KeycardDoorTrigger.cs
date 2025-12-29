@@ -119,6 +119,16 @@ public class KeycardDoorTrigger : MonoBehaviour
             if (_authorizedTokens.Remove(token) && TotalAuthorizedCount == 0)
                 door.Close();
 
+            // Notify AI systems that an enemy has passed through this door
+            if (identity.Kind == EntityKind.Enemy)
+            {
+                var ai = identity.Transform.GetComponent<EnemyBrainController>();
+                if (ai != null)
+                {
+                    ai.OnPassedThroughDoorOrPortal();
+                }
+            }
+
             return;
         }
 

@@ -1000,7 +1000,7 @@ public class EnemyBrainController : MonoBehaviour
             Collider[] cols = Physics.OverlapSphere(wp, rt.cellSize * 0.35f);
             for (int i = 0; i < cols.Length; i++)
             {
-                if (cols[i] != null && cols[i].CompareTag(enemySpawnTag))
+                if (cols[i] != null && cols[i].tag == enemySpawnTag)
                     return true;
             }
         }
