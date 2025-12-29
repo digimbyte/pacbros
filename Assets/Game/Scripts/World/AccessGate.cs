@@ -11,9 +11,13 @@ public class AccessGate : MonoBehaviour
 {
     public enum GateType { Portal, Door }
 
-    [Header("Gate")]
-    public GateType gateType = GateType.Portal;
-    public KeycardColor requiredKey = KeycardColor.None;
+[Header("Gate")]
+public GateType gateType = GateType.Portal;
+public KeycardColor requiredKey = KeycardColor.None;
+
+[Header("Access Rules")]
+[Tooltip("If true, enemies are always allowed to pass even when keys are required.")]
+public bool allowEnemiesToBypass = true;
 
     /// <summary>
     /// Returns true if the given entity is allowed to use/pass this gate.
@@ -21,6 +25,9 @@ public class AccessGate : MonoBehaviour
     public bool HasAccess(EntityIdentity entity)
     {
         if (!entity.IsValid) return false;
+
+        if (allowEnemiesToBypass && entity.Kind == EntityKind.Enemy)
+            return true;
 
         if (DoorOverrideRegistry.HasActive(entity, this))
             return true;

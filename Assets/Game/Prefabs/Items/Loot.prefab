@@ -185,10 +185,12 @@ MonoBehaviour:
   effectIsUniversal: 1
   applyToAllPlayers: 1
   applyToAllGhosts: 0
-  heatValue: 50
-  scoreValue: 10
+  heatValue: 1000
+  scoreValue: 9001
   livesValue: 0
   ammoValue: 0
   inventory: 
   inventoryDeltas: []
   destroyOnPickup: 1
+  pickupSfx: {fileID: 8300000, guid: 0cacd9a8b34999d42bbabf7ac445b1b5, type: 3}
+  pickupSfxVolume: 0.6

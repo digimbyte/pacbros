@@ -192,3 +192,5 @@ MonoBehaviour:
   inventory: 65000000
   inventoryDeltas: []
   destroyOnPickup: 1
+  pickupSfx: {fileID: 8300000, guid: cedf3ca747642a143a6f982e1bcef057, type: 3}
+  pickupSfxVolume: 0.5

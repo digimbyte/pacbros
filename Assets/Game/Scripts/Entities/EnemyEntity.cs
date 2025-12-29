@@ -79,10 +79,10 @@ public class EnemyEntity : MonoBehaviour
 
     public KeycardColor HighestKeycardOwned()
     {
-        if (Has(ItemId.KeycardPurple)) return KeycardColor.Purple;
-        if (Has(ItemId.KeycardRed)) return KeycardColor.Red;
-        if (Has(ItemId.KeycardYellow)) return KeycardColor.Yellow;
-        if (Has(ItemId.KeycardGreen)) return KeycardColor.Green;
+        if (Has(ItemId.Key_Purple)) return KeycardColor.Purple;
+        if (Has(ItemId.Key_Red)) return KeycardColor.Red;
+        if (Has(ItemId.Key_Yellow)) return KeycardColor.Yellow;
+        if (Has(ItemId.Key_Green)) return KeycardColor.Green;
         return KeycardColor.None;
     }
 
@@ -93,10 +93,10 @@ public class EnemyEntity : MonoBehaviour
 
         return required switch
         {
-            KeycardColor.Green => Has(ItemId.KeycardGreen),
-            KeycardColor.Yellow => Has(ItemId.KeycardYellow),
-            KeycardColor.Red => Has(ItemId.KeycardRed),
-            KeycardColor.Purple => Has(ItemId.KeycardPurple),
+            KeycardColor.Green => Has(ItemId.Key_Green),
+            KeycardColor.Yellow => Has(ItemId.Key_Yellow),
+            KeycardColor.Red => Has(ItemId.Key_Red),
+            KeycardColor.Purple => Has(ItemId.Key_Purple),
             _ => false,
         };
     }

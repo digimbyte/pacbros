@@ -12,6 +12,11 @@ using Core.Registry; // for Registry (Entities.asset)
 public class LevelRuntime : MonoBehaviour
 {
     public static LevelRuntime Active { get; private set; }
+    [Header("Level List")]
+    [Tooltip("Optional list of level atlases usable by this runtime. Use LoadLevel(index) to switch.")]
+    public TileAdjacencyAtlas[] levels = Array.Empty<TileAdjacencyAtlas>();
+    [Tooltip("Index of the currently loaded atlas in `levels` (-1 = none).")]
+    [HideInInspector] public int activeLevelIndex = -1;
     [Header("Level Asset")]
     [Tooltip("TileAdjacencyAtlas to instantiate as level geometry under this runtime root.")]
     public TileAdjacencyAtlas levelAtlas;
@@ -89,6 +94,17 @@ public class LevelRuntime : MonoBehaviour
     [HideInInspector] public int currentLives;
     [HideInInspector] public PlayerSpawnPoint lastPlayerSpawnPoint;
 
+    [Header("UI/HUD")]
+    [Tooltip("HUD GameObject to enable when the game is over.")]
+    public GameObject gameOverHUD;
+    [Tooltip("HUD GameObject to enable when the level is won (all coins collected).")]
+    public GameObject winHUD;
+
+    [Header("Game State")]
+    [Tooltip("How often (seconds) to poll win/lose conditions. Lower = more responsive but slightly more CPU.")]
+    public float gameStateCheckInterval = 0.5f;
+    float _nextGameStateCheck = 0f;
+
     readonly List<GridMotor> _motors = new();
     bool _ghostEnemiesSpawned;
 
@@ -151,6 +167,12 @@ public class LevelRuntime : MonoBehaviour
             SpawnLevelFromAtlas(levelAtlas);
         }
 
+        // If configured with a list of levels and no explicit atlas assigned, optionally load index 0.
+        if ((levelAtlas == null || levelAtlas == default) && levels != null && levels.Length > 0)
+        {
+            LoadLevel(0);
+        }
+
         if (spawnGhostEnemiesOnAwake)
         {
             SpawnInitialGhostEnemies();
@@ -204,6 +226,27 @@ public class LevelRuntime : MonoBehaviour
     {
         if (Active == this)
             Active = null;
+    }
+
+    /// <summary>
+    /// Load a level by index from the configured `levels` array. This assigns `levelAtlas` and
+    /// spawns the level geometry and placeables under the runtime roots.
+    /// </summary>
+    public void LoadLevel(int index)
+    {
+        if (levels == null || index < 0 || index >= levels.Length) return;
+        activeLevelIndex = index;
+        levelAtlas = levels[index];
+
+        // Spawn the atlas content into the level container / entities root.
+        SpawnLevelFromAtlas(levelAtlas);
+
+        // Recompute grid/collision and navmesh as needed.
+        AutoConfigureFromChildren();
+        if (astar != null && buildNavmeshOnAwake)
+        {
+            StartCoroutine(ConfigureAndScanNextFrame(astar, GetComponentInChildren<LevelSetup>()));
+        }
     }
 
     Transform ResolveEntitiesRoot()
@@ -400,6 +443,9 @@ public class LevelRuntime : MonoBehaviour
         localPlayerInstance = playerEntity.gameObject;
         playerEntity.playerIndex = playerIndex;
         playerEntity.isLocal = true;
+        var lifeController = localPlayerInstance.GetComponent<PlayerLifeController>();
+        if (lifeController != null)
+            lifeController.RegisterSpawnPoint(spawnPoint);
 
         // Ensure PlayerController (if present) is wired to this motor.
         var motor = localPlayerInstance.GetComponent<GridMotor>();
@@ -681,6 +727,72 @@ public class LevelRuntime : MonoBehaviour
 
         graph.center = new Vector3(gCenterX, -0.5f, gCenterZ);
         graph.SetDimensions(gWidth, gDepth, 1f);
+    }
+
+    void LateUpdate()
+    {
+        // Poll win/lose conditions periodically.
+        if (Time.time >= _nextGameStateCheck)
+        {
+            _nextGameStateCheck = Time.time + Mathf.Max(0.05f, gameStateCheckInterval);
+            EvaluateGameState();
+        }
+    }
+
+    bool _gameOverTriggered = false;
+    bool _winTriggered = false;
+
+    void EvaluateGameState()
+    {
+        if (_gameOverTriggered || _winTriggered) return;
+
+        // Win condition: no remaining ItemPickup objects (coins) in the entities root.
+        int remainingCoins = CountRemainingCoins();
+        if (remainingCoins <= 0)
+        {
+            _winTriggered = true;
+            if (winHUD != null) winHUD.SetActive(true);
+            return;
+        }
+
+        // Game over condition: all players dead AND no lives remaining.
+        bool allPlayersDead = AreAllPlayersDead();
+        if (allPlayersDead && currentLives <= 0)
+        {
+            _gameOverTriggered = true;
+            if (gameOverHUD != null) gameOverHUD.SetActive(true);
+        }
+    }
+
+    int CountRemainingCoins()
+    {
+        // Consider ItemPickup instances that are active in the scene and not consumed.
+        var pickups = FindObjectsOfType<ItemPickup>();
+        int count = 0;
+        for (int i = 0; i < pickups.Length; i++)
+        {
+            var p = pickups[i];
+            if (p == null) continue;
+            if (!p.gameObject.activeInHierarchy) continue;
+            count++;
+        }
+        return count;
+    }
+
+    bool AreAllPlayersDead()
+    {
+        var players = FindObjectsOfType<PlayerEntity>();
+        if (players == null || players.Length == 0)
+            return false; // no players means not a local-game over decision here
+
+        for (int i = 0; i < players.Length; i++)
+        {
+            var p = players[i];
+            if (p == null) continue;
+            // If any player is not marked dead, we're not game over.
+            if (!p.isDead) return false;
+        }
+        return true;
     }
 
     GridGraph EnsureGridGraph(AstarPath path)

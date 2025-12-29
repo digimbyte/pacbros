@@ -8,12 +8,16 @@ public class PairedPortal : MonoBehaviour
 {
     public PairedPortal paired;
 
-    // Access/security is handled by a required `AccessGate` component on this GameObject.
+    [Header("Debug")]
+    public bool verboseDebug = false;
+
+    [Header("Activation")]
+    [Tooltip("Optional: assign a separate trigger collider (child) to use for activation. If null, the collider on this GameObject is used.")]
+    public Collider activationCollider;
 
     [Header("Teleport")]
     public Vector3 exitWorldOffset = Vector3.zero;
     public float cooldownSeconds = 0.20f;
-    [Tooltip("Activation radius on XZ (meters). Must be within this distance from portal center to trigger teleport.")]
     public float activationRadius = 0.25f;
 
     static readonly Dictionary<int, float> _cooldowns = new();
@@ -27,145 +31,136 @@ public class PairedPortal : MonoBehaviour
     void Awake()
     {
         var c = GetComponent<Collider>();
-        if (c != null && !c.isTrigger)
+        if (c != null)
+        {
             c.isTrigger = true;
+            if (activationCollider == null)
+                activationCollider = c;
+        }
+
+        // If a separate activation collider exists, ensure it forwards triggers
+        if (activationCollider != null && activationCollider != c)
+        {
+            activationCollider.isTrigger = true;
+
+            var fwd = activationCollider.GetComponent<PortalTriggerForwarder>();
+            if (fwd == null)
+                fwd = activationCollider.gameObject.AddComponent<PortalTriggerForwarder>();
+
+            fwd.parentPortal = this;
+        }
     }
 
     void OnTriggerEnter(Collider other)
     {
-        if (paired == null) return;
+        ProcessTrigger(other);
+    }
 
-        int key = GetCooldownKey(other);
-        if (IsCoolingDown(key)) return;
+    public void ExternalTriggerEnter(Collider other)
+    {
+        ProcessTrigger(other);
+    }
 
-        var gate = GetComponent<AccessGate>();
-        if (gate == null)
+    void ProcessTrigger(Collider other)
+    {
+        if (paired == null)
         {
-            Debug.LogError("PairedPortal requires an AccessGate component to decide access.");
+            if (verboseDebug)
+                Debug.LogWarning($"{name}: Ignored — portal not paired.", this);
             return;
         }
 
+        int key = GetCooldownKey(other);
+        if (IsCoolingDown(key))
+        {
+            if (verboseDebug)
+                Debug.Log($"{name}: Ignored — cooldown active.", this);
+            return;
+        }
+
+        var gate = GetComponent<AccessGate>();
         EntityIdentity identity = EntityIdentityUtility.From(other);
+
         if (identity.IsValid && !gate.HasAccess(identity))
+        {
+            if (verboseDebug)
+                Debug.Log($"{name}: Access denied for {identity.Name}.", this);
+            return;
+        }
+
+        Transform root =
+            identity.IsValid && identity.Transform != null
+            ? identity.Transform
+            : other.transform.root;
+
+        Vector2 rootXZ = new(root.position.x, root.position.z);
+        Vector2 portalXZ = new(transform.position.x, transform.position.z);
+
+        if (Vector2.Distance(rootXZ, portalXZ) > activationRadius)
             return;
 
-        // Only teleport when the entity root is close enough to the portal center on XZ.
-        Transform root = identity.IsValid && identity.Transform != null ? identity.Transform : other.transform.root;
-        Vector3 rootPos = root.position;
-        Vector2 rootXZ = new Vector2(rootPos.x, rootPos.z);
-        Vector2 portalXZ = new Vector2(transform.position.x, transform.position.z);
-        if (Vector2.Distance(rootXZ, portalXZ) > activationRadius) return;
-
-        // Capture last movement direction from GridMotor or Rigidbody so we can reapply after teleport.
         Vector3 lastMove = Vector3.zero;
         GridMotor motor = root.GetComponent<GridMotor>();
         if (motor != null) lastMove = motor.GetVelocity();
-        else
-        {
-            var rb = root.GetComponent<Rigidbody>();
-            if (rb != null) lastMove = rb.linearVelocity;
-        }
+        else if (root.TryGetComponent(out Rigidbody rb)) lastMove = rb.linearVelocity;
 
-        // Teleport to center
         Vector3 target = paired.transform.position + paired.exitWorldOffset;
+        // Force global ground Y to 0 so teleported objects don't end up underground.
+        target.y = 0f;
 
-        // Apply teleportation (prefer GridMotor to preserve grid state)
         if (motor != null)
         {
             motor.HardTeleport(target);
-            // Restore movement direction as a desired cardinal direction if available
+
             if (lastMove.sqrMagnitude > 0.0001f)
             {
-                Vector2Int dir = (Mathf.Abs(lastMove.x) >= Mathf.Abs(lastMove.z)) ? new Vector2Int(lastMove.x > 0f ? 1 : -1, 0) : new Vector2Int(0, lastMove.z > 0f ? 1 : -1);
+                Vector2Int dir =
+                    Mathf.Abs(lastMove.x) >= Mathf.Abs(lastMove.z)
+                        ? new Vector2Int(lastMove.x > 0 ? 1 : -1, 0)
+                        : new Vector2Int(0, lastMove.z > 0 ? 1 : -1);
+
                 motor.SetDesiredDirection(dir);
             }
         }
+        else if (root.TryGetComponent(out CharacterController cc))
+        {
+            bool enabled = cc.enabled;
+            cc.enabled = false;
+            root.position = target;
+            cc.enabled = enabled;
+        }
+        else if (root.TryGetComponent(out Rigidbody rb))
+        {
+            rb.position = target;
+            rb.linearVelocity = lastMove;
+        }
         else
         {
-            // Use CharacterController / Rigidbody fallback
-            CharacterController cc = root.GetComponent<CharacterController>();
-            if (cc != null)
-            {
-                bool wasEnabled = cc.enabled;
-                cc.enabled = false;
-                root.position = target;
-                cc.enabled = wasEnabled;
-            }
-            else
-            {
-                Rigidbody rb = root.GetComponent<Rigidbody>();
-                if (rb != null)
-                {
-                    rb.position = target;
-                    rb.linearVelocity = lastMove; // preserve motion for rigidbodies
-                }
-                else
-                {
-                    root.position = target;
-                }
-            }
+            root.position = target;
         }
 
         if (identity.IsValid)
-        {
             DoorOverrideRegistry.Consume(identity, gate);
-        }
-        SetCooldown(key);
-    }
 
-    int GetCooldownKey(Collider other)
-    {
-        EntityIdentity identity = EntityIdentityUtility.From(other);
-        if (identity.IsValid) return identity.InstanceId;
-        return other.transform.root.GetInstanceID();
+        SetCooldown(key);
     }
 
     bool IsCoolingDown(int key)
     {
-        if (cooldownSeconds <= 0f) return false;
-        if (!_cooldowns.TryGetValue(key, out float until)) return false;
-        return Time.time < until;
+        return cooldownSeconds > 0f
+            && _cooldowns.TryGetValue(key, out float until)
+            && Time.time < until;
     }
 
     void SetCooldown(int key)
     {
-        if (cooldownSeconds <= 0f) return;
-        _cooldowns[key] = Time.time + cooldownSeconds;
+        if (cooldownSeconds > 0f)
+            _cooldowns[key] = Time.time + cooldownSeconds;
     }
 
-    static void TeleportOther(Collider other, Vector3 target)
+    int GetCooldownKey(Collider other)
     {
-        // Prefer entity root.
-        Transform root = other.transform.root;
-        EntityIdentity identity = EntityIdentityUtility.From(other);
-        if (identity.IsValid && identity.Transform != null) root = identity.Transform;
-
-        GridMotor motor = root.GetComponent<GridMotor>();
-        if (motor != null)
-        {
-            motor.HardTeleport(target);
-            return;
-        }
-
-        CharacterController cc = root.GetComponent<CharacterController>();
-        if (cc != null)
-        {
-            bool wasEnabled = cc.enabled;
-            cc.enabled = false;
-            root.position = target;
-            cc.enabled = wasEnabled;
-            return;
-        }
-
-        Rigidbody rb = root.GetComponent<Rigidbody>();
-        if (rb != null)
-        {
-            rb.position = target;
-            rb.linearVelocity = Vector3.zero;
-            rb.angularVelocity = Vector3.zero;
-            return;
-        }
-
-        root.position = target;
+        EntityIdentity id = EntityIdentityUtility.From(other);
+        return id.IsValid ? id.InstanceId : other.GetInstanceID();
     }
 }

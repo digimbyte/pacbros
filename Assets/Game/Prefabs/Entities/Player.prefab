@@ -13,6 +13,9 @@ GameObject:
   - component: {fileID: 619055779628719833}
   - component: {fileID: 3489647428217073734}
   - component: {fileID: 7242115553091643686}
+  - component: {fileID: 679993214253418567}
+  - component: {fileID: 679993214253418568}
+  - component: {fileID: 679993214253418569}
   - component: {fileID: 7686317791198650605}
   - component: {fileID: 1161058637082010665}
   - component: {fileID: 5171025004939381343}
@@ -99,10 +102,10 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 1.2
+  m_Height: 2
   m_Radius: 0.35
   m_SlopeLimit: 45
-  m_StepOffset: 0.3
+  m_StepOffset: 0.2
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0.6, z: 0}
@@ -119,6 +122,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEntity
   isGhost: 0
+  isDead: 0
   inventory: 00000000
   playerIndex: 0
   isLocal: 0
@@ -148,6 +152,55 @@ MonoBehaviour:
   - 3.5
   - 4
   currentInput: {x: 0, y: 0}
+--- !u!114 &679993214253418567
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2584990566347290654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c30febd0a20922458406588f09d0ca1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  deathFreezeSeconds: 1
+  verboseLogging: 0
+--- !u!114 &679993214253418568
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2584990566347290654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99149e5329dd5514ba150798ede46e8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  attackRange: 2
+  ammoPerShot: 1
+  enemyLayers:
+    serializedVersion: 2
+    m_Bits: 8183
+  logHits: 0
+--- !u!114 &679993214253418569
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2584990566347290654}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5badd4c1f6324a41b69c7b9c998f0bc1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  probeRadius: 0.5
+  doorLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  logBlocks: 0
 --- !u!114 &7686317791198650605
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -168,6 +221,8 @@ MonoBehaviour:
   fireTrailStartKelvin: 6000
   firesPerSpawn: 1
   fireSpawnRadius: 0.5
+  fireSpawnDelay: 0.2
+  spawnBatchSize: 8
 --- !u!198 &1161058637082010665
 ParticleSystem:
   m_ObjectHideFlags: 0

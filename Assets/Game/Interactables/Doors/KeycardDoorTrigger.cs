@@ -25,8 +25,7 @@ public class KeycardDoorTrigger : MonoBehaviour
     // Authorized entities currently inside.
     readonly HashSet<AuthorizedToken> _authorizedTokens = new();
 
-    // Legacy authorized inventories (older component).
-    readonly HashSet<KeycardInventory> _authorizedLegacy = new();
+    // (legacy KeycardInventory support removed) - use EntityIdentity-based checks only.
 
     // Hashable token for entity identity.
     readonly struct AuthorizedToken
@@ -56,6 +55,8 @@ public class KeycardDoorTrigger : MonoBehaviour
             door.trigger = this;
     }
 
+    int TotalAuthorizedCount => _authorizedTokens.Count;
+
     void OnTriggerEnter(Collider other)
     {
         if (IsOnLayerMask(other.gameObject, ignoreLayers))
@@ -73,41 +74,29 @@ public class KeycardDoorTrigger : MonoBehaviour
         EntityIdentity identity = EntityIdentityUtility.From(other);
         if (identity.IsValid)
         {
-            if (identity.IsGhost)
+            bool isEnemy = identity.Kind == EntityKind.Enemy;
+            if (!isEnemy && identity.IsGhost)
             {
-                Debug.LogWarning($"{name}: Ghost entity '{identity.Name}' attempted to open {door.requiredKey} door. Ignoring.");
+                // Player ghosts still can't open doors.
                 return;
             }
 
-            if (!identity.HasKeycard(door.requiredKey, door.allowHigherKeys))
+            bool hasAccess = isEnemy || identity.HasKeycard(door.requiredKey, door.allowHigherKeys);
+            if (!hasAccess)
             {
                 Debug.LogWarning($"{name}: '{identity.Name}' is missing key {door.requiredKey} (allowHigherKeys={door.allowHigherKeys}); door stays closed.");
                 return;
             }
-
-            // Track authorization by entity via a lightweight shim (see AuthorizedToken).
             AuthorizedToken token = AuthorizedToken.For(identity);
             _authorizedTokens.Add(token);
-            if (_authorizedTokens.Count == 1)
+            if (TotalAuthorizedCount == 1)
                 door.Open();
 
             return;
         }
 
-        // Legacy fallback (older component)
-        KeycardInventory inv = other.GetComponentInParent<KeycardInventory>();
-        if (inv == null)
-            return;
-
-        if (!inv.HasAccess(door.requiredKey, door.allowHigherKeys))
-            return;
-
-        _authorizedLegacy.Add(inv);
-        if (_authorizedLegacy.Count == 1)
-        {
-            Debug.LogWarning($"{name}: Legacy KeycardInventory '{inv.name}' authorized {door.requiredKey} door. Consider migrating to PlayerEntity inventory.");
-            door.Open();
-        }
+        // No legacy KeycardInventory support; rely on EntityIdentity only.
+        return;
     }
 
     void OnTriggerExit(Collider other)
@@ -126,22 +115,15 @@ public class KeycardDoorTrigger : MonoBehaviour
         EntityIdentity identity = EntityIdentityUtility.From(other);
         if (identity.IsValid)
         {
-            if (identity.IsGhost)
-                return;
-
             AuthorizedToken token = AuthorizedToken.For(identity);
-            if (_authorizedTokens.Remove(token) && _authorizedTokens.Count == 0 && _authorizedLegacy.Count == 0)
+            if (_authorizedTokens.Remove(token) && TotalAuthorizedCount == 0)
                 door.Close();
 
             return;
         }
 
-        KeycardInventory inv = other.GetComponentInParent<KeycardInventory>();
-        if (inv == null)
-            return;
-
-        if (_authorizedLegacy.Remove(inv) && _authorizedLegacy.Count == 0 && _authorizedTokens.Count == 0)
-            door.Close();
+        // No legacy KeycardInventory support; nothing to remove for non-entity objects.
+        return;
     }
 
     public void PushOccupantsAlongWorldZ(float doorWorldZ, float strength)

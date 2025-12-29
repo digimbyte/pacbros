@@ -56,6 +56,13 @@ public class ItemPickup : MonoBehaviour
     [Tooltip("If true, the pickup object will be destroyed after applying.")]
     public bool destroyOnPickup = true;
 
+    [Header("SFX")]
+    [Tooltip("Optional sound to play when this pickup is collected.")]
+    public AudioClip pickupSfx;
+    [Range(0f, 1f)]
+    [Tooltip("Volume at which to play the pickup SFX.")]
+    public float pickupSfxVolume = 1f;
+
     bool _consumed;
 
     void OnTriggerEnter(Collider other)
@@ -81,6 +88,12 @@ public class ItemPickup : MonoBehaviour
         Apply(picker);
 
         _consumed = true;
+        // Play SFX if assigned
+        if (pickupSfx != null)
+        {
+            AudioSource.PlayClipAtPoint(pickupSfx, transform.position, Mathf.Clamp01(pickupSfxVolume));
+        }
+
         if (destroyOnPickup)
             Destroy(gameObject);
         else

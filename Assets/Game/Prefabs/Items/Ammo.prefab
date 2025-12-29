@@ -165,7 +165,9 @@ MonoBehaviour:
   heatValue: -1000
   scoreValue: 1000
   livesValue: 0
-  ammoValue: 0
-  inventory: 64000000
+  ammoValue: 1
+  inventory: 
   inventoryDeltas: []
   destroyOnPickup: 1
+  pickupSfx: {fileID: 8300000, guid: ffa3242d635861140a71e5699d75fc95, type: 3}
+  pickupSfxVolume: 0.5

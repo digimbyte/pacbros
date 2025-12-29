@@ -9,6 +9,9 @@ using UnityEngine;
 public class PathFinding : MonoBehaviour
 {
     public GridMotor motor;
+    [Header("Debug")]
+    [Tooltip("When enabled, PathFinding will log assigned paths and motor commands.")]
+    public bool verboseDebug = false;
 
     [Header("Path")]
     public float waypointReachRadius = 0.15f;
@@ -38,6 +41,12 @@ public class PathFinding : MonoBehaviour
     {
         if (motor == null)
             motor = GetComponent<GridMotor>();
+
+        // Runtime fallback: try parent/children in case components are arranged differently.
+        if (motor == null)
+            motor = GetComponentInParent<GridMotor>();
+        if (motor == null)
+            motor = GetComponentInChildren<GridMotor>();
     }
 
     public void SetPath(IList<Vector2Int> cells)
@@ -81,6 +90,22 @@ public class PathFinding : MonoBehaviour
         }
 
         SetPath(buffer);
+        if (verboseDebug)
+            Debug.Log($"PathFinding: SetPathFromWorldPoints on '{name}' -> {buffer.Count} cells.", this);
+
+        if (motor == null)
+        {
+            // Try to recover motor reference at the moment a path is assigned.
+            motor = GetComponent<GridMotor>() ?? GetComponentInParent<GridMotor>() ?? GetComponentInChildren<GridMotor>();
+            if (motor == null)
+            {
+                Debug.LogWarning($"PathFinding: SetPathFromWorldPoints called but no GridMotor found on '{name}'. Path will not drive movement.", this);
+            }
+            else if (verboseDebug)
+            {
+                Debug.Log($"PathFinding: resolved GridMotor for '{name}' -> '{motor.name}'", this);
+            }
+        }
     }
 
     static Vector2Int WorldToCell(Vector3 world, Vector3 origin, float cellSize)
@@ -93,7 +118,12 @@ public class PathFinding : MonoBehaviour
 
     void Update()
     {
-        if (motor == null) return;
+        if (motor == null)
+        {
+            // Attempt to recover motor reference every frame until found (cheap check).
+            motor = GetComponent<GridMotor>() ?? GetComponentInParent<GridMotor>() ?? GetComponentInChildren<GridMotor>();
+            if (motor == null) return;
+        }
         if (_cells.Count == 0) return;
 
         Vector3 pos = transform.position;
@@ -126,6 +156,14 @@ public class PathFinding : MonoBehaviour
         else
             dir = new Vector2Int(0, delta.z >= 0f ? 1 : -1);
 
-        motor.SetDesiredDirection(dir);
+        if (motor != null)
+        {
+            if (verboseDebug) Debug.Log($"PathFinding: '{name}' issuing direction {dir} to motor '{motor.name}'.", this);
+            motor.SetDesiredDirection(dir);
+        }
+        else if (verboseDebug)
+        {
+            Debug.LogWarning($"PathFinding: '{name}' wanted to issue direction {dir} but motor is null.", this);
+        }
     }
 }

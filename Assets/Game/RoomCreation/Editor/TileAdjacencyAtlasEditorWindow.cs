@@ -849,6 +849,10 @@ public class TileAdjacencyAtlasEditorWindow : EditorWindow
     {
         if (atlas == null)
             return;
+        // Always re-sync the cached path in case the asset was renamed or moved externally.
+        string existingPath = AssetDatabase.GetAssetPath(atlas);
+        if (!string.IsNullOrEmpty(existingPath))
+            atlasPath = existingPath;
 
         if (string.IsNullOrEmpty(atlasPath))
         {
