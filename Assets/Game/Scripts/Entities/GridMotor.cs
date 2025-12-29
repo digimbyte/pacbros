@@ -64,6 +64,7 @@ public class GridMotor : MonoBehaviour
 
     [Header("Collision")]
     public LayerMask solidMask = ~0;
+    public LayerMask floorMask = ~0;
     public float forwardProbeDistance = 0.10f;
     public float skin = 0.02f;
     [Tooltip("Scales collision probe radius to let the capsule slip past corners (0.5..1).")]
@@ -180,7 +181,8 @@ public class GridMotor : MonoBehaviour
 
         cellSize   = level.cellSize;
         gridOrigin = level.gridOrigin;
-        solidMask  = level.solidMask;
+        solidMask  = level.wallLayers;
+        floorMask  = level.floorLayers;
     }
 
     public static void FlushPendingMotorsTo(LevelRuntime level)
@@ -486,7 +488,22 @@ public class GridMotor : MonoBehaviour
             int hitLayer = go != null ? go.layer : -1;
             Debug.Log($"GridMotor: BLOCKED (HIT) dir={dir} hit={hitName} layer={hitLayer} dist={hitInfo.distance} mask={solidMask.value}", this);
         }
+
+        // Check if target cell has floor
+        if (!HasFloor(dir)) return true;
+
         return hit;
+    }
+
+    bool HasFloor(Vector2Int dir)
+    {
+        Vector3 dirWorld = new Vector3(dir.x, 0f, dir.y);
+        Vector3 targetPos = transform.position + dirWorld.normalized * cellSize;
+        Vector3 checkPos = new Vector3(targetPos.x, transform.position.y + 0.1f, targetPos.z); // slightly above ground
+
+        // Use OverlapBox to check for floor colliders
+        Collider[] colliders = Physics.OverlapBox(checkPos, new Vector3(cellSize * 0.4f, 0.1f, cellSize * 0.4f), Quaternion.identity, floorMask);
+        return colliders.Length > 0;
     }
 
     Vector3 GetCapsuleCenterWorld()

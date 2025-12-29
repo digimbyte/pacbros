@@ -1065,7 +1065,7 @@ Transform:
   m_GameObject: {fileID: 462969031}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 666.3677, y: -322, z: 0}
+  m_LocalPosition: {x: 538.4292, y: -322, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2332,6 +2332,8 @@ GameObject:
   - component: {fileID: 940847537}
   - component: {fileID: 940847543}
   - component: {fileID: 940847542}
+  - component: {fileID: 940847545}
+  - component: {fileID: 940847544}
   m_Layer: 0
   m_Name: Networking
   m_TagString: Untagged
@@ -2354,7 +2356,10 @@ MonoBehaviour:
   mode: 0
   gameSceneName: GameLoop
   friendCode: 
+  hostScript: {fileID: 940847542}
+  clientScript: {fileID: 940847543}
   localPlayerIndex: 0
+  networkPlayerController: {fileID: 0}
 --- !u!135 &940847538
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -2459,6 +2464,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be0d75732e5bbf24da462742cc497302, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnityNetworkHost
+  networkManager: {fileID: 940847545}
+  maxPlayers: 12
 --- !u!114 &940847543
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2471,6 +2478,78 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 801781263036bc34e8fae88960afe025, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UnityNetworkClient
+  networkManager: {fileID: 940847545}
+--- !u!114 &940847544
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940847536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6960e84d07fb87f47956e7a81d71c4e6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Transports.UTP.UnityTransport
+  m_ProtocolType: 0
+  m_UseWebSockets: 1
+  m_UseEncryption: 0
+  m_MaxPacketQueueSize: 128
+  m_MaxPayloadSize: 6144
+  m_HeartbeatTimeoutMS: 500
+  m_ConnectTimeoutMS: 1000
+  m_MaxConnectAttempts: 60
+  m_DisconnectTimeoutMS: 30000
+  ConnectionData:
+    Address: 127.0.0.1
+    Port: 7777
+    ServerListenAddress: 127.0.0.1
+  DebugSimulator:
+    PacketDelayMS: 0
+    PacketJitterMS: 0
+    PacketDropRate: 0
+--- !u!114 &940847545
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 940847536}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 593a2fe42fa9d37498c96f9a383b6521, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkManager
+  NetworkManagerExpanded: 0
+  NetworkConfig:
+    ProtocolVersion: 0
+    NetworkTransport: {fileID: 940847544}
+    PlayerPrefab: {fileID: 0}
+    Prefabs:
+      NetworkPrefabsLists:
+      - {fileID: 11400000, guid: 61650872bd123c44a88cd4828b061cfe, type: 2}
+    TickRate: 30
+    ClientConnectionBufferTimeout: 10
+    ConnectionApproval: 0
+    ConnectionData: 
+    EnableTimeResync: 0
+    TimeResyncInterval: 30
+    EnsureNetworkVariableLengthSafety: 0
+    EnableSceneManagement: 1
+    ForceSamePrefabs: 1
+    RecycleNetworkIds: 1
+    NetworkIdRecycleDelay: 120
+    RpcHashSize: 0
+    LoadSceneTimeOut: 120
+    SpawnTimeout: 10
+    EnableNetworkLogs: 1
+    NetworkTopology: 1
+    UseCMBService: 0
+    AutoSpawnPlayerPrefabClientSide: 1
+    NetworkProfilingMetrics: 1
+    OldPrefabList: []
+  RunInBackground: 1
+  LogLevel: 1
 --- !u!1 &958231958
 GameObject:
   m_ObjectHideFlags: 0
@@ -2799,7 +2878,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -709.25287, y: -437.99454}
+  m_AnchoredPosition: {x: -581.3144, y: -437.99454}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1041693579
@@ -4177,7 +4256,7 @@ Transform:
   m_GameObject: {fileID: 1323194521}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 477.4364, y: 284.9, z: 0}
+  m_LocalPosition: {x: 413.72305, y: 284.9, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -5778,7 +5857,7 @@ Transform:
   m_GameObject: {fileID: 2138915341}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 122.38446, y: 0, z: 0}
+  m_LocalPosition: {x: 250.32294, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

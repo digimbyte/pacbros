@@ -51,6 +51,7 @@ public class ClientSessionMarker : MonoBehaviour
     [Header("Player Reference")]
     [Tooltip("Reference to the local player's NetworkPlayerController, set by the NetworkPlayerController on network spawn.")]
     public NetworkPlayerController networkPlayerController;
+    public bool IsClient => mode == SessionMode.NetClient;
     public bool IsHostLike => mode == SessionMode.LocalHost || mode == SessionMode.NetHost;
 
     void Awake()
@@ -72,6 +73,14 @@ public class ClientSessionMarker : MonoBehaviour
     public void StartLocalGame()
     {
         mode = SessionMode.LocalHost;
+        SceneManager.LoadScene(gameSceneName);
+    }
+
+    /// <summary>
+    /// Load the gameplay scene. Call this after network setup is complete.
+    /// </summary>
+    public void LoadGameScene()
+    {
         SceneManager.LoadScene(gameSceneName);
     }
 

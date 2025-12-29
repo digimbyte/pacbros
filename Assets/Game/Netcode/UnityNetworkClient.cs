@@ -3,8 +3,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Core;
 using Unity.Services.Authentication;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Models;
+using Unity.Services.Multiplayer;
 using System.Threading.Tasks;
 
 public class UnityNetworkClient : MonoBehaviour
@@ -20,7 +19,10 @@ public class UnityNetworkClient : MonoBehaviour
     public async Task StartJoining(string code)
     {
         await InitServices();
-        await JoinGame(code);
+
+        var session = await MultiplayerService.Instance.JoinSessionByCodeAsync(code);
+
+        Debug.Log($"JOINED SESSION: {session.Id}");
     }
 
     async Task InitServices()
@@ -28,15 +30,5 @@ public class UnityNetworkClient : MonoBehaviour
         await UnityServices.InitializeAsync();
         if (!AuthenticationService.Instance.IsSignedIn)
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-    }
-
-    async Task JoinGame(string code)
-    {
-        JoinAllocation joinAlloc = await RelayService.Instance.JoinAllocationAsync(code);
-
-        var transport = networkManager.GetComponent<UnityTransport>();
-        transport.SetRelayServerData(new RelayServerData(joinAlloc, "dtls"));
-
-        networkManager.StartClient();
     }
 }

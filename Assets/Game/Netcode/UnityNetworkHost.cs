@@ -3,15 +3,13 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Services.Core;
 using Unity.Services.Authentication;
-using Unity.Services.Relay;
-using Unity.Services.Relay.Models;
+using Unity.Services.Multiplayer;
 using System.Threading.Tasks;
 
 public class UnityNetworkHost : MonoBehaviour
 {
     public NetworkManager networkManager;
     public int maxPlayers = 4;
-    private string joinCode;
 
     void Awake()
     {
@@ -22,7 +20,18 @@ public class UnityNetworkHost : MonoBehaviour
     public async Task<string> StartHosting()
     {
         await InitServices();
-        return await HostGame();
+
+        var options = new SessionOptions
+        {
+            MaxPlayers = maxPlayers,
+            IsPrivate = false
+        };
+
+        var session = await MultiplayerService.Instance.CreateSessionAsync(options);
+
+        Debug.Log($"SESSION CREATED: Join code {session.Code}");
+
+        return session.Code;
     }
 
     async Task InitServices()
@@ -30,20 +39,5 @@ public class UnityNetworkHost : MonoBehaviour
         await UnityServices.InitializeAsync();
         if (!AuthenticationService.Instance.IsSignedIn)
             await AuthenticationService.Instance.SignInAnonymouslyAsync();
-    }
-
-    async Task<string> HostGame()
-    {
-        Allocation alloc = await RelayService.Instance.CreateAllocationAsync(maxPlayers);
-        joinCode = await RelayService.Instance.GetJoinCodeAsync(alloc.AllocationId);
-
-        Debug.Log($"JOIN CODE: {joinCode}");
-
-        var transport = networkManager.GetComponent<UnityTransport>();
-        transport.SetRelayServerData(new RelayServerData(alloc, "dtls"));
-
-        networkManager.StartHost();
-
-        return joinCode;
     }
 }
