@@ -16,6 +16,7 @@ public class AssaultBrain : BrainBehavior
     private float _assaultHoldTimer;
     private Vector3 _assaultAmbushPoint;
     private bool _isCamping;
+    public bool IsCamping => _isCamping;
 
     public AssaultBrain(EnemyBrainController controller) : base(controller) { }
 

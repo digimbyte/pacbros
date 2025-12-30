@@ -287,8 +287,6 @@ public class EnemyBrainController : MonoBehaviour
     public PlayerEntity CurrentTarget => _currentTarget;
     public PlayerTracker PlayerTracker => _tracker;
     public float LastDecisionAt { get => _lastDecisionAt; set => _lastDecisionAt = value; }
-    public float decisionCooldown = 0.5f;
-    public float destinationUpdateThreshold = 0.5f;
 
     // ----------------------------
     // Components / State
@@ -740,7 +738,7 @@ public class EnemyBrainController : MonoBehaviour
         }
     }
 
-    void ScheduleDestination(Vector3 worldPos, bool forceImmediate)
+    public void ScheduleDestination(Vector3 worldPos, bool forceImmediate)
     {
         _desiredDestination = ClampToLevel(worldPos);
         _hasDestination = true;
@@ -1377,7 +1375,7 @@ public class EnemyBrainController : MonoBehaviour
             AddSharedHeat(gp, sharedHeatRadius, 1f);
         }
 
-        if (!(brainType == EnemyBrainType.Assault && _assaultState == AssaultState.Holding))
+        if (!(brainType == EnemyBrainType.Assault && (_brain as AssaultBrain)?.IsCamping == true))
         {
             Vector2Int my = WorldToGrid(transform.position);
             _sharedHeatMap[my] = float.MaxValue;
@@ -1447,7 +1445,7 @@ public class EnemyBrainController : MonoBehaviour
         if (_isStuck)
             gain += 35f;
 
-        if (brainType == EnemyBrainType.Assault && _assaultState == AssaultState.Holding)
+        if (brainType == EnemyBrainType.Assault && (_brain as AssaultBrain)?.IsCamping == true)
             gain *= 0.25f;
 
         // If A* says "no path to player", push panic up faster to encourage overrides/exploration.
