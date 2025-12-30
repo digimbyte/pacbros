@@ -267,6 +267,18 @@ public class LevelSetup : MonoBehaviour
 
             var t = enemy.transform;
             var pos = chosen.transform.position;
+            
+            // Snap spawn position to nearest grid cell center to ensure AI can move
+            var runtime = LevelRuntime.Active;
+            if (runtime != null)
+            {
+                float cell = runtime.cellSize;
+                Vector3 origin = runtime.gridOrigin;
+                int gridX = Mathf.RoundToInt((pos.x - origin.x) / cell);
+                int gridZ = Mathf.RoundToInt((pos.z - origin.z) / cell);
+                pos = new Vector3(origin.x + gridX * cell, pos.y, origin.z + gridZ * cell);
+            }
+            
             // Prefer to use the enemy's GridMotor HardTeleport so CharacterController
             // offsets are accounted for and the capsule bottom sits on the spawn Y.
             var motor = enemy.GetComponent<GridMotor>();

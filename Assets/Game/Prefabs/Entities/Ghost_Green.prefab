@@ -479,23 +479,21 @@ MonoBehaviour:
   cellSize: 1
   gridOrigin: {x: 0, y: 0, z: 0}
   bindFromLevelRuntime: 1
+  originMode: 0
   gridOffsetX: 0
   gridOffsetZ: 0
-  characterController: {fileID: 0}
-  moveSpeed: 6
-  acceleration: 60
-  speedMultiplier: 1
-  instantAcceleration: 1
-  stopOnBlocked: 1
-  allowBufferedTurnOnBlock: 1
-  allowInstantReverse: 0
-  turnAlignEpsilon: 0.2
-  laneSnapMaxSpeed: 8
   solidMask:
     serializedVersion: 2
     m_Bits: 1088
-  cornerRadiusScale: 0.85
-  skin: 0.02
+  blockExtentsXZ: 0.9
+  blockExtentsY: 0.45
+  stopOnBlocked: 1
+  moveSpeed: 6
+  speedMultiplier: 1
+  turnAlignEpsilon: 0.2
+  allowBufferedTurnOnBlock: 1
+  allowInstantReverse: 1
+  characterController: {fileID: 0}
 --- !u!143 &2153044852385526397
 CharacterController:
   m_ObjectHideFlags: 0
@@ -535,6 +533,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyEntity
   isGhost: 0
   isDead: 0
+  enemyTypeId: 0
   onKilled:
     m_PersistentCalls:
       m_Calls:
@@ -637,11 +636,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  deathAudio: {fileID: 8300000, guid: 1806a8da231fcd749bdd8447db8e75f2, type: 3}
-  respawnAudio: {fileID: 8300000, guid: 88da5816e3c43734ba5b36132ab1a6ec, type: 3}
+  brainController: {fileID: 0}
   inventory: 64000000
-  dropInventoryOnDeath: 1
-  enemyTypeId: 0
 --- !u!114 &8241190991842302216
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -658,6 +654,40 @@ MonoBehaviour:
   repathInterval: 1.2
   targetShuffleInterval: 30
   destinationUpdateThreshold: 0.75
+  centerSnapEpsilon: 0.12
+  stoppedSteerEpsilon: 0.6
+  reversePenalty: 250
+  forwardBias: 4
+  tieBreakJitter: 0.35
+  goalDirectionBias: 0.65
+  useSharedHeatMap: 1
+  sharedHeatRadius: 2.5
+  sharedHeatAvoidanceWeight: 0.15
+  perEntityHistorySize: 1000
+  perEntityTouchThreshold: 10
+  perEntityHeatPerExtraTouch: 10
+  spawnTilePassiveHeat: 50
+  perEntityHeatWeight: 0.65
+  enemySpawnMask:
+    serializedVersion: 2
+    m_Bits: 0
+  enemySpawnTag: EnemySpawn
+  verboseDebug: 0
+  maxDebugEntries: 50
+  pathDebug: 0
+  pathDebugDuration: 1
+  decisionCooldown: 0.35
+  stuckTimeout: 2.2
+  panicMax: 1000
+  panicBaseGainPerSecond: 6
+  panicTightSpaceGainPerSecond: 40
+  floorSpaceScanInterval: 0.6
+  floorSpaceScanMaxNodes: 80
+  floorSpaceCrampedThreshold: 26
+  panicLoopBonus: 30
+  enableGhostOnPanic: 1
+  disableGhostAfterFirstDoorOrPortal: 1
+  postPanicCooldown: 2
   snifferChaseDistance: 3.5
   curiousWanderDuration: 4
   curiousInterceptDuration: 3

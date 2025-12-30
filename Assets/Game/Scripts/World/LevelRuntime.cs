@@ -13,66 +13,109 @@ using Core.Registry; // for Registry (Entities.asset)
 public class LevelRuntime : MonoBehaviour
 {
     public static LevelRuntime Active { get; private set; }
+
     [Header("Level List")]
-    [Tooltip("Optional list of level atlases usable by this runtime. Use LoadLevel(index) to switch.")]
+    [Tooltip(
+        "Optional list of level atlases usable by this runtime. Use LoadLevel(index) to switch."
+    )]
     public TileAdjacencyAtlas[] levels = Array.Empty<TileAdjacencyAtlas>();
+
     [Tooltip("Index of the currently loaded atlas in `levels` (-1 = none).")]
-    [HideInInspector] public int activeLevelIndex = -1;
+    [HideInInspector]
+    public int activeLevelIndex = -1;
+
     [Header("Level Asset")]
     [Tooltip("TileAdjacencyAtlas to instantiate as level geometry under this runtime root.")]
     public TileAdjacencyAtlas levelAtlas;
+
     [Tooltip("Optional explicit container for spawned level geometry. Will be created if null.")]
     public Transform levelContainer;
-    [Tooltip("Root that will hold runtime entities (players, coins, items, etc.). If null, a sibling/child named 'Entities' will be created or reused.")]
+
+    [Tooltip(
+        "Root that will hold runtime entities (players, coins, items, etc.). If null, a sibling/child named 'Entities' will be created or reused."
+    )]
     public Transform entitiesRoot;
+
     [Header("Registries")]
-    [Tooltip("Primary registry (Assets/Game/Entities.asset created via Core/Data/Registry). Must be a Core.Registry.Registry instance.")]
+    [Tooltip(
+        "Primary registry (Assets/Game/Entities.asset created via Core/Data/Registry). Must be a Core.Registry.Registry instance."
+    )]
     public Registry entityRegistry;
 
     [Header("Grid (auto-computed from children)")]
-    [HideInInspector] public float cellSize = 1f;
-    [HideInInspector] public Vector3 gridOrigin = Vector3.zero;
-    [HideInInspector] public Bounds levelBoundsXZ;
+    [HideInInspector]
+    public float cellSize = 1f;
+
+    [HideInInspector]
+    public Vector3 gridOrigin = Vector3.zero;
+
+    [HideInInspector]
+    public Bounds levelBoundsXZ;
 
     [Header("Collision (auto-computed from children)")]
-    [HideInInspector] public LayerMask solidMask = 0;
+    [HideInInspector]
+    public LayerMask solidMask = 0;
 
     [Header("Layers")]
-    [Tooltip("Layer(s) used for walls. Auto-filled from name 'wall' on Awake, but can be overridden.")]
+    [Tooltip(
+        "Layer(s) used for walls. Auto-filled from name 'wall' on Awake, but can be overridden."
+    )]
     public LayerMask wallLayers;
-    [Tooltip("Layer(s) used for floors. Auto-filled from name 'floor' on Awake, but can be overridden.")]
+
+    [Tooltip(
+        "Layer(s) used for floors. Auto-filled from name 'floor' on Awake, but can be overridden."
+    )]
     public LayerMask floorLayers;
+
     [Tooltip("Layer(s) used for portals (walkable like floor).")]
     public LayerMask portalLayers;
+
     [Tooltip("Layer(s) used for doors (walkable like floor).")]
     public LayerMask doorLayers;
 
-    [Header("Navigation")] 
+    [Header("Navigation")]
     [Tooltip("If true, build/scan navmesh on Awake for this level instance.")]
     public bool buildNavmeshOnAwake = true;
+
     [Tooltip("Optional explicit AstarPath reference; if null, will FindObjectOfType.")]
     public AstarPath astar;
-    [Tooltip("If true, use A* pathfinding for enemies. If false, use simple marching algorithm.")]
-    public bool useAStar = false;
 
-    [Header("State")] 
-    [Tooltip("True once the level has finished its Awake/initialisation and all registered motors have been notified.")]
+    [Header("State")]
+    [Tooltip(
+        "True once the level has finished its Awake/initialisation and all registered motors have been notified."
+    )]
     public bool isReady;
 
     [Header("Local Player")]
-    [Tooltip("Camera used for the local player. If assigned, LevelRuntime will attach a CameraFollow to it and set the spawned player as the follow target.")]
+    [Tooltip(
+        "Camera used for the local player. If assigned, LevelRuntime will attach a CameraFollow to it and set the spawned player as the follow target."
+    )]
     public Camera playerCamera;
-    [Tooltip("If true, LevelRuntime will spawn the local Player prefab at the atlas 'player' spawn and assign the camera to follow it.")]
+
+    [Tooltip(
+        "If true, LevelRuntime will spawn the local Player prefab at the atlas 'player' spawn and assign the camera to follow it."
+    )]
     public bool spawnLocalPlayer = true;
-    [Tooltip("Registry key used when spawning the local player prefab from entityRegistry (e.g. 'Player').")]
+
+    [Tooltip(
+        "Registry key used when spawning the local player prefab from entityRegistry (e.g. 'Player')."
+    )]
     public string localPlayerRegistryKey = "Player";
+
     [Tooltip("Number of lives the local player starts with (each spawn/respawn consumes one).")]
     public int startingLives = 3;
-    [Tooltip("If true, LevelRuntime will respawn the local player at the last chosen spawn point until lives are exhausted.")]
+
+    [Tooltip(
+        "If true, LevelRuntime will respawn the local player at the last chosen spawn point until lives are exhausted."
+    )]
     public bool enableRespawn = true;
+
     [Header("Ghost Enemy Auto-Spawn")]
-    [Tooltip("If true, LevelRuntime will spawn each ghost registry key once at random enemy spawn points when the level boots.")]
+    [Tooltip(
+        "If true, LevelRuntime will spawn each ghost registry key once at random enemy spawn points when the level boots."
+    )]
     public bool spawnGhostEnemiesOnAwake = true;
+
     [Tooltip("Registry keys (from entityRegistry) used for ghost auto-spawn.")]
     public string[] ghostEnemyRegistryKeys = new string[]
     {
@@ -81,30 +124,48 @@ public class LevelRuntime : MonoBehaviour
         "Ghost_Red",
         "Ghost_Purple"
     };
-    [Tooltip("If true, prefer EnemySpawnPoints flagged as ghostEnemySpawn; falls back to any enemy spawn if none exist.")]
+
+    [Tooltip(
+        "If true, prefer EnemySpawnPoints flagged as ghostEnemySpawn; falls back to any enemy spawn if none exist."
+    )]
     public bool restrictGhostAutoSpawnsToGhostMarkers = true;
+
     [Tooltip("If true, attempt to use unique spawn tiles per ghost until the pool is exhausted.")]
     public bool enforceUniqueGhostSpawnTiles = true;
 
     [Header("Multiplayer Role")]
-    [Tooltip("If true, force this runtime to behave as a CLIENT even when no ClientSessionMarker is present in the scene.")]
+    [Tooltip(
+        "If true, force this runtime to behave as a CLIENT even when no ClientSessionMarker is present in the scene."
+    )]
     public bool forceClientMode = false;
-    [Tooltip("Computed on Awake: true if this runtime is acting as a client (joined/guest session). If false, treated as host.")]
-    [HideInInspector] public bool isClient = false;
+
+    [Tooltip(
+        "Computed on Awake: true if this runtime is acting as a client (joined/guest session). If false, treated as host."
+    )]
+    [HideInInspector]
+    public bool isClient = false;
 
     // Runtime instance for the local player (if spawned by this runtime).
-    [HideInInspector] public GameObject localPlayerInstance;
-    [HideInInspector] public int currentLives;
-    [HideInInspector] public PlayerSpawnPoint lastPlayerSpawnPoint;
+    [HideInInspector]
+    public GameObject localPlayerInstance;
+
+    [HideInInspector]
+    public int currentLives;
+
+    [HideInInspector]
+    public PlayerSpawnPoint lastPlayerSpawnPoint;
 
     [Header("UI/HUD")]
     [Tooltip("HUD GameObject to enable when the game is over.")]
     public GameObject gameOverHUD;
+
     [Tooltip("HUD GameObject to enable when the level is won (all coins collected).")]
     public GameObject winHUD;
 
     [Header("Game State")]
-    [Tooltip("How often (seconds) to poll win/lose conditions. Lower = more responsive but slightly more CPU.")]
+    [Tooltip(
+        "How often (seconds) to poll win/lose conditions. Lower = more responsive but slightly more CPU."
+    )]
     public float gameStateCheckInterval = 0.5f;
     float _nextGameStateCheck = 0f;
 
@@ -120,7 +181,8 @@ public class LevelRuntime : MonoBehaviour
     /// </summary>
     public void NotifyLocalPlayerDeath(GameObject localPlayer)
     {
-        if (localPlayer == null) return;
+        if (localPlayer == null)
+            return;
         try
         {
             onLocalPlayerDeath?.Invoke(localPlayer);
@@ -131,7 +193,9 @@ public class LevelRuntime : MonoBehaviour
         }
     }
 
-    [Tooltip("Invoked when the local player has no lives remaining. Parameter: the local player GameObject.")]
+    [Tooltip(
+        "Invoked when the local player has no lives remaining. Parameter: the local player GameObject."
+    )]
     public UnityEvent<GameObject> onLocalPlayerOutOfLives;
 
     [Tooltip("Invoked when the level is won (all coins collected). No parameters.")]
@@ -142,7 +206,8 @@ public class LevelRuntime : MonoBehaviour
     /// </summary>
     public void NotifyLocalPlayerOutOfLives(GameObject localPlayer)
     {
-        if (localPlayer == null || _outOfLivesTriggered) return;
+        if (localPlayer == null || _outOfLivesTriggered)
+            return;
         _outOfLivesTriggered = true;
         try
         {
@@ -154,14 +219,16 @@ public class LevelRuntime : MonoBehaviour
         }
         // Trigger game over
         _gameOverTriggered = true;
-        if (gameOverHUD != null) gameOverHUD.SetActive(true);
+        if (gameOverHUD != null)
+            gameOverHUD.SetActive(true);
         // Destroy player and clean up to stop game activity
         DestroyPlayerAndEntities();
     }
 
     public void RegisterMotor(GridMotor motor)
     {
-        if (motor == null) return;
+        if (motor == null)
+            return;
         if (!_motors.Contains(motor))
             _motors.Add(motor);
 
@@ -171,7 +238,8 @@ public class LevelRuntime : MonoBehaviour
 
     public void UnregisterMotor(GridMotor motor)
     {
-        if (motor == null) return;
+        if (motor == null)
+            return;
         _motors.Remove(motor);
     }
 
@@ -261,7 +329,6 @@ public class LevelRuntime : MonoBehaviour
         // Drain any motors that awoke before this level (race-safe).
         GridMotor.FlushPendingMotorsTo(this);
 
-
         isReady = true;
 
         // Notify everything that's registered.
@@ -285,7 +352,8 @@ public class LevelRuntime : MonoBehaviour
     /// </summary>
     public void LoadLevel(int index)
     {
-        if (levels == null || index < 0 || index >= levels.Length) return;
+        if (levels == null || index < 0 || index >= levels.Length)
+            return;
         activeLevelIndex = index;
         levelAtlas = levels[index];
 
@@ -304,7 +372,10 @@ public class LevelRuntime : MonoBehaviour
     {
         if (entitiesRoot == null)
         {
-            Debug.LogError("LevelRuntime: entitiesRoot is not assigned. Please assign the root that holds all entities.", this);
+            Debug.LogError(
+                "LevelRuntime: entitiesRoot is not assigned. Please assign the root that holds all entities.",
+                this
+            );
         }
         return entitiesRoot;
     }
@@ -313,14 +384,18 @@ public class LevelRuntime : MonoBehaviour
     {
         if (levelContainer == null)
         {
-            Debug.LogError("LevelRuntime: levelContainer is not assigned. Please assign the root that will hold spawned level geometry.", this);
+            Debug.LogError(
+                "LevelRuntime: levelContainer is not assigned. Please assign the root that will hold spawned level geometry.",
+                this
+            );
         }
         return levelContainer;
     }
 
     void SpawnLevelFromAtlas(TileAdjacencyAtlas atlas)
     {
-        if (atlas == null) return;
+        if (atlas == null)
+            return;
 
         var levelRoot = ResolveLevelContainer();
         // Create/ensure a child named after the atlas to hold all spawned tiles/placeables
@@ -338,9 +413,9 @@ public class LevelRuntime : MonoBehaviour
         if (atlasRoot != null)
         {
             for (int i = atlasRoot.childCount - 1; i >= 0; i--)
-        {
-            Destroy(atlasRoot.GetChild(i).gameObject);
-        }
+            {
+                Destroy(atlasRoot.GetChild(i).gameObject);
+            }
         }
 
         // Tiles (world geometry)
@@ -349,17 +424,21 @@ public class LevelRuntime : MonoBehaviour
             for (int i = 0; i < atlas.cells.Count; i++)
             {
                 var c = atlas.cells[i];
-                if (c.tile == null) continue;
+                if (c.tile == null)
+                    continue;
 
                 var prefab = c.tile.gameObject;
-                if (prefab == null) continue;
+                if (prefab == null)
+                    continue;
 
                 var inst = Instantiate(prefab, atlasRoot);
                 Transform prefabT = c.tile.transform;
                 // Preserve prefab local position additively (grid + prefab local offset).
                 inst.transform.localPosition = new Vector3(c.x, 0f, c.y) + prefabT.localPosition;
                 // preserve prefab local position additively
-                inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(c.rotationIndex) * 90f, 0f) * prefabT.localRotation;
+                inst.transform.localRotation =
+                    Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(c.rotationIndex) * 90f, 0f)
+                    * prefabT.localRotation;
                 inst.transform.localScale = prefabT.localScale;
             }
         }
@@ -382,24 +461,36 @@ public class LevelRuntime : MonoBehaviour
                     inst.name = $"{prefab.name}<{p.kind}>";
                 Transform prefabT = prefab.transform;
                 inst.transform.localPosition = new Vector3(p.x, 0f, p.y) + prefabT.localPosition;
-                inst.transform.localRotation = Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(p.rotationIndex) * 90f, 0f) * prefabT.localRotation;
+                inst.transform.localRotation =
+                    Quaternion.Euler(0f, TileAdjacencyAtlas.NormalizeRot(p.rotationIndex) * 90f, 0f)
+                    * prefabT.localRotation;
                 inst.transform.localScale = prefabT.localScale;
 
                 // If this is a player spawn marker kind, ensure it carries a PlayerSpawnPoint component
                 // so LevelSetup can discover it and choose a spawn for the local player.
-                if (string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.SpawnPlayer, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(p.kind, "SpawnPoint", StringComparison.OrdinalIgnoreCase))
+                if (
+                    string.Equals(
+                        p.kind,
+                        TileAdjacencyAtlas.PlaceableKind.SpawnPlayer,
+                        StringComparison.OrdinalIgnoreCase
+                    ) || string.Equals(p.kind, "SpawnPoint", StringComparison.OrdinalIgnoreCase)
+                )
                 {
                     var marker = inst.GetComponent<PlayerSpawnPoint>();
                     if (marker == null)
                     {
                         marker = inst.AddComponent<PlayerSpawnPoint>();
-                        marker.playerIndex = -1;   // default: any player
+                        marker.playerIndex = -1; // default: any player
                         marker.weight = 1f;
                     }
                 }
-                else if (string.Equals(p.kind, TileAdjacencyAtlas.PlaceableKind.Enemy, StringComparison.OrdinalIgnoreCase) ||
-                         string.Equals(p.kind, "EnemySpawn", StringComparison.OrdinalIgnoreCase))
+                else if (
+                    string.Equals(
+                        p.kind,
+                        TileAdjacencyAtlas.PlaceableKind.Enemy,
+                        StringComparison.OrdinalIgnoreCase
+                    ) || string.Equals(p.kind, "EnemySpawn", StringComparison.OrdinalIgnoreCase)
+                )
                 {
                     var marker = inst.GetComponent<EnemySpawnPoint>();
                     if (marker == null)
@@ -418,14 +509,16 @@ public class LevelRuntime : MonoBehaviour
         }
     }
 
-
     // ---------- Registry API (singleton-friendly via LevelRuntime.Active) ----------
 
     public GameObject GetRegistryPrefab(string uid)
     {
         if (entityRegistry == null)
         {
-            Debug.LogError($"LevelRuntime '{name}' has no entityRegistry assigned; cannot resolve uid '{uid}'.", this);
+            Debug.LogError(
+                $"LevelRuntime '{name}' has no entityRegistry assigned; cannot resolve uid '{uid}'.",
+                this
+            );
             return null; // explicit config error; avoids immediate null-ref crash
         }
 
@@ -433,10 +526,16 @@ public class LevelRuntime : MonoBehaviour
         return entityRegistry.GetPrefabByUID(uid);
     }
 
-    public GameObject InstantiateRegistryPrefab(string key, Vector3 position, Quaternion rotation, Transform parent = null)
+    public GameObject InstantiateRegistryPrefab(
+        string key,
+        Vector3 position,
+        Quaternion rotation,
+        Transform parent = null
+    )
     {
         var prefab = GetRegistryPrefab(key);
-        if (prefab == null) return null;
+        if (prefab == null)
+            return null;
 
         var targetParent = parent ?? ResolveEntitiesRoot();
         var go = Instantiate(prefab, position, rotation, targetParent);
@@ -445,7 +544,13 @@ public class LevelRuntime : MonoBehaviour
         return go;
     }
 
-    public T InstantiateRegistryPrefab<T>(string key, Vector3 position, Quaternion rotation, Transform parent = null) where T : Component
+    public T InstantiateRegistryPrefab<T>(
+        string key,
+        Vector3 position,
+        Quaternion rotation,
+        Transform parent = null
+    )
+        where T : Component
     {
         var go = InstantiateRegistryPrefab(key, position, rotation, parent);
         return go != null ? go.GetComponent<T>() : null;
@@ -455,7 +560,11 @@ public class LevelRuntime : MonoBehaviour
     /// Spawn (or respawn) the local player at the given spawn point, consuming one life.
     /// Stores the spawn as the current respawn point and wires the camera rig to the new instance.
     /// </summary>
-    public PlayerEntity SpawnLocalPlayerAt(PlayerSpawnPoint spawnPoint, int playerIndex = 0, bool isRespawn = false)
+    public PlayerEntity SpawnLocalPlayerAt(
+        PlayerSpawnPoint spawnPoint,
+        int playerIndex = 0,
+        bool isRespawn = false
+    )
     {
         if (!spawnLocalPlayer || spawnPoint == null)
             return null;
@@ -491,7 +600,11 @@ public class LevelRuntime : MonoBehaviour
         Vector3 spawnPos = spawnPoint.transform.position;
         Quaternion spawnRot = Quaternion.identity;
 
-        var playerEntity = InstantiateRegistryPrefab<PlayerEntity>(localPlayerRegistryKey, spawnPos, spawnRot);
+        var playerEntity = InstantiateRegistryPrefab<PlayerEntity>(
+            localPlayerRegistryKey,
+            spawnPos,
+            spawnRot
+        );
         if (playerEntity == null)
             return null;
 
@@ -564,22 +677,28 @@ public class LevelRuntime : MonoBehaviour
         // No CameraControl found — if a `playerCamera` is assigned, log guidance.
         if (playerCamera != null)
         {
-            Debug.LogWarning("LevelRuntime: No CameraControl found in scene; assign the camera rig to set follow target. `playerCamera` is present but LevelRuntime will not auto-wire it.", this);
+            Debug.LogWarning(
+                "LevelRuntime: No CameraControl found in scene; assign the camera rig to set follow target. `playerCamera` is present but LevelRuntime will not auto-wire it.",
+                this
+            );
         }
         else
         {
-            Debug.LogWarning("LevelRuntime: No CameraControl found in scene and no `playerCamera` is assigned. Camera will not follow the spawned player.", this);
+            Debug.LogWarning(
+                "LevelRuntime: No CameraControl found in scene and no `playerCamera` is assigned. Camera will not follow the spawned player.",
+                this
+            );
         }
     }
-
 
     // No reflection into fields: registry must implement a direct API.
     void AutoConfigureFromChildren()
     {
         // Use colliders from the levelContainer only (entities are dynamic/non-world and excluded).
-        var cols = levelContainer != null
-            ? levelContainer.GetComponentsInChildren<Collider>(includeInactive: true)
-            : Array.Empty<Collider>();
+        var cols =
+            levelContainer != null
+                ? levelContainer.GetComponentsInChildren<Collider>(includeInactive: true)
+                : Array.Empty<Collider>();
 
         if (cols == null || cols.Length == 0)
         {
@@ -595,7 +714,8 @@ public class LevelRuntime : MonoBehaviour
                 float fSizeZ = Mathf.Max(1f, levelAtlas.height);
                 levelBoundsXZ = new Bounds(
                     new Vector3((fSizeX) * 0.5f, transform.position.y, (fSizeZ) * 0.5f),
-                    new Vector3(fSizeX, 0f, fSizeZ));
+                    new Vector3(fSizeX, 0f, fSizeZ)
+                );
             }
             return;
         }
@@ -612,27 +732,38 @@ public class LevelRuntime : MonoBehaviour
         for (int i = 0; i < cols.Length; i++)
         {
             var c = cols[i];
-            if (c == null) continue;
+            if (c == null)
+                continue;
 
             int layerMaskBit = 1 << c.gameObject.layer;
 
             // Floor tiles drive the grid origin extents.
-            if ((floorLayers.value & layerMaskBit) != 0 ||
-                (portalLayers.value & layerMaskBit) != 0 ||
-                (doorLayers.value & layerMaskBit) != 0)
+            if (
+                (floorLayers.value & layerMaskBit) != 0
+                || (portalLayers.value & layerMaskBit) != 0
+                || (doorLayers.value & layerMaskBit) != 0
+            )
             {
                 anyFloor = true;
                 Bounds b = c.bounds;
                 Vector3 p = b.center;
-                if (p.x < minX) minX = p.x;
-                if (p.z < minZ) minZ = p.z;
-                if (p.x > maxX) maxX = p.x;
-                if (p.z > maxZ) maxZ = p.z;
+                if (p.x < minX)
+                    minX = p.x;
+                if (p.z < minZ)
+                    minZ = p.z;
+                if (p.x > maxX)
+                    maxX = p.x;
+                if (p.z > maxZ)
+                    maxZ = p.z;
                 // include extents so we don't clip edges
-                if (b.max.x > maxX) maxX = b.max.x;
-                if (b.max.z > maxZ) maxZ = b.max.z;
-                if (b.min.x < minX) minX = b.min.x;
-                if (b.min.z < minZ) minZ = b.min.z;
+                if (b.max.x > maxX)
+                    maxX = b.max.x;
+                if (b.max.z > maxZ)
+                    maxZ = b.max.z;
+                if (b.min.x < minX)
+                    minX = b.min.x;
+                if (b.min.z < minZ)
+                    minZ = b.min.z;
             }
         }
 
@@ -655,7 +786,11 @@ public class LevelRuntime : MonoBehaviour
         levelBoundsXZ = new Bounds();
         float sizeX = (maxX - minX);
         float sizeZ = (maxZ - minZ);
-        Vector3 center = new Vector3(minX + sizeX * 0.5f, transform.position.y, minZ + sizeZ * 0.5f);
+        Vector3 center = new Vector3(
+            minX + sizeX * 0.5f,
+            transform.position.y,
+            minZ + sizeZ * 0.5f
+        );
         Vector3 size = new Vector3(sizeX, 0f, sizeZ);
         levelBoundsXZ.center = center;
         levelBoundsXZ.size = size;
@@ -685,24 +820,30 @@ public class LevelRuntime : MonoBehaviour
         {
             levelBoundsXZ = new Bounds(
                 new Vector3((atlasMin.x + atlasMax.x) * 0.5f, y, (atlasMin.z + atlasMax.z) * 0.5f),
-                new Vector3(w, 0f, h));
+                new Vector3(w, 0f, h)
+            );
             return;
         }
 
         // Expand existing bounds to include atlas bounds (never shrink).
         Vector3 min = levelBoundsXZ.min;
         Vector3 max = levelBoundsXZ.max;
-        if (atlasMin.x < min.x) min.x = atlasMin.x;
-        if (atlasMin.z < min.z) min.z = atlasMin.z;
-        if (atlasMax.x > max.x) max.x = atlasMax.x;
-        if (atlasMax.z > max.z) max.z = atlasMax.z;
+        if (atlasMin.x < min.x)
+            min.x = atlasMin.x;
+        if (atlasMin.z < min.z)
+            min.z = atlasMin.z;
+        if (atlasMax.x > max.x)
+            max.x = atlasMax.x;
+        if (atlasMax.z > max.z)
+            max.z = atlasMax.z;
 
         levelBoundsXZ.SetMinMax(min, max);
     }
 
     void ConfigureGridGraph(AstarPath path)
     {
-        if (path == null) return;
+        if (path == null)
+            return;
     }
 
     System.Collections.IEnumerator ConfigureAndScanNextFrame(AstarPath path, LevelSetup setup)
@@ -726,18 +867,25 @@ public class LevelRuntime : MonoBehaviour
 
     void ConfigureGridGraphFromAtlas(AstarPath path)
     {
-        if (path == null || levelAtlas == null) return;
+        if (path == null || levelAtlas == null)
+            return;
 
         // All grid cells are exactly 1m apart.
         GridGraph graph = EnsureGridGraph(path);
-        if (graph == null) return;
+        if (graph == null)
+            return;
+
+        graph.neighbours = NumNeighbours.Four;
+        graph.cutCorners = false;
+        graph.maxClimb = 0f;
+        graph.maxSlope = 0f;
 
         // Use walls as unwalkable obstacles, with a reduced sampling footprint so 1-wide corridors stay open.
         graph.collision.use2D = false;
         graph.collision.collisionCheck = true;
-        graph.collision.mask = wallLayers;    // only walls block
+        graph.collision.mask = wallLayers; // only walls block
         graph.collision.thickRaycast = false;
-        graph.collision.diameter = 0.5f;      // default is 1; smaller keeps nodes off wall corners
+        graph.collision.diameter = 0.5f; // default is 1; smaller keeps nodes off wall corners
         graph.collision.collisionOffset = -0.45f; // inset more aggressively
 
         graph.collision.heightCheck = true;
@@ -755,22 +903,30 @@ public class LevelRuntime : MonoBehaviour
         float gCenterZ = fSizeZ * 0.5f + 0.5f;
 
         // If colliders exist, expand (never shrink) to cover them.
-        var cols = levelContainer != null
-            ? levelContainer.GetComponentsInChildren<Collider>(includeInactive: true)
-            : Array.Empty<Collider>();
+        var cols =
+            levelContainer != null
+                ? levelContainer.GetComponentsInChildren<Collider>(includeInactive: true)
+                : Array.Empty<Collider>();
         if (cols != null && cols.Length > 0)
         {
-            float minX = float.PositiveInfinity, maxX = float.NegativeInfinity;
-            float minZ = float.PositiveInfinity, maxZ = float.NegativeInfinity;
+            float minX = float.PositiveInfinity,
+                maxX = float.NegativeInfinity;
+            float minZ = float.PositiveInfinity,
+                maxZ = float.NegativeInfinity;
             for (int i = 0; i < cols.Length; i++)
             {
                 var c = cols[i];
-                if (c == null) continue;
+                if (c == null)
+                    continue;
                 var b = c.bounds;
-                if (b.min.x < minX) minX = b.min.x;
-                if (b.max.x > maxX) maxX = b.max.x;
-                if (b.min.z < minZ) minZ = b.min.z;
-                if (b.max.z > maxZ) maxZ = b.max.z;
+                if (b.min.x < minX)
+                    minX = b.min.x;
+                if (b.max.x > maxX)
+                    maxX = b.max.x;
+                if (b.min.z < minZ)
+                    minZ = b.min.z;
+                if (b.max.z > maxZ)
+                    maxZ = b.max.z;
             }
             float cSizeX = Mathf.Max(fSizeX, maxX - minX);
             float cSizeZ = Mathf.Max(fSizeZ, maxZ - minZ);
@@ -780,7 +936,7 @@ public class LevelRuntime : MonoBehaviour
             gCenterZ = Mathf.Max(gCenterZ, minZ + cSizeZ * 0.5f + 0.5f);
         }
 
-        graph.center = new Vector3(gCenterX, -0.5f, gCenterZ);
+        graph.center = new Vector3(gCenterX - 1f, -0.5f, gCenterZ - 1f);
         graph.SetDimensions(gWidth, gDepth, 1f);
     }
 
@@ -800,14 +956,16 @@ public class LevelRuntime : MonoBehaviour
 
     void EvaluateGameState()
     {
-        if (_gameOverTriggered || _winTriggered) return;
+        if (_gameOverTriggered || _winTriggered)
+            return;
 
         // Win condition: no remaining ItemPickup objects (coins) in the entities root.
         int remainingCoins = CountRemainingCoins();
         if (remainingCoins <= 0)
         {
             _winTriggered = true;
-            if (winHUD != null) winHUD.SetActive(true);
+            if (winHUD != null)
+                winHUD.SetActive(true);
             try
             {
                 onLevelWon?.Invoke();
@@ -820,7 +978,6 @@ public class LevelRuntime : MonoBehaviour
             DestroyPlayerAndEntities();
             return;
         }
-
     }
 
     public int CountRemainingCoins()
@@ -831,8 +988,10 @@ public class LevelRuntime : MonoBehaviour
         for (int i = 0; i < pickups.Length; i++)
         {
             var p = pickups[i];
-            if (p == null) continue;
-            if (!p.gameObject.activeInHierarchy) continue;
+            if (p == null)
+                continue;
+            if (!p.gameObject.activeInHierarchy)
+                continue;
             count++;
         }
         return count;
@@ -877,16 +1036,19 @@ public class LevelRuntime : MonoBehaviour
         for (int i = 0; i < players.Length; i++)
         {
             var p = players[i];
-            if (p == null) continue;
+            if (p == null)
+                continue;
             // If any player is not marked dead, we're not game over.
-            if (!p.isDead) return false;
+            if (!p.isDead)
+                return false;
         }
         return true;
     }
 
     GridGraph EnsureGridGraph(AstarPath path)
     {
-        if (path == null) return null;
+        if (path == null)
+            return null;
         var data = path.data;
         GridGraph graph = null;
         for (int i = 0; i < data.graphs.Length; i++)
@@ -897,7 +1059,8 @@ public class LevelRuntime : MonoBehaviour
         }
         if (graph == null)
             graph = data.AddGraph(typeof(GridGraph)) as GridGraph;
-        if (graph == null) return null;
+        if (graph == null)
+            return null;
 
         graph.isometricAngle = 0f;
         graph.uniformEdgeCosts = true;
@@ -918,11 +1081,16 @@ public class LevelRuntime : MonoBehaviour
         var spawnPool = AcquireEnemySpawnPoints(restrictGhostAutoSpawnsToGhostMarkers);
         if (spawnPool == null || spawnPool.Count == 0)
         {
-            Debug.LogWarning("LevelRuntime: No EnemySpawnPoint instances available for ghost auto-spawn.", this);
+            Debug.LogWarning(
+                "LevelRuntime: No EnemySpawnPoint instances available for ghost auto-spawn.",
+                this
+            );
             return;
         }
 
-        var uniquePool = enforceUniqueGhostSpawnTiles ? new List<EnemySpawnPoint>(spawnPool) : spawnPool;
+        var uniquePool = enforceUniqueGhostSpawnTiles
+            ? new List<EnemySpawnPoint>(spawnPool)
+            : spawnPool;
 
         for (int i = 0; i < ghostEnemyRegistryKeys.Length; i++)
         {
@@ -951,7 +1119,10 @@ public class LevelRuntime : MonoBehaviour
             GameObject ghost = InstantiateRegistryPrefab(key, position, rotation);
             if (ghost == null)
             {
-                Debug.LogError($"LevelRuntime: Failed to auto-spawn ghost '{key}'. Verify the registry entry exists.", this);
+                Debug.LogError(
+                    $"LevelRuntime: Failed to auto-spawn ghost '{key}'. Verify the registry entry exists.",
+                    this
+                );
             }
         }
     }
@@ -1050,7 +1221,8 @@ public class LevelRuntime : MonoBehaviour
             {
                 var spawn = pool[i];
                 float w = Mathf.Max(0f, spawn.weight);
-                if (w <= 0f) continue;
+                if (w <= 0f)
+                    continue;
                 accum += w;
                 if (r <= accum)
                 {
