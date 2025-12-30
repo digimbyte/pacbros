@@ -888,7 +888,7 @@ public class LevelRuntime : MonoBehaviour
         graph.collision.diameter = 0.5f; // default is 1; smaller keeps nodes off wall corners
         graph.collision.collisionOffset = -0.45f; // inset more aggressively
 
-        graph.collision.heightCheck = true;
+        graph.collision.heightCheck = false;
         graph.collision.heightMask = floorLayers | portalLayers | doorLayers;
         graph.collision.fromHeight = 5f;
         graph.collision.height = 10f;
