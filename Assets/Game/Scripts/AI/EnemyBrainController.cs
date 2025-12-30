@@ -367,6 +367,10 @@ public class EnemyBrainController : MonoBehaviour
     float _lastDecisionAt;
     Vector2Int _lastDecisionCell;
 
+    // Direction commitment (prevents immediate reversal after turns)
+    Vector2Int _committedDir;
+    float _commitmentEndsAt;
+
     // Repath policy (axis change + min cells)
     bool _wantsAxisRepath;
     int _cellsSinceLastRepath;
@@ -522,6 +526,12 @@ public class EnemyBrainController : MonoBehaviour
             DrawPlayerPath();
             DrawDestinationLine();
             DrawStatusIndicator();
+        }
+
+        // Always draw red panic indicator
+        if (_inPanic)
+        {
+            Debug.DrawLine(transform.position, transform.position + Vector3.up * 2f, Color.red, 0f);
         }
     }
 
@@ -1106,7 +1116,8 @@ public class EnemyBrainController : MonoBehaviour
         }
 
         // Decide only once per cell while centered-ish (prevents multi-frame rerolls at junctions)
-        if (currentGrid == _lastDecisionCell && !_isStuck)
+        // But allow re-decision if stopped (MUST NEVER remain still) or stuck
+        if (currentGrid == _lastDecisionCell && !_isStuck && curDirBrain != Vector2Int.zero)
             return;
 
         Vector2Int astarDir = GetAStarAdviceDir();
@@ -1154,6 +1165,16 @@ public class EnemyBrainController : MonoBehaviour
                     s += turnBonus;
             }
 
+            // DEAD END PRIORITIES: When we MUST turn, strongly prefer bends over reversing
+            if (isDeadEnd && curDirBrain != Vector2Int.zero)
+            {
+                if (d != rev2)
+                {
+                    s += 0.6f; // 60% bonus for any turn (all turns are perpendicular in 4-way grid)
+                }
+                // Reversing gets no bonus - heat map will discourage retracing footsteps
+            }
+
             if (d == astarDir)
                 s += astarBias;
             if (d == marchDir)
@@ -1177,12 +1198,14 @@ public class EnemyBrainController : MonoBehaviour
                     s -= portalAvoidHeat; // big shove away
             }
 
+            // HEAVY PENALTY: Cannot reverse committed direction (prevents turn-then-immediate-reverse)
+            if (Time.time < _commitmentEndsAt && d == -_committedDir)
+                s -= 10f; // Massive penalty for reversing committed direction
+
             if (useSharedHeatMap && sharedHeatAvoidanceWeight > 0f)
                 s -= GetSharedHeat(stepCell) * sharedHeatAvoidanceWeight;
 
-            // If we *are* allowed to reverse (dead end), still slightly discourage it
-            if (curDirBrain != Vector2Int.zero && d == rev2 && isDeadEnd && !_isStuck && !_inPanic)
-                s -= 0.25f;
+            // Dead end priorities handled above - heat map provides bias against retracing footsteps
 
             s += Random.Range(-randomness, randomness);
 
@@ -1245,6 +1268,13 @@ public class EnemyBrainController : MonoBehaviour
         _lastChosenDir = chosenBrainDir;
         _lastDirChangeAt = Time.time;
         _lastDecisionCell = currentGrid;
+
+        // Set direction commitment to prevent immediate reversal
+        if (chosenBrainDir != Vector2Int.zero && chosenBrainDir != curDirBrain)
+        {
+            _committedDir = chosenBrainDir;
+            _commitmentEndsAt = Time.time + 2.0f; // Commit to direction for 2 seconds
+        }
 
         // Your requested rule: repath on axis change, throttled by minCellsBetweenAxisRepath
         if (chosenBrainDir != Vector2Int.zero && chosenBrainDir != curDirBrain)
@@ -1627,6 +1657,10 @@ public class EnemyBrainController : MonoBehaviour
     void EnterPanic()
     {
         _inPanic = true;
+
+        // Reset direction commitment during panic (allows more flexible movement)
+        _committedDir = Vector2Int.zero;
+        _commitmentEndsAt = 0f;
 
         if (enableGhostOnPanic && _enemy != null)
             _enemy.isGhost = true;

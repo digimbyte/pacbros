@@ -118,6 +118,10 @@ public class PathFinding : MonoBehaviour
 
     void Update()
     {
+        // Don't control motor if there's an AI brain making decisions
+        if (GetComponent<EnemyBrainController>() != null)
+            return;
+
         if (motor == null)
         {
             // Attempt to recover motor reference every frame until found (cheap check).
