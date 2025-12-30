@@ -12,13 +12,18 @@ using Pathfinding;
 /// - IMPORTANT: Grid math matches GridMotor.cs:
 ///     * World->Cell uses FLOOR on (world - gridOrigin) / cellSize
 ///     * Cell center is gridOrigin + (cell + 0.5) * cellSize
+///
+/// NOTE (your request):
+/// - GhostRole enum + field are PURGED.
+/// - Classic 4-corner scatter behavior is preserved by *mapping BrainType -> classic corner slot* (inspiration),
+///   while BrainType remains the real behavior driver.
 /// </summary>
 public enum EnemyBrainType
 {
-    Sniffer,
-    Curious,
-    Assault,
-    Afraid
+    Sniffer,   // breadcrumb tracker
+    Curious,   // wander/predict hybrid
+    Assault,   // aggressive interceptor
+    Afraid     // keep-away / flee
 }
 
 [RequireComponent(typeof(EnemyEntity))]
@@ -26,7 +31,6 @@ public enum EnemyBrainType
 [RequireComponent(typeof(PathFinding))]
 public class EnemyBrainController : MonoBehaviour
 {
-
     public enum GhostMode
     {
         Scatter,
@@ -84,7 +88,6 @@ public class EnemyBrainController : MonoBehaviour
     )]
     public float stoppedSteerEpsilon = 0.60f;
 
-    // How far from the cell center (meters along travel axis) we start buffering a turn.
     [Tooltip("Pre-turn window for buffering desired turns before hitting cell center.")]
     public float preTurnWindow = 0.35f;
 
@@ -134,10 +137,10 @@ public class EnemyBrainController : MonoBehaviour
 
     [Range(0f, 1f)]
     public float sharedHeatAvoidanceWeight = 0.15f;
-    static readonly Dictionary<Vector2Int, float> _sharedHeatMap = new Dictionary<
-        Vector2Int,
-        float
-    >(1024);
+
+    static readonly Dictionary<Vector2Int, float> _sharedHeatMap = new Dictionary<Vector2Int, float>(
+        1024
+    );
     static float _sharedHeatMapNextUpdate;
 
     [Header("Per-Entity Heat (loop avoidance)")]
@@ -163,6 +166,9 @@ public class EnemyBrainController : MonoBehaviour
     )]
     public LayerMask enemySpawnMask;
 
+    [Tooltip("If you tag spawn tile objects, set the tag here (optional).")]
+    public string enemySpawnTag = "EnemySpawn";
+
     [Header("Portal Avoidance")]
     public LayerMask portalMask;
     public string portalTag = "Portal";
@@ -170,9 +176,6 @@ public class EnemyBrainController : MonoBehaviour
     public float portalAllowAfterSeenSeconds = 3.0f;
     public float portalDesperationAfterNoSightSeconds = 6.0f;
     float _portalAllowedUntil = -999f;
-
-    [Tooltip("If you tag spawn tile objects, set the tag here (optional).")]
-    public string enemySpawnTag = "EnemySpawn";
 
     // ----------------------------
     // Debug / Diagnostics
@@ -398,8 +401,12 @@ public class EnemyBrainController : MonoBehaviour
     {
         _tracker = PlayerTracker.EnsureInstance();
         _nextFloorScanAt = Time.time + Random.Range(0f, floorSpaceScanInterval);
+
         _modeUntil = Time.time + scatterSeconds;
         mode = GhostMode.Scatter;
+
+        // Prevent "immediately desperate" portal allowance on spawn.
+        _lastSeenPlayerTime = Time.time;
     }
 
     void OnDestroy()
@@ -432,6 +439,8 @@ public class EnemyBrainController : MonoBehaviour
             return;
         }
 
+        UpdateTargetSelection();
+
         CheckAStarReachabilityToPlayer();
 
         UpdateStuckDetection();
@@ -439,8 +448,8 @@ public class EnemyBrainController : MonoBehaviour
         UpdatePerEntityHeatTracking();
         UpdatePanicMeter();
         UpdateDoorOverrideTracker();
+        UpdatePortalAllowanceFromBreadcrumbs();
 
-        UpdateTargetSelection();
         UpdateVisionAndMode();
 
         if (_currentTarget == null)
@@ -478,20 +487,28 @@ public class EnemyBrainController : MonoBehaviour
         }
         else
         {
-            switch (brainType)
+            // Scatter overrides destination (corner), but NOT the steering/heat/policies.
+            if (mode == GhostMode.Scatter)
             {
-                case EnemyBrainType.Sniffer:
-                    UpdateSniffer();
-                    break;
-                case EnemyBrainType.Curious:
-                    UpdateCurious(dt);
-                    break;
-                case EnemyBrainType.Assault:
-                    UpdateAssault(dt);
-                    break;
-                case EnemyBrainType.Afraid:
-                    UpdateAfraid();
-                    break;
+                ScheduleDestination(GetScatterCorner(), forceImmediate: false);
+            }
+            else
+            {
+                switch (brainType)
+                {
+                    case EnemyBrainType.Sniffer:
+                        UpdateSniffer();
+                        break;
+                    case EnemyBrainType.Curious:
+                        UpdateCurious(dt);
+                        break;
+                    case EnemyBrainType.Assault:
+                        UpdateAssault(dt);
+                        break;
+                    case EnemyBrainType.Afraid:
+                        UpdateAfraid();
+                        break;
+                }
             }
         }
 
@@ -545,7 +562,7 @@ public class EnemyBrainController : MonoBehaviour
     // --------------------------------------------------------------------
     Vector2Int BrainToMotorDir(Vector2Int d)
     {
-        // brain basis: (x, z)
+        // brain basis: (x, z) where Vector2Int.y represents Z
         int x = d.x;
         int z = d.y;
 
@@ -1039,18 +1056,22 @@ public class EnemyBrainController : MonoBehaviour
 
     void TickMoveDecision()
     {
-        // Only decide at cell centers (chess) - use stopped epsilon when not moving
         var curDirBrain = MotorCurDirBrain();
-
         bool blockedForward = (curDirBrain != Vector2Int.zero && MotorIsBlockedBrain(curDirBrain));
+
         float eps =
             (curDirBrain == Vector2Int.zero || blockedForward)
                 ? stoppedSteerEpsilon
                 : centerSnapEpsilon;
-        if (!IsNearCellCenter(eps) && !blockedForward)
+
+        // CORNER-AWARE DECISION GATE:
+        // - When moving, we allow decisions inside a "preTurnWindow" along travel axis,
+        //   but require snapping on the perpendicular axis (prevents ignoring side gaps).
+        if (!IsNearDecisionPoint(curDirBrain, eps) && !blockedForward)
             return;
 
         Vector2Int currentGrid = WorldToGrid(transform.position);
+
         // Hard rule: if there's only one way out (or one way excluding reverse), take it.
         List<Vector2Int> openDirs = new List<Vector2Int>(4);
         Vector2Int[] dirs4 = { Vector2Int.up, Vector2Int.down, Vector2Int.left, Vector2Int.right };
@@ -1083,12 +1104,17 @@ public class EnemyBrainController : MonoBehaviour
                     return;
                 }
         }
-        // Decide only once per cell while centered (prevents multi-frame rerolls at the center)
+
+        // Decide only once per cell while centered-ish (prevents multi-frame rerolls at junctions)
         if (currentGrid == _lastDecisionCell && !_isStuck)
             return;
 
         Vector2Int astarDir = GetAStarAdviceDir();
         Vector2Int marchDir = GetMarchAdviceDir();
+
+        // Dynamic blending: chase leans A*, scatter leans marching/heat exploration.
+        float astarBias = astarVote * (mode == GhostMode.Chase ? 1.0f : 0.35f);
+        float marchBias = marchVote * (mode == GhostMode.Scatter ? 1.0f : 0.65f);
 
         var options = new List<Vector2Int>(4)
         {
@@ -1100,7 +1126,7 @@ public class EnemyBrainController : MonoBehaviour
 
         float minS = float.PositiveInfinity;
         var candidates = new List<(Vector2Int d, float s)>(4);
-        Vector2Int reverseDir = -curDirBrain;
+        Vector2Int rev2 = -curDirBrain;
         int openCount = 0;
         for (int i = 0; i < options.Count; i++)
             if (!MotorIsBlockedBrain(options[i]))
@@ -1112,8 +1138,9 @@ public class EnemyBrainController : MonoBehaviour
         {
             if (MotorIsBlockedBrain(d))
                 continue;
+
             // HARD RULE: cannot reverse unless dead end (or stuck/panic)
-            if (curDirBrain != Vector2Int.zero && d == reverseDir && !isDeadEnd && !_isStuck && !_inPanic)
+            if (curDirBrain != Vector2Int.zero && d == rev2 && !isDeadEnd && !_isStuck && !_inPanic)
                 continue;
 
             float s = 1f;
@@ -1123,34 +1150,38 @@ public class EnemyBrainController : MonoBehaviour
             {
                 if (d == curDirBrain)
                     s += straightBonus;
-                else if (d != reverseDir)
+                else if (d != rev2)
                     s += turnBonus;
             }
 
             if (d == astarDir)
-                s += astarVote;
+                s += astarBias;
             if (d == marchDir)
-                s += marchVote;
-            if (astarDir == Vector2Int.zero && d == marchDir)
-                s += marchVote; // extra recovery
+                s += marchBias;
 
-            // s -= GetPerEntityHeat(currentGrid + d) * perEntityHeatWeight;
+            // Buffered A* gets a small extra nudge (helps early commitment at corners)
+            if (_bufferedDir != Vector2Int.zero && d == _bufferedDir)
+                s += astarBias * 0.25f;
+
+            if (astarDir == Vector2Int.zero && d == marchDir)
+                s += marchBias; // extra recovery
+
             Vector2Int stepCell = currentGrid + d;
             s -= GetPerEntityHeat(stepCell) * perEntityHeatWeight;
 
             // Portal avoidance unless allowed / panic
             if (!_inPanic && Time.time > _portalAllowedUntil)
             {
-                // Simplified: no portal world checking in this version
-                // if (IsPortalWorld(stepWorld))
-                //     s -= portalAvoidHeat; // big shove away
+                Vector3 stepWorld = GridToWorldCenter(stepCell);
+                if (IsPortalWorld(stepWorld))
+                    s -= portalAvoidHeat; // big shove away
             }
 
             if (useSharedHeatMap && sharedHeatAvoidanceWeight > 0f)
-                s -= GetSharedHeat(currentGrid + d) * sharedHeatAvoidanceWeight;
+                s -= GetSharedHeat(stepCell) * sharedHeatAvoidanceWeight;
 
-            // if we *are* allowed to reverse (dead end), still slightly discourage it
-            if (curDirBrain != Vector2Int.zero && d == reverseDir && isDeadEnd && !_isStuck && !_inPanic)
+            // If we *are* allowed to reverse (dead end), still slightly discourage it
+            if (curDirBrain != Vector2Int.zero && d == rev2 && isDeadEnd && !_isStuck && !_inPanic)
                 s -= 0.25f;
 
             s += Random.Range(-randomness, randomness);
@@ -1185,6 +1216,30 @@ public class EnemyBrainController : MonoBehaviour
         CommitDirection(currentGrid, curDirBrain, candidates[candidates.Count - 1].d);
     }
 
+    bool IsNearDecisionPoint(Vector2Int curDirBrain, float eps)
+    {
+        if (_motor == null)
+            return true;
+
+        Vector2Int cell = WorldToGrid(transform.position);
+        Vector3 c = GridToWorldCenter(cell);
+
+        float dx = Mathf.Abs(transform.position.x - c.x);
+        float dz = Mathf.Abs(transform.position.z - c.z);
+
+        // Stopped: require both axes within eps
+        if (curDirBrain == Vector2Int.zero)
+            return (dx <= eps && dz <= eps);
+
+        // Moving: lock perpendicular axis tightly, allow a window on travel axis.
+        float w = Mathf.Max(0.05f, preTurnWindow);
+
+        if (curDirBrain.x != 0) // moving along X
+            return (dz <= eps && dx <= w);
+        // moving along Z
+        return (dx <= eps && dz <= w);
+    }
+
     void CommitDirection(Vector2Int currentGrid, Vector2Int curDirBrain, Vector2Int chosenBrainDir)
     {
         _lastChosenDir = chosenBrainDir;
@@ -1200,11 +1255,9 @@ public class EnemyBrainController : MonoBehaviour
 
     Vector2Int GetAStarAdviceDir()
     {
-        // IMPORTANT FIX:
-        // Use the vectorPath segment direction in world-space to avoid "diagonal delta => X-first bias".
+        // Use vectorPath segment direction in world-space to avoid "diagonal delta => X-first bias".
         if (_currentPathPoints != null && _currentPathPoints.Count >= 2)
         {
-            // Find the next point that isn't basically our current position.
             Vector3 here = transform.position;
             int idx = 0;
             while (
@@ -1226,7 +1279,6 @@ public class EnemyBrainController : MonoBehaviour
                 if (d.z > 0.05f && !MotorIsBlockedBrain(Vector2Int.up))
                     return Vector2Int.up;
 
-                // choose dominant axis
                 Vector2Int brainDir;
                 if (Mathf.Abs(d.x) >= Mathf.Abs(d.z))
                     brainDir = d.x >= 0f ? Vector2Int.right : Vector2Int.left;
@@ -1313,9 +1365,11 @@ public class EnemyBrainController : MonoBehaviour
     }
 
     static Vector2Int TurnLeft(Vector2Int d) => new Vector2Int(-d.y, d.x);
-
     static Vector2Int TurnRight(Vector2Int d) => new Vector2Int(d.y, -d.x);
 
+    // --------------------------------------------------------------------
+    // Scatter corner (BrainType -> classic corner slot mapping)
+    // --------------------------------------------------------------------
     Vector3 GetScatterCorner()
     {
         var rt = LevelRuntime.Active;
@@ -1324,13 +1378,17 @@ public class EnemyBrainController : MonoBehaviour
 
         var b = rt.levelBoundsXZ;
 
-        // 4 corners by brain type (classic ghost corners)
+        // Mapping (inspiration only):
+        // Assault  -> corner slot 0 (maxX,maxZ)
+        // Sniffer  -> corner slot 1 (minX,maxZ)
+        // Curious  -> corner slot 2 (maxX,minZ)
+        // Afraid   -> corner slot 3 (minX,minZ)
         return brainType switch
         {
-            EnemyBrainType.Sniffer => new Vector3(b.max.x, b.center.y, b.max.z),  // Red corner
-            EnemyBrainType.Curious => new Vector3(b.min.x, b.center.y, b.max.z),  // Pink corner
-            EnemyBrainType.Assault => new Vector3(b.max.x, b.center.y, b.min.z),  // Blue corner
-            _ => new Vector3(b.min.x, b.center.y, b.min.z),                       // Orange corner (Afraid)
+            EnemyBrainType.Assault => new Vector3(b.max.x, b.center.y, b.max.z),
+            EnemyBrainType.Sniffer => new Vector3(b.min.x, b.center.y, b.max.z),
+            EnemyBrainType.Curious => new Vector3(b.max.x, b.center.y, b.min.z),
+            _ => new Vector3(b.min.x, b.center.y, b.min.z),
         };
     }
 
@@ -1353,6 +1411,8 @@ public class EnemyBrainController : MonoBehaviour
         _lastRecordedTile = tile;
 
         _recentTiles.Enqueue(tile);
+
+        // Evict oldest history entry and correctly recompute its heat (fix: stale heat accumulation)
         if (_recentTiles.Count > perEntityHistorySize)
         {
             Vector2Int old = _recentTiles.Dequeue();
@@ -1360,19 +1420,34 @@ public class EnemyBrainController : MonoBehaviour
             {
                 oldCount = Mathf.Max(0, oldCount - 1);
                 if (oldCount == 0)
+                {
                     _tileTouchCounts.Remove(old);
+                    _tileHeat.Remove(old);
+                }
                 else
+                {
                     _tileTouchCounts[old] = oldCount;
+                    _tileHeat[old] = ComputeTileHeat(old, oldCount);
+                }
             }
         }
 
+        // Add touch for current tile
         if (_tileTouchCounts.TryGetValue(tile, out int count))
             count++;
         else
             count = 1;
 
         _tileTouchCounts[tile] = count;
+        _tileHeat[tile] = ComputeTileHeat(tile, count);
 
+        // Loop pressure -> panic bump (NOT dt-scaled; this is an event, not a per-frame rate)
+        if (count > perEntityTouchThreshold)
+            _panic = Mathf.Min(panicMax, _panic + panicLoopBonus);
+    }
+
+    float ComputeTileHeat(Vector2Int tile, int count)
+    {
         float heat = 0f;
 
         if (IsSpawnTile(tile))
@@ -1381,15 +1456,13 @@ public class EnemyBrainController : MonoBehaviour
         if (count > perEntityTouchThreshold)
         {
             int extra = count - perEntityTouchThreshold;
-            heat += extra * perEntityHeatPerExtraTouch * 10f;
+            heat += extra * perEntityHeatPerExtraTouch * 10f; // your "10x shove"
         }
 
+        // baseline "recentness" penalty
         heat += count * 0.75f;
 
-        _tileHeat[tile] = heat;
-
-        if (count > perEntityTouchThreshold)
-            _panic += Time.deltaTime * panicLoopBonus;
+        return heat;
     }
 
     float GetPerEntityHeat(Vector2Int tile)
@@ -1535,6 +1608,10 @@ public class EnemyBrainController : MonoBehaviour
         if (brainType == EnemyBrainType.Assault && _assaultState == AssaultState.Holding)
             gain *= 0.25f;
 
+        // If A* says "no path to player", push panic up faster to encourage overrides/exploration.
+        if (!_hasAStarPathToPlayer && !_inPanic)
+            gain += 12f;
+
         _panic = Mathf.Clamp(_panic + gain * Time.deltaTime, 0f, panicMax);
     }
 
@@ -1563,6 +1640,9 @@ public class EnemyBrainController : MonoBehaviour
         _nextRepathTime = Time.time;
         _pathFollower.ClearPath();
         _pathPending = false;
+
+        // Panic means portals are fair game.
+        _portalAllowedUntil = Time.time + 1.0f;
     }
 
     void ExitPanic()
@@ -1641,6 +1721,13 @@ public class EnemyBrainController : MonoBehaviour
         if (!_doorOverrideArmed && doorOverrideAllowance > 0 && doorOverrideTimeout > 0f)
         {
             if (Time.time - _lastProgressTime >= doorOverrideTimeout)
+                _doorOverrideArmed = true;
+        }
+
+        // If A* says "no path", arm overrides sooner.
+        if (!_doorOverrideArmed && doorOverrideAllowance > 0 && !_hasAStarPathToPlayer)
+        {
+            if (Time.time - _lastProgressTime >= Mathf.Max(1.5f, doorOverrideTimeout * 0.50f))
                 _doorOverrideArmed = true;
         }
     }
@@ -1773,6 +1860,67 @@ public class EnemyBrainController : MonoBehaviour
     }
 
     // --------------------------------------------------------------------
+    // Portal allowance / avoidance helpers
+    // --------------------------------------------------------------------
+    void UpdatePortalAllowanceFromBreadcrumbs()
+    {
+        if (_inPanic)
+        {
+            _portalAllowedUntil = Time.time + 1.0f;
+            return;
+        }
+
+        // If we saw the player recently, allow portals briefly (chase pressure).
+        if (Time.time - _lastSeenPlayerTime <= portalAllowAfterSeenSeconds)
+        {
+            _portalAllowedUntil = Mathf.Max(_portalAllowedUntil, Time.time + portalAllowAfterSeenSeconds);
+            return;
+        }
+
+        // If we've been blind too long, allow portals as a desperation tool.
+        if (Time.time - _lastSeenPlayerTime >= portalDesperationAfterNoSightSeconds)
+        {
+            _portalAllowedUntil = Mathf.Max(_portalAllowedUntil, Time.time + 1.25f);
+        }
+    }
+
+    bool IsPortalWorld(Vector3 worldPos)
+    {
+        float r = (_motor != null ? _motor.cellSize : 1f) * 0.25f;
+
+        // Layer check first (fast)
+        if (portalMask.value != 0)
+        {
+            Collider[] cols = Physics.OverlapSphere(
+                worldPos,
+                r,
+                portalMask,
+                QueryTriggerInteraction.Collide
+            );
+            if (cols != null && cols.Length > 0)
+                return true;
+        }
+
+        // Tag fallback
+        if (!string.IsNullOrEmpty(portalTag))
+        {
+            Collider[] cols = Physics.OverlapSphere(
+                worldPos,
+                r,
+                ~0,
+                QueryTriggerInteraction.Collide
+            );
+            for (int i = 0; i < cols.Length; i++)
+            {
+                if (cols[i] != null && cols[i].CompareTag(portalTag))
+                    return true;
+            }
+        }
+
+        return false;
+    }
+
+    // --------------------------------------------------------------------
     // World/Grid helpers (MATCH GridMotor.cs)
     // --------------------------------------------------------------------
     Vector2Int WorldToGrid(Vector3 worldPos)
@@ -1793,20 +1941,6 @@ public class EnemyBrainController : MonoBehaviour
 
         return origin
             + new Vector3((cell.x + 0.5f) * cs, transform.position.y, (cell.y + 0.5f) * cs);
-    }
-
-    bool IsNearCellCenter(float eps)
-    {
-        if (_motor == null)
-            return true;
-
-        Vector2Int cell = WorldToGrid(transform.position);
-        Vector3 c = GridToWorldCenter(cell);
-
-        float dx = Mathf.Abs(transform.position.x - c.x);
-        float dz = Mathf.Abs(transform.position.z - c.z);
-
-        return (dx <= eps && dz <= eps);
     }
 
     Vector3 ClampToLevel(Vector3 pos)
@@ -2045,9 +2179,9 @@ public class EnemyBrainController : MonoBehaviour
         Debug.Log($"Path Pending: {_pathPending}", this);
         Debug.Log($"In Panic: {_inPanic} (meter: {_panic})", this);
         Debug.Log($"Is Stuck: {_isStuck}", this);
-        Debug.Log($"Near Cell Center: {IsNearCellCenter(centerSnapEpsilon)}", this);
         Debug.Log($"A* Path to Player: {_hasAStarPathToPlayer}", this);
         Debug.Log($"Brain Type: {brainType}", this);
+        Debug.Log($"Mode: {mode}", this);
         Debug.Log($"Grid Cell: {cell}", this);
 
         Debug.Log(
