@@ -283,6 +283,13 @@ public class EnemyBrainController : MonoBehaviour
     [Tooltip("Lifetime in seconds for a granted override ticket before it expires.")]
     public float doorOverrideTicketLifetime = 5f;
 
+    // Public properties for brain behaviors
+    public PlayerEntity CurrentTarget => _currentTarget;
+    public PlayerTracker PlayerTracker => _tracker;
+    public float LastDecisionAt { get => _lastDecisionAt; set => _lastDecisionAt = value; }
+    public float decisionCooldown = 0.5f;
+    public float destinationUpdateThreshold = 0.5f;
+
     // ----------------------------
     // Components / State
     // ----------------------------
@@ -293,6 +300,9 @@ public class EnemyBrainController : MonoBehaviour
     PlayerTracker _tracker;
     PlayerEntity _currentTarget;
     float _nextTargetShuffle;
+
+    // Current brain behavior
+    BrainBehavior _brain;
 
     Vector3 _desiredDestination;
     bool _hasDestination;
@@ -311,35 +321,6 @@ public class EnemyBrainController : MonoBehaviour
 
     // Marching state (brain-basis)
     Vector2Int _marchFacing = Vector2Int.right;
-
-    // Curious
-    enum CuriousMode
-    {
-        Wander,
-        Predict
-    }
-
-    CuriousMode _curiousMode = CuriousMode.Wander;
-    float _curiousModeUntil;
-    Vector3 _curiousGoal;
-
-    // Assault
-    enum AssaultState
-    {
-        Moving,
-        Holding,
-        Striking
-    }
-
-    AssaultState _assaultState = AssaultState.Moving;
-    float _assaultHoldTimer;
-    Vector3 _assaultAmbushPoint;
-    bool _isCamping;
-
-    // Afraid
-    Vector3 _afraidFleeDirection;
-    Vector3 _afraidLastPlayerPos;
-    float _lastAfraidDecision;
 
     // Stuck detection
     Vector3 _lastPos;
@@ -392,6 +373,9 @@ public class EnemyBrainController : MonoBehaviour
         _cellsSinceLastRepath = 999;
         _lastRepathCell = new Vector2Int(int.MinValue, int.MinValue);
 
+        // Initialize brain behavior
+        InitializeBrain();
+
         if (_motor != null)
             _motor.OnTeleport += OnTeleported;
 
@@ -411,6 +395,25 @@ public class EnemyBrainController : MonoBehaviour
 
         // Prevent "immediately desperate" portal allowance on spawn.
         _lastSeenPlayerTime = Time.time;
+    }
+
+    void InitializeBrain()
+    {
+        switch (brainType)
+        {
+            case EnemyBrainType.Sniffer:
+                _brain = new SnifferBrain(this);
+                break;
+            case EnemyBrainType.Curious:
+                _brain = new CuriousBrain(this);
+                break;
+            case EnemyBrainType.Assault:
+                _brain = new AssaultBrain(this);
+                break;
+            case EnemyBrainType.Afraid:
+                _brain = new AfraidBrain(this);
+                break;
+        }
     }
 
     void OnDestroy()
@@ -498,21 +501,9 @@ public class EnemyBrainController : MonoBehaviour
             }
             else
             {
-                switch (brainType)
-                {
-                    case EnemyBrainType.Sniffer:
-                        UpdateSniffer();
-                        break;
-                    case EnemyBrainType.Curious:
-                        UpdateCurious(dt);
-                        break;
-                    case EnemyBrainType.Assault:
-                        UpdateAssault(dt);
-                        break;
-                    case EnemyBrainType.Afraid:
-                        UpdateAfraid();
-                        break;
-                }
+                // Use brain behavior system
+                if (_brain != null)
+                    _brain.Update(dt);
             }
         }
 
@@ -707,185 +698,6 @@ public class EnemyBrainController : MonoBehaviour
     // --------------------------------------------------------------------
     // Brain goals
     // --------------------------------------------------------------------
-    void UpdateSniffer()
-    {
-        Vector3 targetPos = _currentTarget.transform.position;
-        float dist = Vector3.Distance(transform.position, targetPos);
-
-        Vector3 goal = targetPos;
-        var crumbs = _tracker.GetBreadcrumbs(_currentTarget);
-
-        if (dist > snifferChaseDistance)
-        {
-            if (crumbs != null && crumbs.Count > 0)
-                goal = crumbs[0];
-        }
-
-        ScheduleDestination(goal, forceImmediate: false);
-    }
-
-    void UpdateCurious(float dt)
-    {
-        if (Time.time >= _curiousModeUntil && Time.time - _lastDecisionAt >= decisionCooldown)
-            SwitchCuriousMode();
-
-        if (
-            Vector3.Distance(transform.position, _curiousGoal)
-            <= Mathf.Max(0.6f, destinationUpdateThreshold)
-        )
-        {
-            if (Time.time - _lastDecisionAt >= decisionCooldown)
-                SwitchCuriousMode();
-        }
-
-        ScheduleDestination(_curiousGoal, forceImmediate: false);
-    }
-
-    void SwitchCuriousMode()
-    {
-        _curiousMode =
-            (_curiousMode == CuriousMode.Wander) ? CuriousMode.Predict : CuriousMode.Wander;
-        float duration =
-            (_curiousMode == CuriousMode.Wander) ? curiousWanderDuration : curiousInterceptDuration;
-        _curiousModeUntil = Time.time + duration;
-        _lastDecisionAt = Time.time;
-
-        if (_curiousMode == CuriousMode.Wander)
-            _curiousGoal = SampleReachablePoint(
-                _currentTarget.transform.position,
-                curiousWanderRadius
-            );
-        else
-            _curiousGoal = PredictPlayerPosition(_currentTarget, curiousLeadTime);
-    }
-
-    void UpdateAssault(float dt)
-    {
-        switch (_assaultState)
-        {
-            case AssaultState.Moving:
-            {
-                _isCamping = false;
-
-                if (
-                    _assaultAmbushPoint == Vector3.zero
-                    || Vector3.Distance(_assaultAmbushPoint, _currentTarget.transform.position) > 2f
-                )
-                {
-                    if (Time.time - _lastDecisionAt >= decisionCooldown)
-                    {
-                        PickAmbushPoint();
-                        _lastDecisionAt = Time.time;
-                    }
-                }
-
-                if (_assaultAmbushPoint != Vector3.zero)
-                    ScheduleDestination(_assaultAmbushPoint, forceImmediate: false);
-
-                if (
-                    _assaultAmbushPoint != Vector3.zero
-                    && Vector3.Distance(transform.position, _assaultAmbushPoint)
-                        <= Mathf.Max(0.5f, destinationUpdateThreshold)
-                )
-                {
-                    if (Time.time - _lastDecisionAt >= decisionCooldown)
-                    {
-                        _assaultState = AssaultState.Holding;
-                        _assaultHoldTimer = assaultHoldSeconds;
-                        _lastDecisionAt = Time.time;
-                    }
-                }
-                break;
-            }
-
-            case AssaultState.Holding:
-            {
-                _isCamping = true;
-                _assaultHoldTimer -= dt;
-
-                float dist = Vector3.Distance(
-                    transform.position,
-                    _currentTarget.transform.position
-                );
-                if (
-                    (dist <= assaultTriggerDistance || _assaultHoldTimer <= 0f)
-                    && Time.time - _lastDecisionAt >= decisionCooldown
-                )
-                {
-                    _assaultState = AssaultState.Striking;
-                    _lastDecisionAt = Time.time;
-                }
-                break;
-            }
-
-            case AssaultState.Striking:
-            {
-                _isCamping = false;
-                Vector3 strikeGoal = _currentTarget.transform.position;
-                ScheduleDestination(strikeGoal, forceImmediate: true);
-
-                if (
-                    Vector3.Distance(transform.position, strikeGoal) <= assaultResetDistance
-                    && Time.time - _lastDecisionAt >= decisionCooldown
-                )
-                {
-                    _assaultState = AssaultState.Moving;
-                    _assaultAmbushPoint = Vector3.zero;
-                    _lastDecisionAt = Time.time;
-                }
-                break;
-            }
-        }
-    }
-
-    void UpdateAfraid()
-    {
-        Vector3 playerPos = _currentTarget.transform.position;
-        float dist = Vector3.Distance(transform.position, playerPos);
-
-        if (dist <= afraidPanicChaseDistance)
-        {
-            ScheduleDestination(playerPos, forceImmediate: true);
-            return;
-        }
-
-        if (
-            _afraidFleeDirection == Vector3.zero
-            || Time.time - _lastAfraidDecision > decisionCooldown
-            || Vector3.Distance(_afraidLastPlayerPos, playerPos) > 1f
-        )
-        {
-            Vector3 away = (transform.position - playerPos);
-            away.y = 0f;
-
-            if (away.sqrMagnitude < 0.001f)
-                away = Random.insideUnitSphere;
-
-            away.y = 0f;
-            if (away.sqrMagnitude < 0.001f)
-                away = Vector3.forward;
-
-            away.Normalize();
-            _afraidFleeDirection = away;
-            _afraidLastPlayerPos = playerPos;
-            _lastAfraidDecision = Time.time;
-        }
-
-        float desired = dist < afraidInnerRadius ? afraidFleeDistance : afraidDesiredRadius;
-        Vector3 goal = playerPos + _afraidFleeDirection * desired;
-        ScheduleDestination(goal, forceImmediate: false);
-    }
-
-    void PickAmbushPoint()
-    {
-        Vector3 predicted = PredictPlayerPosition(_currentTarget, assaultLeadTime);
-        Vector3 velocity = _tracker.GetVelocity(_currentTarget);
-        Vector3 forward =
-            velocity.sqrMagnitude > 0.01f ? velocity.normalized : _currentTarget.transform.forward;
-        Vector3 lateral = new Vector3(-forward.z, 0f, forward.x) * Random.Range(-2f, 2f);
-        _assaultAmbushPoint = SampleReachablePoint(predicted + lateral, 2.5f);
-    }
-
     // --------------------------------------------------------------------
     // Scheduling / Hysteresis
     // --------------------------------------------------------------------
@@ -1993,7 +1805,7 @@ public class EnemyBrainController : MonoBehaviour
     // --------------------------------------------------------------------
     // Path sampling / prediction helpers
     // --------------------------------------------------------------------
-    Vector3 PredictPlayerPosition(PlayerEntity player, float leadTime)
+    public Vector3 PredictPlayerPosition(PlayerEntity player, float leadTime)
     {
         Vector3 pos = player.transform.position;
         Vector3 vel = _tracker.GetVelocity(player);
@@ -2004,7 +1816,7 @@ public class EnemyBrainController : MonoBehaviour
         return ClampToLevel(pos + vel * Mathf.Max(0.1f, leadTime));
     }
 
-    Vector3 SampleReachablePoint(Vector3 near, float radius)
+    public Vector3 SampleReachablePoint(Vector3 near, float radius)
     {
         Vector3 candidate = ClampToLevel(near);
 
