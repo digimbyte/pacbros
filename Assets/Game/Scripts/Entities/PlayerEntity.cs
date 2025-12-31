@@ -126,7 +126,6 @@ public class PlayerEntity : MonoBehaviour
         {
             onKilled.AddListener(() => trails.enabled = false);
             onRespawn.AddListener(() => trails.enabled = true);
-            trails.enabled = !isDead;
         }
 
         _lastDeadState = isDead;

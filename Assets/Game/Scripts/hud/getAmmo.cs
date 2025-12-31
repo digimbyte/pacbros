@@ -1,14 +1,14 @@
 using UnityEngine;
 
-public class getLives : MonoBehaviour
+public class getAmmo : MonoBehaviour
 {
-    [Tooltip("Optional explicit LevelRuntime to read lives from. If null, LevelRuntime.Active will be used.")]
+    [Tooltip("Optional explicit LevelRuntime to read ammo from. If null, LevelRuntime.Active will be used.")]
     public LevelRuntime runtime;
 
-    [Tooltip("Nova Text Mesh Pro TextBlock component to write the lives value to. Use the TextBlock component instance here.")]
+    [Tooltip("Nova Text Mesh Pro TextBlock component to write the ammo value to. Use the TextBlock component instance here.")]
     public Component novaTextBlock;
 
-    private int _lastLives = int.MinValue;
+    private int _lastAmmo = int.MinValue;
 
     void Reset()
     {
@@ -26,13 +26,16 @@ public class getLives : MonoBehaviour
     void Update()
     {
         var lr = runtime != null ? runtime : LevelRuntime.Active;
-        if (lr == null) return;
+        if (lr == null || lr.localPlayerInstance == null) return;
 
-        int lives = lr.currentLives;
-        if (lives != _lastLives)
+        var pe = lr.localPlayerInstance.GetComponent<PlayerEntity>();
+        if (pe == null) return;
+
+        int ammo = pe.ammo;
+        if (ammo != _lastAmmo)
         {
-            _lastLives = lives;
-            string text = lives.ToString();
+            _lastAmmo = ammo;
+            string text = ammo.ToString();
             TrySetTextOnNovaBlock(novaTextBlock, text);
         }
     }
@@ -40,8 +43,12 @@ public class getLives : MonoBehaviour
     private void RefreshImmediate()
     {
         var lr = runtime != null ? runtime : LevelRuntime.Active;
-        if (lr == null) return;
-        _lastLives = lr.currentLives - 1; // force update
+        if (lr == null || lr.localPlayerInstance == null) return;
+
+        var pe = lr.localPlayerInstance.GetComponent<PlayerEntity>();
+        if (pe == null) return;
+
+        _lastAmmo = pe.ammo - 1; // force update
         Update();
     }
 

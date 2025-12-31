@@ -34,8 +34,6 @@ public class EnemyEntity : MonoBehaviour
 
     [Header("Inventory")]
     public ItemId[] inventory = Array.Empty<ItemId>();
-    
-    private Trails trails;
 
     public bool Has(ItemId item)
     {
@@ -122,15 +120,6 @@ public class EnemyEntity : MonoBehaviour
 
     void Awake()
     {
-        trails = GetComponent<Trails>();
-        if (trails != null)
-        {
-            if (onKilled == null) onKilled = new UnityEvent();
-            if (onRespawn == null) onRespawn = new UnityEvent();
-            onKilled.AddListener(() => trails.enabled = false);
-            onRespawn.AddListener(() => trails.enabled = true);
-        }
-
         if (brainController == null)
             brainController = GetComponent<EnemyBrainController>();
     }
@@ -154,10 +143,6 @@ public class EnemyEntity : MonoBehaviour
             onRespawn?.Invoke();
         }
 
-        if (trails != null)
-        {
-            trails.enabled = !isDead;
-        }
     }
 
     void Update()

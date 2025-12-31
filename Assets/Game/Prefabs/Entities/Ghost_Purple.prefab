@@ -606,9 +606,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 4161584084102729630, guid: d9a32d9dffffde84982b2b2d4aa0091a, type: 3}
-        m_TargetAssemblyTypeName: kill, Assembly-CSharp
-        m_MethodName: set_enabled
+      - m_Target: {fileID: 2284610265079509116}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -657,9 +657,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 4161584084102729630, guid: d9a32d9dffffde84982b2b2d4aa0091a, type: 3}
-        m_TargetAssemblyTypeName: kill, Assembly-CSharp
-        m_MethodName: set_enabled
+      - m_Target: {fileID: 2284610265079509116}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

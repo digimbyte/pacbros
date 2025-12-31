@@ -435,6 +435,37 @@ public class EnemyBrainController : MonoBehaviour
             return;
         }
 
+        // If dead, pathfind to nearest enemy spawn point
+        if (_enemy.isDead)
+        {
+            EnemySpawnPoint[] spawns = FindObjectsOfType<EnemySpawnPoint>();
+            if (spawns.Length > 0)
+            {
+                EnemySpawnPoint nearest = null;
+                float minDist = float.MaxValue;
+                foreach (var s in spawns)
+                {
+                    if (s == null) continue;
+                    float d = Vector3.Distance(transform.position, s.transform.position);
+                    if (d < minDist)
+                    {
+                        minDist = d;
+                        nearest = s;
+                    }
+                }
+                if (nearest != null)
+                {
+                    ScheduleDestination(nearest.transform.position, forceImmediate: true);
+                }
+            }
+            else
+            {
+                _pathFollower.ClearPath();
+                _hasDestination = false;
+            }
+            return; // Do not perform other AI behaviors when dead
+        }
+
         if (_tracker == null)
             _tracker = PlayerTracker.EnsureInstance();
 
