@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6019028572318908304}
   - component: {fileID: 2719552132166818557}
   - component: {fileID: 4685702271602259821}
-  m_Layer: 8
+  m_Layer: 13
   m_Name: Dead
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -28,7 +28,7 @@ Transform:
   m_GameObject: {fileID: 1957760676518863932}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: -0, z: -0, w: 0.8660254}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.8, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 7766518045613671595}
   - component: {fileID: 3934065628131784414}
   - component: {fileID: 3465030543957362329}
-  m_Layer: 8
+  m_Layer: 13
   m_Name: Square
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -239,7 +239,7 @@ Transform:
   m_GameObject: {fileID: 2348840176091687288}
   serializedVersion: 2
   m_LocalRotation: {x: 0.5, y: -0, z: -0, w: 0.8660254}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.8, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -436,11 +436,9 @@ GameObject:
   - component: {fileID: 3908160944877652555}
   - component: {fileID: 8241190991842302216}
   - component: {fileID: 6358558277448211888}
-  - component: {fileID: 4161584084102729630}
-  - component: {fileID: 4837892936186115006}
   - component: {fileID: -9030944426474154348}
   - component: {fileID: 36420086281377169}
-  m_Layer: 8
+  m_Layer: 13
   m_Name: Ghost_Green
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -462,6 +460,7 @@ Transform:
   m_Children:
   - {fileID: 2527624984478347847}
   - {fileID: 392138354890297539}
+  - {fileID: 2945816477913457937}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &6900743032598973765
@@ -479,21 +478,20 @@ MonoBehaviour:
   cellSize: 1
   gridOrigin: {x: 0, y: 0, z: 0}
   bindFromLevelRuntime: 1
-  originMode: 0
   gridOffsetX: 0
   gridOffsetZ: 0
-  solidMask:
-    serializedVersion: 2
-    m_Bits: 1088
-  blockExtentsXZ: 0.9
-  blockExtentsY: 0.45
-  stopOnBlocked: 1
+  characterController: {fileID: 0}
   moveSpeed: 6
+  acceleration: 60
   speedMultiplier: 1
-  turnAlignEpsilon: 0.2
+  instantAcceleration: 1
+  stopOnBlocked: 1
   allowBufferedTurnOnBlock: 1
   allowInstantReverse: 1
-  characterController: {fileID: 0}
+  turnAlignEpsilon: 0.2
+  laneSnapMaxSpeed: 1000
+  cornerRadiusScale: 0.5
+  skin: 0.02
 --- !u!143 &2153044852385526397
 CharacterController:
   m_ObjectHideFlags: 0
@@ -561,7 +559,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 4161584084102729630}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: kill, Assembly-CSharp
         m_MethodName: set_enabled
         m_Mode: 6
@@ -612,7 +610,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 4161584084102729630}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: kill, Assembly-CSharp
         m_MethodName: set_enabled
         m_Mode: 6
@@ -637,6 +635,8 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   brainController: {fileID: 0}
+  fearTriggerTime: 10
+  fearTriggerDistance: 1
   inventory: 64000000
 --- !u!114 &8241190991842302216
 MonoBehaviour:
@@ -650,16 +650,31 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3c2d9f9f5c1446178a4c46df1742bb1a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  mode: 0
+  scatterSeconds: 7
+  chaseSeconds: 20
+  sightRadius: 7.5
+  wallMask:
+    serializedVersion: 2
+    m_Bits: 0
   brainType: 0
   repathInterval: 1.2
+  minCellsBetweenAxisRepath: 2
   targetShuffleInterval: 30
   destinationUpdateThreshold: 0.75
+  aStarHealthCheckInterval: 0.75
   centerSnapEpsilon: 0.12
   stoppedSteerEpsilon: 0.6
-  reversePenalty: 250
-  forwardBias: 4
-  tieBreakJitter: 0.35
-  goalDirectionBias: 0.65
+  preTurnWindow: 0.35
+  alwaysBufferAStar: 1
+  astarVote: 2.5
+  marchVote: 1.5
+  randomness: 0.25
+  turnBonus: 0.75
+  straightBonus: 0.1
+  swapXZForMotor: 0
+  invertXForMotor: 0
+  invertZForMotor: 0
   useSharedHeatMap: 1
   sharedHeatRadius: 2.5
   sharedHeatAvoidanceWeight: 0.15
@@ -672,6 +687,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   enemySpawnTag: EnemySpawn
+  portalMask:
+    serializedVersion: 2
+    m_Bits: 0
+  portalTag: Portal
+  portalAvoidHeat: 250
+  portalAllowAfterSeenSeconds: 3
+  portalDesperationAfterNoSightSeconds: 6
   verboseDebug: 0
   maxDebugEntries: 50
   pathDebug: 0
@@ -720,43 +742,6 @@ MonoBehaviour:
   motor: {fileID: 6900743032598973765}
   verboseDebug: 0
   waypointReachRadius: 0.15
---- !u!114 &4161584084102729630
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6081089341591554248}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3aaa714f04caf424aa9665992823a1c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::kill
-  killPlayers: 1
-  killEnemies: 0
-  destroySelfOnTouch: 0
-  selfDestructAfterSeconds: 0
---- !u!65 &4837892936186115006
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6081089341591554248}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 1
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-9030944426474154348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -869,3 +854,73 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!1 &7817524790378291705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2945816477913457937}
+  - component: {fileID: 9218684396002948551}
+  - component: {fileID: 7123000719147580172}
+  m_Layer: 13
+  m_Name: KillZone
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2945816477913457937
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7817524790378291705}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 47722320972896316}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &9218684396002948551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7817524790378291705}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3aaa714f04caf424aa9665992823a1c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::kill
+  killPlayers: 1
+  killEnemies: 0
+  destroySelfOnTouch: 0
+  selfDestructAfterSeconds: 0
+--- !u!65 &7123000719147580172
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7817524790378291705}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1, y: 1, z: 1}
+  m_Center: {x: 0, y: 0, z: 0}

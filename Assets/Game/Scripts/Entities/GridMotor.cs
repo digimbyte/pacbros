@@ -35,10 +35,10 @@ public class GridMotor : MonoBehaviour
     public float skin = 0.02f;
 
     // Hard-coded layer IDs for collision detection
-    const int WALL_LAYER = 6;  // Assuming wall layer is 8
-    const int DOOR_LAYER = 10;  // Assuming door layer is 9
-    const int PLAYER_LAYER = 8; // Assuming player layer is 10
-    const int ENEMY_LAYER = 13; // Assuming enemy layer is 11
+    const int WALL_LAYER = 6;
+    const int DOOR_LAYER = 10;
+    const int PLAYER_LAYER = 8;
+    const int ENEMY_LAYER = 13;
 
     private LayerMask wallMask;
 
@@ -64,6 +64,16 @@ public class GridMotor : MonoBehaviour
 
         // Set up hard-coded layer masks
         wallMask = 1 << WALL_LAYER;
+
+        // Prevent physics collisions between entities so they can pass through
+        int enemyLayer = LayerMask.NameToLayer("Enemy");
+        int playerLayer = LayerMask.NameToLayer("Player");
+        if (enemyLayer != -1 && playerLayer != -1)
+        {
+            Physics.IgnoreLayerCollision(enemyLayer, enemyLayer);
+            Physics.IgnoreLayerCollision(playerLayer, playerLayer);
+            Physics.IgnoreLayerCollision(enemyLayer, playerLayer);
+        }
 
         TryRegisterWithLevel();
     }
@@ -135,11 +145,26 @@ public class GridMotor : MonoBehaviour
             if (_moveProgress >= 1f)
             {
                 // Snap to next grid cell
-                Vector3 delta = targetPos - transform.position;
-                if (characterController && characterController.enabled)
-                    characterController.Move(delta);
-                else
-                    transform.position = targetPos;
+                transform.position = targetPos;
+
+                // Check for tunnel triggers at new position
+                if (characterController != null)
+                {
+                    Collider[] hits = Physics.OverlapSphere(transform.position, 0.5f);
+                    foreach (Collider hit in hits)
+                    {
+                        PairedTunnel pt = hit.GetComponent<PairedTunnel>();
+                        if (pt != null)
+                        {
+                            pt.ExternalTriggerEnter(characterController);
+                        }
+                        PairedPortal pp = hit.GetComponent<PairedPortal>();
+                        if (pp != null)
+                        {
+                            pp.ExternalTriggerEnter(characterController);
+                        }
+                    }
+                }
 
                 _startPos = transform.position;
                 _moveProgress = 0f;
@@ -159,11 +184,7 @@ public class GridMotor : MonoBehaviour
             {
                 // Lerp position
                 Vector3 newPos = Vector3.Lerp(_startPos, targetPos, _moveProgress);
-                Vector3 delta = newPos - transform.position;
-                if (characterController && characterController.enabled)
-                    characterController.Move(delta);
-                else
-                    transform.position = newPos;
+                transform.position = newPos;
             }
         }
     }
@@ -233,7 +254,14 @@ public class GridMotor : MonoBehaviour
         if (Physics.SphereCast(center + Vector3.up * 2f, radius, Vector3.down, out RaycastHit hit, 4f, wallMask))
         {
             if (hit.collider.gameObject != gameObject)
-                return true;
+            {
+                var pe = hit.collider.GetComponent<PlayerEntity>();
+                var ee = hit.collider.GetComponent<EnemyEntity>();
+                var pt = hit.collider.GetComponent<PairedTunnel>();
+                var pp = hit.collider.GetComponent<PairedPortal>();
+                if (pe == null && ee == null && pt == null && pp == null)
+                    return true;
+            }
         }
 
         // Entities NEVER block each other - only walls block movement

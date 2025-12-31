@@ -340,6 +340,10 @@ public class EnemyBrainController : MonoBehaviour
     bool _pendingGhostDisableAfterDoor;
     bool _needsPostDoorRecheck;
 
+    // Stuck pause
+    float _stuckPauseUntil;
+    bool _stuckPauseActive;
+
     // Direction memory (reduces 180 jitter)
     Vector2Int _lastChosenDir; // brain-basis
     float _lastDirChangeAt;
@@ -615,6 +619,47 @@ public class EnemyBrainController : MonoBehaviour
         return new Vector2Int(x, z);
     }
 
+    bool IsCellInvalidForDestination(Vector2Int cell)
+    {
+        Vector3 worldPos = GridToWorldCenter(cell);
+        // Check enemy spawns
+        EnemySpawnPoint[] spawns = FindObjectsOfType<EnemySpawnPoint>();
+        foreach (var spawn in spawns)
+        {
+            if (Vector3.Distance(worldPos, spawn.transform.position) < 0.5f)
+            {
+                return true;
+            }
+        }
+        // Check doors
+        KeycardDoorController[] doors = FindObjectsOfType<KeycardDoorController>();
+        foreach (var door in doors)
+        {
+            if (Vector3.Distance(worldPos, door.transform.position) < 0.5f)
+            {
+                return true;
+            }
+        }
+        // Check tunnels/portals
+        PairedTunnel[] tunnels = FindObjectsOfType<PairedTunnel>();
+        foreach (var tunnel in tunnels)
+        {
+            if (Vector3.Distance(worldPos, tunnel.transform.position) < 0.5f)
+            {
+                return true;
+            }
+        }
+        PairedPortal[] portals = FindObjectsOfType<PairedPortal>();
+        foreach (var portal in portals)
+        {
+            if (Vector3.Distance(worldPos, portal.transform.position) < 0.5f)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     Vector2Int MotorCurDirBrain()
     {
         return _motor != null ? MotorToBrainDir(_motor.GetCurrentDirection()) : Vector2Int.zero;
@@ -740,6 +785,13 @@ public class EnemyBrainController : MonoBehaviour
 
     public void ScheduleDestination(Vector3 worldPos, bool forceImmediate)
     {
+        Vector2Int cell = WorldToGrid(worldPos);
+        if (IsCellInvalidForDestination(cell))
+        {
+            // Don't schedule destinations on invalid cells
+            return;
+        }
+
         _desiredDestination = ClampToLevel(worldPos);
         _hasDestination = true;
 
@@ -876,6 +928,14 @@ public class EnemyBrainController : MonoBehaviour
 
     void TickMoveDecision()
     {
+        // If stuck pause is active, wait until timeout
+        if (_stuckPauseActive)
+        {
+            if (Time.time < _stuckPauseUntil)
+                return;
+            _stuckPauseActive = false;
+        }
+
         var curDirBrain = MotorCurDirBrain();
         bool blockedForward = (curDirBrain != Vector2Int.zero && MotorIsBlockedBrain(curDirBrain));
 
@@ -960,8 +1020,8 @@ public class EnemyBrainController : MonoBehaviour
             if (MotorIsBlockedBrain(d))
                 continue;
 
-            // HARD RULE: cannot reverse unless dead end (or stuck/panic)
-            if (curDirBrain != Vector2Int.zero && d == rev2 && !isDeadEnd && !_isStuck && !_inPanic)
+            // HARD RULE: cannot reverse unless dead end or panic
+            if (curDirBrain != Vector2Int.zero && d == rev2 && !isDeadEnd && !_inPanic)
                 continue;
 
             float s = 1f;
@@ -1464,7 +1524,7 @@ public class EnemyBrainController : MonoBehaviour
         return _panic >= panicMax;
     }
 
-    void EnterPanic()
+    public void EnterPanic()
     {
         _inPanic = true;
 
@@ -1650,6 +1710,13 @@ public class EnemyBrainController : MonoBehaviour
 
         if (_isStuck)
         {
+            if (!_stuckPauseActive)
+            {
+                _stuckPauseActive = true;
+                _stuckPauseUntil = Time.time + 0.5f;
+                MotorSetDesiredBrain(Vector2Int.zero); // Stop moving
+            }
+
             _nextRepathTime = Time.time;
             _pathFollower.ClearPath();
             _pathPending = false;

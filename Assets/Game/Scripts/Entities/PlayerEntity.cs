@@ -29,6 +29,9 @@ public class PlayerEntity : MonoBehaviour
     [Header("Resources")]
     [Min(0)]
     public int ammo;
+    
+    private Trails trails;
+
     public bool Has(ItemId item)
     {
         if (item == ItemId.None) return false;
@@ -118,6 +121,14 @@ public class PlayerEntity : MonoBehaviour
 
     void Start()
     {
+        trails = GetComponent<Trails>();
+        if (trails != null)
+        {
+            onKilled.AddListener(() => trails.enabled = false);
+            onRespawn.AddListener(() => trails.enabled = true);
+            trails.enabled = !isDead;
+        }
+
         _lastDeadState = isDead;
 
         if (onKilled == null) onKilled = new UnityEvent();

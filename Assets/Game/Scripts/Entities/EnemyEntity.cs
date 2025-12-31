@@ -26,8 +26,16 @@ public class EnemyEntity : MonoBehaviour
     [Tooltip("Reference to the brain controller component.")]
     public EnemyBrainController brainController;
 
+    [Header("Fear")]
+    [Tooltip("Time in seconds after which being near enemy spawn triggers fear.")]
+    public float fearTriggerTime = 10f;
+    [Tooltip("Distance to enemy spawn to trigger fear.")]
+    public float fearTriggerDistance = 1f;
+
     [Header("Inventory")]
     public ItemId[] inventory = Array.Empty<ItemId>();
+    
+    private Trails trails;
 
     public bool Has(ItemId item)
     {
@@ -114,7 +122,80 @@ public class EnemyEntity : MonoBehaviour
 
     void Awake()
     {
+        trails = GetComponent<Trails>();
+        if (trails != null)
+        {
+            if (onKilled == null) onKilled = new UnityEvent();
+            if (onRespawn == null) onRespawn = new UnityEvent();
+            onKilled.AddListener(() => trails.enabled = false);
+            onRespawn.AddListener(() => trails.enabled = true);
+        }
+
         if (brainController == null)
             brainController = GetComponent<EnemyBrainController>();
+    }
+
+    // Track last dead state for change detection
+    bool _lastDeadState = false;
+    bool _killedEventTriggered = false;
+
+    void Start()
+    {
+        _lastDeadState = isDead;
+
+        // Invoke event based on initial state
+        if (isDead)
+        {
+            _killedEventTriggered = true;
+            onKilled?.Invoke();
+        }
+        else
+        {
+            onRespawn?.Invoke();
+        }
+
+        if (trails != null)
+        {
+            trails.enabled = !isDead;
+        }
+    }
+
+    void Update()
+    {
+        if (isDead != _lastDeadState)
+        {
+            _lastDeadState = isDead;
+            if (isDead)
+            {
+                if (!_killedEventTriggered)
+                {
+                    _killedEventTriggered = true;
+                    onKilled?.Invoke();
+                }
+            }
+            else
+            {
+                _killedEventTriggered = false;
+                onRespawn?.Invoke();
+            }
+        }
+
+        // Check for fear trigger near enemy spawns
+        if (brainController != null && !isDead)
+        {
+            Clock clock = FindObjectOfType<Clock>();
+            if (clock != null && clock.Seconds > fearTriggerTime)
+            {
+                EnemySpawnPoint[] spawns = FindObjectsOfType<EnemySpawnPoint>();
+                foreach (var spawn in spawns)
+                {
+                    if (Vector3.Distance(transform.position, spawn.transform.position) < fearTriggerDistance)
+                    {
+                        brainController.EnterPanic();
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

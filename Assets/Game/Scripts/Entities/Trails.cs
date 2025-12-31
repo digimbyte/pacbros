@@ -35,11 +35,21 @@ public class Trails : MonoBehaviour
     [Tooltip("Delay (seconds) after leaving a tile before spawning fire there. Prevents spawning under actor.")]
     public float fireSpawnDelay = 0.2f;
 
-    // Track pending and completed spawns to avoid duplicates.
-    HashSet<Vector2Int> _pendingSpawnCells = new HashSet<Vector2Int>();
-    HashSet<Vector2Int> _spawnedCells = new HashSet<Vector2Int>();
+    // Track spawned trail objects for cleanup
+    Dictionary<Vector2Int, GameObject> _spawnedTrailObjects = new Dictionary<Vector2Int, GameObject>();
     [Tooltip("How many queued spawns to process per frame when catching up.")]
     public int spawnBatchSize = 8;
+
+    // Track cells that are pending spawn or already spawned to avoid duplicates
+    HashSet<Vector2Int> _pendingSpawnCells = new HashSet<Vector2Int>();
+    HashSet<Vector2Int> _spawnedCells = new HashSet<Vector2Int>();
+
+    // Player position tracking to prevent spawning on player
+    PlayerTracker _playerTracker;
+    [Tooltip("Minimum distance (in cells) from player to allow spawning.")]
+    public int playerSafetyRadius = 1;
+
+    PlayerEntity _playerEntity;
 
     struct PendingSpawn
     {
@@ -56,6 +66,12 @@ public class Trails : MonoBehaviour
     {
         // Initialise references and heat state.
         _motor = GetComponent<GridMotor>();
+        _playerTracker = PlayerTracker.EnsureInstance();
+        _playerEntity = GetComponent<PlayerEntity>();
+        if (_playerEntity != null)
+        {
+            _playerEntity.onKilled.AddListener(ClearAllTrails);
+        }
 
         // Ensure the smoke system is not playing on awake. We'll enable it from heat events.
         if (smokeSystem != null)
@@ -78,6 +94,10 @@ public class Trails : MonoBehaviour
     {
         Heat.OnStageChanged -= HandleStageChanged;
         Heat.OnHeatUnitsChanged -= HandleHeatChanged;
+        if (_playerEntity != null)
+        {
+            _playerEntity.onKilled.RemoveListener(ClearAllTrails);
+        }
     }
 
     void Update()
@@ -96,12 +116,18 @@ public class Trails : MonoBehaviour
         // Fire trail: when active and we have a motor, spawn on grid when entering a new cell while moving.
         if (_fireTrailActive && _motor != null)
         {
-            // Compute current cell consistent with GridMotor.CurrentCell logic.
-            Vector3 origin = _motor.EffectiveOrigin();
-            float cellSize = Mathf.Max(0.0001f, _motor.cellSize);
-            int cx = Mathf.RoundToInt((transform.position.x - origin.x) / cellSize);
-            int cz = Mathf.RoundToInt((transform.position.z - origin.z) / cellSize);
-            Vector2Int cur = new Vector2Int(cx, cz);
+            // Compute current cell using LevelRuntime grid for consistency
+            Vector2Int cur = new Vector2Int(int.MinValue, int.MinValue);
+            Vector3 origin = Vector3.zero;
+            float cellSize = 1f;
+            if (LevelRuntime.Active != null)
+            {
+                origin = LevelRuntime.Active.gridOrigin;
+                cellSize = Mathf.Max(0.0001f, LevelRuntime.Active.cellSize);
+                int cx = Mathf.RoundToInt((transform.position.x - origin.x) / cellSize);
+                int cz = Mathf.RoundToInt((transform.position.z - origin.z) / cellSize);
+                cur = new Vector2Int(cx, cz);
+            }
             if (cur != _lastCell)
             {
                 // When entering a new cell, schedule delayed spawns for all cells we left
@@ -111,6 +137,12 @@ public class Trails : MonoBehaviour
                     EnqueueCellsBetween(_lastCell, cur, origin, cellSize);
                 }
                 _lastCell = cur;
+            }
+
+            // Periodically clean up pending spawns that are now unsafe due to player movement
+            if (Time.frameCount % 10 == 0) // Every 10 frames
+            {
+                CleanupUnsafePendingSpawns();
             }
         }
     }
@@ -128,6 +160,8 @@ public class Trails : MonoBehaviour
         // Keep existing stage-based single-time fire spawns (legacy behaviour).
         if (newStage < fireStageThreshold) return;
         if (_spawnedStages.Contains(newStage)) return;
+        // Don't spawn stage fires on the player entity to avoid self-damage
+        if (_playerEntity != null) return;
         _spawnedStages.Add(newStage);
         SpawnFires(newStage);
     }
@@ -197,6 +231,34 @@ public class Trails : MonoBehaviour
             // clear pending/spawned cells so a new trail starts fresh
             _pendingSpawnCells.Clear();
             _spawnedCells.Clear();
+            // destroy and clear spawned trail objects
+            foreach (var obj in _spawnedTrailObjects.Values)
+            {
+                if (obj != null)
+                    Destroy(obj);
+            }
+            _spawnedTrailObjects.Clear();
+        }
+    }
+
+    void ClearAllTrails()
+    {
+        // Clear pending/spawned cells
+        _pendingSpawnCells.Clear();
+        _spawnedCells.Clear();
+        // Destroy and clear spawned trail objects
+        foreach (var obj in _spawnedTrailObjects.Values)
+        {
+            if (obj != null)
+                Destroy(obj);
+        }
+        _spawnedTrailObjects.Clear();
+        // Clear spawn queue
+        _spawnQueue.Clear();
+        if (_spawnProcessorCoroutine != null)
+        {
+            StopCoroutine(_spawnProcessorCoroutine);
+            _spawnProcessorCoroutine = null;
         }
     }
 
@@ -227,7 +289,11 @@ public class Trails : MonoBehaviour
 
         if (!string.IsNullOrEmpty(fireRegistryKey) && LevelRuntime.Active != null)
         {
-            LevelRuntime.Active.InstantiateRegistryPrefab(fireRegistryKey, pos, Quaternion.identity, parent);
+            GameObject spawnedObject = LevelRuntime.Active.InstantiateRegistryPrefab(fireRegistryKey, pos, Quaternion.identity, parent);
+            if (spawnedObject != null)
+            {
+                _spawnedTrailObjects[cell] = spawnedObject;
+            }
         }
         else
         {
@@ -262,6 +328,11 @@ public class Trails : MonoBehaviour
             var cell = line[i];
             if (_spawnedCells.Contains(cell) || _pendingSpawnCells.Contains(cell))
                 continue;
+            
+            // Don't enqueue cells that are too close to players
+            if (!IsCellSafeForSpawning(cell))
+                continue;
+                
             ScheduleSpawnForCell(cell, origin, cellSize);
         }
     }
@@ -289,8 +360,8 @@ public class Trails : MonoBehaviour
                 if (_spawnQueue[i].readyTime <= now)
                 {
                     var p = _spawnQueue[i];
-                    // spawn if still pending and not already spawned
-                    if (_pendingSpawnCells.Contains(p.cell) && !_spawnedCells.Contains(p.cell))
+                    // Check if player is too close to this cell before spawning
+                    if (IsCellSafeForSpawning(p.cell) && _pendingSpawnCells.Contains(p.cell) && !_spawnedCells.Contains(p.cell))
                     {
                         SpawnFireAtCell(p.cell, p.origin, p.cellSize);
                         _spawnedCells.Add(p.cell);
@@ -317,5 +388,154 @@ public class Trails : MonoBehaviour
             }
         }
         _spawnProcessorCoroutine = null;
+    }
+
+    bool IsCellSafeForSpawning(Vector2Int cell)
+    {
+        if (_playerTracker == null || !_playerTracker.HasPlayers)
+            return true; // No players, safe to spawn
+
+        // Prevent spawning on the current cell of this trail entity
+        Vector2Int myCell = GetEntityCell(transform.position);
+        if (cell == myCell) return false;
+
+        // Check all players
+        foreach (var player in _playerTracker.Players)
+        {
+            if (player == null) continue;
+
+            // Get player's current cell
+            Vector2Int playerCell = GetEntityCell(player.transform.position);
+            
+            // Check if the spawn cell is within the safety radius of any player
+            int dx = Mathf.Abs(cell.x - playerCell.x);
+            int dy = Mathf.Abs(cell.y - playerCell.y);
+            
+            if (dx <= playerSafetyRadius && dy <= playerSafetyRadius)
+                return false; // Too close to a player
+        }
+
+        // Additional world distance check to ensure at least 0.6f away
+        Vector3 gridOrigin = LevelRuntime.Active != null ? LevelRuntime.Active.gridOrigin : Vector3.zero;
+        float gridCellSize = LevelRuntime.Active != null ? LevelRuntime.Active.cellSize : 1f;
+        Vector3 cellWorldPos = gridOrigin + new Vector3(cell.x * gridCellSize, 0f, cell.y * gridCellSize);
+
+        // Check distance from this entity
+        if (Vector3.Distance(transform.position, cellWorldPos) < 0.6f) return false;
+
+        // Check distance from players
+        foreach (var player in _playerTracker.Players)
+        {
+            if (player == null) continue;
+            if (Vector3.Distance(player.transform.position, cellWorldPos) < 0.6f) return false;
+        }
+
+        return true; // Safe to spawn
+    }
+
+    // Get all cells currently occupied by players (for debugging/visualization)
+    public List<Vector2Int> GetPlayerOccupiedCells()
+    {
+        var occupied = new List<Vector2Int>();
+        if (_playerTracker == null || !_playerTracker.HasPlayers)
+            return occupied;
+
+        foreach (var player in _playerTracker.Players)
+        {
+            if (player == null) continue;
+            Vector2Int playerCell = GetEntityCell(player.transform.position);
+            occupied.Add(playerCell);
+        }
+
+        return occupied;
+    }
+
+    // Get all cells that are blocked due to player proximity
+    public List<Vector2Int> GetPlayerBlockedCells()
+    {
+        var blocked = new List<Vector2Int>();
+        var playerCells = GetPlayerOccupiedCells();
+        
+        foreach (var playerCell in playerCells)
+        {
+            for (int dx = -playerSafetyRadius; dx <= playerSafetyRadius; dx++)
+            {
+                for (int dy = -playerSafetyRadius; dy <= playerSafetyRadius; dy++)
+                {
+                    Vector2Int cell = new Vector2Int(playerCell.x + dx, playerCell.y + dy);
+                    if (!blocked.Contains(cell))
+                        blocked.Add(cell);
+                }
+            }
+        }
+
+        return blocked;
+    }
+
+    // Convert world position to grid cell coordinates
+    Vector2Int GetEntityCell(Vector3 worldPosition)
+    {
+        if (LevelRuntime.Active == null)
+            return Vector2Int.zero;
+
+        var lr = LevelRuntime.Active;
+        Vector3 relativePos = worldPosition - lr.gridOrigin;
+        int x = Mathf.RoundToInt(relativePos.x / lr.cellSize);
+        int y = Mathf.RoundToInt(relativePos.z / lr.cellSize); // Note: Z is Y in 2D grid
+        return new Vector2Int(x, y);
+    }
+
+    void CleanupUnsafePendingSpawns()
+    {
+        // Remove pending spawns that are no longer safe due to player movement
+        var toRemove = new List<Vector2Int>();
+        foreach (var cell in _pendingSpawnCells)
+        {
+            if (!IsCellSafeForSpawning(cell))
+            {
+                toRemove.Add(cell);
+            }
+        }
+
+        foreach (var cell in toRemove)
+        {
+            _pendingSpawnCells.Remove(cell);
+            // Also remove from the spawn queue
+            for (int i = _spawnQueue.Count - 1; i >= 0; i--)
+            {
+                if (_spawnQueue[i].cell == cell)
+                {
+                    _spawnQueue.RemoveAt(i);
+                }
+            }
+        }
+
+        // Also clean up already spawned objects that are now unsafe
+        CleanupUnsafeSpawnedObjects();
+    }
+
+    void CleanupUnsafeSpawnedObjects()
+    {
+        var toRemove = new List<Vector2Int>();
+        foreach (var kvp in _spawnedTrailObjects)
+        {
+            Vector2Int cell = kvp.Key;
+            GameObject obj = kvp.Value;
+
+            if (!IsCellSafeForSpawning(cell) || obj == null)
+            {
+                toRemove.Add(cell);
+                if (obj != null)
+                {
+                    Destroy(obj);
+                }
+            }
+        }
+
+        foreach (var cell in toRemove)
+        {
+            _spawnedTrailObjects.Remove(cell);
+            _spawnedCells.Remove(cell);
+        }
     }
 }

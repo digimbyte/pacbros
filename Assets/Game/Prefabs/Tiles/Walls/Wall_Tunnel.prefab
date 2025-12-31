@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3847592844252714852}
   - component: {fileID: -6240180108987185802}
   - component: {fileID: 2762224662898303185}
-  m_Layer: 11
+  m_Layer: 7
   m_Name: Wall_Tunnel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -52,7 +52,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -924,7 +924,7 @@ GameObject:
   - component: {fileID: 7999288505634699328}
   - component: {fileID: 8365454668258839834}
   m_Layer: 11
-  m_Name: Cube
+  m_Name: detection
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -960,7 +960,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

@@ -30,7 +30,18 @@ public class kill : MonoBehaviour
         TryHandleTouch(other.gameObject, transform.position, other.transform.position);
     }
 
+    void OnTriggerStay(Collider other)
+    {
+        TryHandleTouch(other.gameObject, transform.position, other.transform.position);
+    }
+
     void OnCollisionEnter(Collision collision)
+    {
+        Vector3 contactPoint = collision.contacts.Length > 0 ? collision.contacts[0].point : transform.position;
+        TryHandleTouch(collision.gameObject, contactPoint, contactPoint);
+    }
+
+    void OnCollisionStay(Collision collision)
     {
         Vector3 contactPoint = collision.contacts.Length > 0 ? collision.contacts[0].point : transform.position;
         TryHandleTouch(collision.gameObject, contactPoint, contactPoint);
